@@ -5,6 +5,7 @@ var $form = $('#supplierForm'),
     $country = $('#country'),
     $phonecode = $('.phonecode'),
     $supplier = $('.supplier'),
+    $a_supplier = $('.supplier-select'),
     $label = $("#lblName"),
     $name = $('#name'),
     $divrccm = $('#divRccm'),
@@ -17,8 +18,18 @@ var $form = $('#supplierForm'),
     $mobile = $('#mobile'),
     $row = $('#supplierRow'),
     $score = $('#count_supplier'),
-    $input = $('.input');
+    $input = $('.input'),
+    $suppliers = $('.suppliers'),
+    $list = $('#supplierList'),
+    $search = $('#search'),
+    $progress = $('.progress-container'),
+    $spinner = $('.cssload-container'),
+    $cname = $('.name'),
+    $emailto = $('#emailto'),
+    $type = $('#type'),
+    $cemail = $('.email');
 $(function () {
+    /*** create ***/
     $table.dataTable({
         "sPaginationType": "full_numbers",
         "sDom": "<'row'<'col-sm-6'l><'col-sm-6'f>r>t<'row'<'col-sm-6'i><'col-sm-6'p>>",
@@ -161,6 +172,51 @@ $(function () {
             }
         });
     });
+
+    /*** information ***/
+    $suppliers.on('click', function () {
+        $spinner.show();
+        var id = $(this).attr('id');
+        $.get('listing/' + id, function (data) {
+            $list.empty();
+            $.each(data, function (index, modelObj) {
+                $list.append("<tr><td class='list-group-item'><a href='#' id='" + modelObj.id + "' onclick='selected(this)' class='supplier capitalize'>" + modelObj.name + "</a></td></tr>");
+            });
+            $spinner.hide()
+        })
+    });
+    $search.on('keyup', function () {
+        var searchTerm = $(this).val().toLowerCase();
+        $('#supplierList tbody tr').each(function () {
+            var lineStr = $(this).text().toLowerCase();
+            if (lineStr.indexOf(searchTerm) === -1) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    });
+    $a_supplier.on('click', function () {
+        $progress.show();
+        var id = $(this).attr('id');
+        $.get('supplier/' + id, function (data) {
+            if (data.type === '0') {
+                $type.html(" entreprise");
+                $divrccm.show()
+            } else {
+                $type.html(" particulier");
+                $divrccm.hide()
+            }
+            $cname.html(data.name);
+            $cemail.html(data.email);
+            $emailto.prop("href", "mailto:" + data.email);
+            $phone.html("+" + data.phone);
+            $mobile.html("+" + data.mobile);
+            $address.html(data.address);
+            $rccm.html(data.rccm);
+            $progress.hide();
+        })
+    })
 });
 function cleaner() {
     $form.trigger('reset');
@@ -222,5 +278,26 @@ function supplierEdit(obg) {
 function score() {
     $.get('../score', function (data) {
         $score.html(data)
+    })
+}
+function selected(obj) {
+    $progress.show();
+    var id = $(obj).attr('id');
+    $.get('supplier/' + id, function (data) {
+        if (data.type === '0') {
+            $type.html(" entreprise");
+            $divrccm.show()
+        } else {
+            $type.html(" particulier");
+            $divrccm.hide()
+        }
+        $cname.html(data.name);
+        $cemail.html(data.email);
+        $emailto.prop("href", "mailto:" + data.email);
+        $phone.html("+" + data.phone);
+        $mobile.html("+" + data.mobile);
+        $address.html(data.address);
+        $rccm.html(data.rccm);
+        $progress.hide();
     })
 }
