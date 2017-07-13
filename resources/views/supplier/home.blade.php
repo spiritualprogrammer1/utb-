@@ -46,7 +46,7 @@
                                 <tr>
                                     <td class="list-group-item">
                                         <a href="#" id="{{$supplier->id}}"
-                                           class="supplier capitalize"> {{$supplier->name}} </a>
+                                           class="supplier-select capitalize"> {{$supplier->name}} </a>
                                     </td>
                                 </tr>
                             @empty
@@ -134,112 +134,5 @@
 @endsection
 
 @section('scripts')
-    <script>
-        var $suppliers = $('.suppliers'),
-            $list = $('#supplierList'),
-            $search = $('#search'),
-            $progress = $('.progress-container'),
-            $suppler = $('.supplier'),
-            $spinner = $('.cssload-container'),
-            $divrccm = $('#divRccm'),
-            $name = $('.name'),
-            $emailto = $('#emailto'),
-            $type = $('#type'),
-            $phone = $('#phone'),
-            $mobile = $('#mobile'),
-            $address = $('#address'),
-            $rccm = $('#rccm'),
-            $email = $('.email');
-        $(function () {
-            $suppliers.on('click', function () {
-                $spinner.show();
-                var id = $(this).attr('id');
-                $.get('listing/' + id, function (data) {
-                    $list.empty();
-                    $.each(data, function (index, modelObj) {
-                        $list.append("<tr><td class='list-group-item'><a href='#' id='" + modelObj.id + "' onclick='selected(this)' class='supplier capitalize'>" + modelObj.name + "</a></td></tr>");
-                    });
-                    $spinner.hide()
-                })
-            });
-            $search.on('keyup', function () {
-                var searchTerm = $(this).val().toLowerCase();
-                $('#supplierList tbody tr').each(function () {
-                    var lineStr = $(this).text().toLowerCase();
-                    if (lineStr.indexOf(searchTerm) === -1) {
-                        $(this).hide();
-                    } else {
-                        $(this).show();
-                    }
-                });
-            });
-            $suppler.on('click', function () {
-                $progress.show();
-                var id = $(this).attr('id');
-                $.get('supplier/' + id, function (data) {
-                    if (data.type === '0') {
-                        $type.html(" entreprise");
-                        $divrccm.show()
-                    } else {
-                        $type.html(" particulier");
-                        $divrccm.hide()
-                    }
-                    $name.html(data.name);
-                    $email.html(data.email);
-                    $emailto.prop("href", "mailto:" + data.email);
-                    $phone.html("+" + data.phone);
-                    $mobile.html("+" + data.mobile);
-                    $address.html(data.address);
-                    $rccm.html(data.rccm);
-                    $progress.hide();
-                })
-            })
-        });
-
-        function selected(obj) {
-            var id = $(obj).attr('id');
-            $.get('supplier/' + id, function (data) {
-                if (data.type == 0) {
-                    $('#type').html("entreprise");
-                    $('#divRccm').show()
-                } else {
-                    $('#type').html("particulier");
-                    $('#divRccm').hide()
-                }
-                $('.name').html(data.name);
-                $('#email').html(data.email);
-                $('#emailto').prop("href", "mailto:" + data.email);
-                $('#phone').html("+" + data.phone);
-                $('#mobile').html("+" + data.mobile);
-                $('#address').html(data.address);
-                $('#rccm').html(data.rccm);
-            })
-        }
-
-        function supplierChosen(sel) {
-            var id = sel.attr('id');
-            $.ajax({
-                type: 'get',
-                url: '{{route('/show')}}',
-                data: {'id': id},
-                dataType: 'json',
-                success: function (data) {
-                    if (data.type == 0) {
-                        $('#type').html("entreprise");
-                        $('#divRccm').show()
-                    } else {
-                        $('#type').html("particulier");
-                        $('#divRccm').hide()
-                    }
-                    $('.name').html(data.name);
-                    $('#email').html(data.email);
-                    $('#emailto').prop("href", "mailto:" + data.email);
-                    $('#phone').html("+" + data.phone);
-                    $('#mobile').html("+" + data.mobile);
-                    $('#address').html(data.address);
-                    $('#rccm').html(data.rccm);
-                }
-            });
-        }
-    </script>
+    <script src="{{asset('assets/js/scripts/supplier.js')}}"></script>
 @endsection
