@@ -86,11 +86,10 @@
                                         <input name="sub_family" type="hidden" value="1">
                                         <div class="form-group">
                                             <label>Famille</label>
-                                            <select class="chosen-select form-control" id="families" name="category"
-                                                    required>
-                                                <option selected disabled>CHOISISEZ UNE FAMILLE</option>
+                                            <select class="chosen-select form-control" data-placeholder="CHOISISEZ UNE FAMILLE..." id="families" name="category">
+                                                <option></option>
                                                 @forelse($categories as $key=>$category)
-                                                    <option value="{{$category->id}}">{{strtoupper($category->name)}}</option>
+                                                    <option value="{{$category->id}}" class="uppercase">{{$category->name}}</option>
                                                 @empty
                                                     <option disabled>AUCUNE FAMILLE DISPONIBLE</option>
                                                 @endforelse
