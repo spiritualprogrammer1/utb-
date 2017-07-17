@@ -25,7 +25,7 @@ var $table_1 = $('.table_1'),
     $sub_family_edit = $('.sub-family-edit'),
     /*** end ***/
 
-    /*** Suh Family ***/
+    /*** type ***/
     $type_form = $('#typeForm'),
     $type_name = $('#type_name'),
     $type_id = $('#type_id'),
@@ -34,7 +34,8 @@ var $table_1 = $('.table_1'),
     $type_reset = $('#type_reset'),
     $type_edit = $('.type-edit'),
     $type_row = $('#typeRow');
-/*** end ***/
+    /*** end ***/
+
 $(function () {
     $table_1.dataTable({
         "sPaginationType": "full_numbers",
@@ -284,12 +285,12 @@ function family_edit(obj) {
     $family_name.addClass('loading-input');
     var id = $(obj).attr('id'),
         type = "family";
-    $family_submit.val('edit');
-    $family_submit.html('<i class="fa fa-pencil"></i> modifier');
-    $family_submit.removeClass('btn-success');
-    $family_submit.addClass('btn-info');
-    $family_form.attr('action', 'stock_update/' + id);
     $.get('stock_edit/' + type + '/' + id, function (data) {
+        $family_submit.val('edit');
+        $family_form.attr('action', 'stock_update/' + id);
+        $family_submit.html('<i class="fa fa-pencil"></i> modifier');
+        $family_submit.removeClass('btn-success');
+        $family_submit.addClass('btn-info');
         $family_name.val(data.name);
         $family_id.val(data.id);
         $family_name.removeClass('loading-input');
@@ -322,10 +323,10 @@ function sub_family_edit(obj) {
     $sub_family_reset.show();
     var id = $(obj).attr('id'),
         type = "sub_family";
-    $sub_family_submit.val('edit');
-    $sub_family_submit.html('<i class="fa fa-pencil"></i> modifier');
-    $sub_family_form.attr('action', 'stock_update/' + id);
     $.get('stock_edit/' + type + '/' + id, function (data) {
+        $sub_family_submit.val('edit');
+        $sub_family_submit.html('<i class="fa fa-pencil"></i> modifier');
+        $sub_family_form.attr('action', 'stock_update/' + id);
         $sub_family_name.val(data.name);
         $sub_family_id.val(data.id);
         $families.val(data.category_id);
