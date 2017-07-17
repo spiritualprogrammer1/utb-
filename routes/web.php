@@ -52,10 +52,29 @@ Route::group(['middleware' => ['auth']], function () {
      ** SETTINGS ROUTES **
      ********************/
     Route::group(['prefix' => 'setting'], function () {
-        Route::resource('/setting', 'SettingController');
+        Route::resource('setting', 'SettingController');
+
+        /*** stock settings ***/
+        Route::get('stock', 'SettingController@stock');
+        Route::post('stock_store', 'SettingController@stock_store')->name('stock_store');
+        Route::put('stock_update/{id}', 'SettingController@stock_update')->name('warehouse_update');
+        Route::get('stock_edit/{type}/{id}', 'SettingController@stock_edit');
+        Route::get('families', 'SettingController@families');
+        /*** end ***/
+
+        /*** Store settings ***/
+        Route::get('warehouse', 'SettingController@warehouse');
+        Route::post('warehouse_store', 'SettingController@warehouse_store')->name('warehouse_store');
+        Route::get('warehouse_edit/{type}/{id}', 'SettingController@warehouse_edit');
+        Route::put('warehouse_update/{id}', 'SettingController@warehouse_update')->name('warehouse_update');
+        Route::get('rays/{type}', 'SettingController@rays');
+        Route::get('shelves/{type}/{id}', 'SettingController@shelves');
+        Route::get('blocs/{id}', 'SettingController@blocs');
+        /*** end ***/
+
         Route::get('/category', 'SettingController@category');
-        Route::get('/stock', 'SettingController@stock');
-        Route::get('/shop', 'SettingController@shop');
+
+
         Route::get('/show', [
             'uses' => 'SupplierController@show',
             'as' => '/show'
@@ -108,61 +127,6 @@ Route::group(['middleware' => ['auth']], function () {
         /************* END ***********/
 
 
-        /*********** CATEGORY **************/
-        Route::post('/category_create', [
-            'uses' => 'SettingController@categoryCreate',
-            'as' => '/category_create'
-        ]);
-
-        Route::post('/category_update', [
-            'uses' => 'SettingController@categoryUpdate',
-            'as' => '/category_update'
-        ]);
-
-        Route::get('/category_get', function () {
-            $id = Input::get('id');
-            $category = App\Category::findOrFail($id);
-            return Response::json($category);
-        });
-        /************* END ***********/
-
-
-        /********** SUB CATEGORY **********/
-        Route::post('/sub_category_create', [
-            'uses' => 'SettingController@subCategoryCreate',
-            'as' => '/sub_category_create'
-        ]);
-
-        Route::get('/sub_category_get', function () {
-            $id = Input::get('id');
-            $sub = App\Sub_category::findOrFail($id);
-            return Response::json($sub);
-        });
-
-        Route::post('/sub_category_update', [
-            'uses' => 'SettingController@subCategoryUpdate',
-            'as' => '/sub_category_update'
-        ]);
-        /************* End ****************/
-
-
-        /********** SUB CATEGORY **********/
-        Route::post('/type_create', [
-            'uses' => 'SettingController@typeCreate',
-            'as' => '/type_create'
-        ]);
-
-        Route::get('/type_get', function () {
-            $id = Input::get('id');
-            $type = App\Type::findOrFail($id);
-            return Response::json($type);
-        });
-
-        Route::post('/type_update', [
-            'uses' => 'SettingController@typeUpdate',
-            'as' => '/type_update'
-        ]);
-        /************* End ****************/
 
         /*********** RAY **************/
         Route::post('/ray_create', [
