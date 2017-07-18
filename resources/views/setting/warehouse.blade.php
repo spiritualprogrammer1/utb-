@@ -1,4 +1,4 @@
-@section('title') Parametrage du magasin@endsection
+@section('title') Parametrage du magasin @endsection
 @extends('layouts.master')
 @section('content')
     <header class="header bg-light lt b-b b-light">
