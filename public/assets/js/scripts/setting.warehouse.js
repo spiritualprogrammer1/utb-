@@ -87,7 +87,6 @@ $(function () {
             type: type,
             data: formData,
             success: function (data) {
-                ray_reset();
                 rays();
                 toastr[status](msg, "<span class='uppercase'>" + data.name + "</span>!");
                 toastr.options.preventDuplicates = true;
@@ -102,6 +101,7 @@ $(function () {
                     $('#ray' + data.id).replaceWith(row);
                 }
                 $ray_submit.button('reset');
+                ray_reset();
             },
             error: function (jqXhr) {
                 if (jqXhr.status === 401)
@@ -152,7 +152,6 @@ $(function () {
             type: type,
             data: formData,
             success: function (data) {
-                shelf_reset();
                 toastr[status](msg, "<span class='uppercase'>" + data.name + "</span>!");
                 toastr.options.preventDuplicates = true;
                 var row = '<tr id="shelf' + data.id + '" class="alert alert-info text-danger-dk">' +
@@ -167,6 +166,7 @@ $(function () {
                     $('#shelf' + data.id).replaceWith(row);
                 }
                 $shelf_submit.button('reset');
+                shelf_reset();
             },
             error: function (jqXhr) {
                 if (jqXhr.status === 401)
@@ -236,7 +236,6 @@ $(function () {
             type: type,
             data: formData,
             success: function (data) {
-                bloc_reset();
                 toastr[status](msg, "<span class='uppercase'>" + data.name + "</span>!");
                 toastr.options.preventDuplicates = true;
                 var row = '<tr id="block' + data.id + '" class="alert alert-info text-danger-dk">' +
@@ -252,6 +251,7 @@ $(function () {
                     $('#block' + data.id).replaceWith(row);
                 }
                 $bloc_submit.button('reset');
+                bloc_reset();
             },
             error: function (jqXhr) {
                 if (jqXhr.status === 401)
