@@ -33,7 +33,7 @@
                                             </a>
                                             <input type="text" name="name" id="family_name" minlength="3"
                                                    placeholder="Intitulé de la famille"
-                                                   class="input-sm form-control input_text" required>
+                                                   class="input-sm form-control" required>
                                         </div>
                                         <div class="m-t-lg">
                                             <button type="submit" value="save" id="family_submit"
@@ -104,7 +104,7 @@
                                             </a>
                                             <input type="text" name="name" id="sub_family_name" minlength="3"
                                                    placeholder="Intitulé de sous famille"
-                                                   class="input-sm form-control input_text" required>
+                                                   class="input-sm form-control" required>
                                         </div>
                                         <div class="m-t-lg">
                                             <button type="submit" value="save" id="sub_family_submit"
@@ -161,7 +161,7 @@
                                         <div class="form-group">
                                             <label>Nom</label>
                                             <input type="text" name="name" id="type_name" minlength="3"
-                                                   placeholder="Nom du type" class="input-sm form-control input_text"
+                                                   placeholder="Nom du type" class="input-sm form-control"
                                                    required>
                                         </div>
                                         <div class="form-group">
