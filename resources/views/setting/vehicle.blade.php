@@ -103,7 +103,7 @@
                                                class="btn btn-sm btn-icon btn-default btn-rounded pull-right none m-t-n-sm">
                                                 <i class="fa fa-refresh"></i>
                                             </a>
-                                            <input type="text" name="name" id="model_name" minlength="3"
+                                            <input type="text" name="name" id="model_name" minlength="2"
                                                    placeholder="Nom du modele" class="input-sm form-control input_alpha"
                                                    required>
                                         </div>
