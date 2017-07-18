@@ -59,7 +59,7 @@ class SettingController extends Controller
                     'model_brand.required' => "Le choix d'une Marque est obligatoire",
                 );
                 $rules = array(
-                    'name' => 'bail|required|min:3|max:255|unique:models',
+                    'name' => 'bail|required|min:2|max:255|unique:models',
                     'model_brand' => 'bail|required|min:1|max:255',
                 );
                 $validator = Validator::make($request->all(), $rules, $messages);
@@ -109,7 +109,7 @@ class SettingController extends Controller
                     'model_brand.required' => "Le choix d'une Marque est obligatoire",
                 );
                 $rules = array(
-                    'name' => 'bail|required|min:3|max:255|unique:models',
+                    'name' => 'bail|required|min:2|max:255|unique:models',
                     'model_brand' => 'bail|required|min:1|max:255',
                 );
                 $validator = Validator::make($request->all(), $rules, $messages);
@@ -400,12 +400,12 @@ class SettingController extends Controller
                 }
             }else{
                 $messages = array(
-                    'name.required' => "La valeur du champ Designation est obligatoire",
-                    'name.unique' => "La valeur du champ Designation est déjà utilisée",
+                    //'name.required' => "La valeur du champ Designation est obligatoire",
+                    //'name.unique' => "La valeur du champ Designation est déjà utilisée",
                     'bloc_shelf.required' => "Le choix d'une Etagère est obligatoire",
                 );
                 $rules = array(
-                    'name' => 'bail|required|min:3|max:255|unique:blocks',
+                    //'name' => 'bail|required|min:3|max:255|unique:blocks',
                     'bloc_shelf' => 'bail|required|min:1|max:255',
                 );
                 $validator = Validator::make($request->all(), $rules, $messages);
@@ -503,12 +503,12 @@ class SettingController extends Controller
                 }
             } else {
                 $messages = array(
-                    'name.required' => "La valeur du champ Designation est obligatoire",
-                    'name.unique' => "La valeur du champ Designation est déjà utilisée",
+                   // 'name.required' => "La valeur du champ Designation est obligatoire",
+                    //'name.unique' => "La valeur du champ Designation est déjà utilisée",
                     'bloc_shelf.required' => "Le choix d'une Etagère est obligatoire",
                 );
                 $rules = array(
-                    'name' => 'bail|required|min:3|max:255|unique:blocks',
+                    //'name' => 'bail|required|min:3|max:255|unique:blocks',
                     'bloc_shelf' => 'bail|required|min:1|max:255',
                 );
                 $validator = Validator::make($request->all(), $rules, $messages);
