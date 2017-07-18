@@ -52,17 +52,23 @@ Route::group(['middleware' => ['auth']], function () {
      ** SETTINGS ROUTES **
      ********************/
     Route::group(['prefix' => 'setting'], function () {
-        Route::resource('setting', 'SettingController');
+        /*** VEHICLE SETTINGS ***/
+        Route::get('vehicle', 'SettingController@vehicle');
+        Route::post('vehicle_store', 'SettingController@vehicle_store')->name('vehicle_store');
+        Route::put('vehicle_update/{id}', 'SettingController@vehicle_update')->name('vehicle_update');
+        Route::get('vehicle_edit/{type}/{id}', 'SettingController@vehicle_edit');
+        Route::get('brands', 'SettingController@brands');
+        /*** END ***/
 
-        /*** stock settings ***/
+        /*** STOCK SETTINGS ***/
         Route::get('stock', 'SettingController@stock');
         Route::post('stock_store', 'SettingController@stock_store')->name('stock_store');
         Route::put('stock_update/{id}', 'SettingController@stock_update')->name('warehouse_update');
         Route::get('stock_edit/{type}/{id}', 'SettingController@stock_edit');
         Route::get('families', 'SettingController@families');
-        /*** end ***/
+        /*** END ***/
 
-        /*** Store settings ***/
+        /*** WAREHOUSE SETTINGS ***/
         Route::get('warehouse', 'SettingController@warehouse');
         Route::post('warehouse_store', 'SettingController@warehouse_store')->name('warehouse_store');
         Route::get('warehouse_edit/{type}/{id}', 'SettingController@warehouse_edit');
@@ -70,136 +76,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('rays/{type}', 'SettingController@rays');
         Route::get('shelves/{type}/{id}', 'SettingController@shelves');
         Route::get('blocs/{id}', 'SettingController@blocs');
-        /*** end ***/
-
-        Route::get('/category', 'SettingController@category');
-
-
-        Route::get('/show', [
-            'uses' => 'SupplierController@show',
-            'as' => '/show'
-        ]);
-        /*********** BRAND **************/
-        Route::post('/brand_create', [
-            'uses' => 'SettingController@brandCreate',
-            'as' => '/brand_create'
-        ]);
-
-        Route::get('fetch_categories', function () {
-            $categories = App\Category::select('id', 'name')->get();
-            return Response::json($categories);
-        });
-
-        Route::post('/brand_update', [
-            'uses' => 'SettingController@brandUpdate',
-            'as' => '/brand_update'
-        ]);
-
-        Route::get('/brand_get', function () {
-            $id = Input::get('id');
-            $brand = App\Brand::findOrFail($id);
-            return Response::json($brand);
-        });
-
-        Route::get('/fetch_brands', function () {
-            $brands = App\Brand::select('id', 'name')->get();
-            return Response::json($brands);
-        });
-        /************* END ***********/
-
-
-        /*********** MODEL **************/
-        Route::post('/model_create', [
-            'uses' => 'SettingController@modelCreate',
-            'as' => '/model_create'
-        ]);
-
-        Route::get('/model_get', function () {
-            $id = Input::get('id');
-            $model = App\Models::findOrFail($id);
-            return Response::json($model);
-        });
-
-        Route::post('/model_update', [
-            'uses' => 'SettingController@modelUpdate',
-            'as' => '/model_update'
-        ]);
-        /************* END ***********/
-
-
-
-        /*********** RAY **************/
-        Route::post('/ray_create', [
-            'uses' => 'SettingController@rayCreate',
-            'as' => '/ray_create'
-        ]);
-
-        Route::post('/ray_update', [
-            'uses' => 'SettingController@rayUpdate',
-            'as' => '/ray_update'
-        ]);
-
-        Route::get('/ray_get', function () {
-            $id = Input::get('id');
-            $ray = App\Ray::findOrFail($id);
-            return Response::json($ray);
-        });
-
-        Route::get('/fetch_rays', function () {
-            $rays = App\Ray::select('id', 'name')->get();
-            return Response::json($rays);
-        });
-        /************* END ***********/
-
-        /*********** SHELF **************/
-        Route::post('/shelf_create', [
-            'uses' => 'SettingController@shelfCreate',
-            'as' => '/shelf_create'
-        ]);
-
-        Route::post('/shelf_update', [
-            'uses' => 'SettingController@shelfUpdate',
-            'as' => '/shelf_update'
-        ]);
-
-        Route::get('/shelf_get', function () {
-            $id = Input::get('id');
-            $shelf = App\Shelve::findOrFail($id);
-            return Response::json($shelf);
-        });
-
-        Route::get('/fetch_shelves', function () {
-            $id = Input::get('id');
-            $shelves = App\Shelve::where('ray_id', $id)->get();
-            return Response::json($shelves);
-        });
-        Route::get('/fetch_shelve', function () {
-            $id = Input::get('id');
-            $shelve = App\Shelve::findOrFail($id);
-            $shelves = App\Shelve::where('ray_id', $shelve->ray_id)->get();
-            return Response::json($shelves);
-        });
-        /************* END ***********/
-
-        /*********** SHELF **************/
-        Route::post('/block_create', [
-            'uses' => 'SettingController@blockCreate',
-            'as' => '/block_create'
-        ]);
-
-        Route::post('/block_update', [
-            'uses' => 'SettingController@blockUpdate',
-            'as' => '/block_update'
-        ]);
-
-        Route::get('/block_get', function () {
-            $id = Input::get('id');
-            $block = App\Block::findOrFail($id);
-            return Response::json($block);
-        });
-        /************* END ***********/
+        /*** END ***/
     });
-    /************* END SETTINGS****************/
+    /************* END SETTINGS ****************/
 
     /***********************
      ** Stock Routes **
