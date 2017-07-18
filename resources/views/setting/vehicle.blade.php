@@ -32,7 +32,7 @@
                                             </a>
                                             <input type="text" name="name" id="brand_name" minlength="3"
                                                    placeholder="Nom de la marque"
-                                                   class="input-sm form-control input_text" required>
+                                                   class="input-sm form-control" required>
                                         </div>
                                         <div class="m-t-lg">
                                             <button type="submit" value="save" id="brand_submit"
@@ -104,7 +104,7 @@
                                                 <i class="fa fa-refresh"></i>
                                             </a>
                                             <input type="text" name="name" id="model_name" minlength="2"
-                                                   placeholder="Nom du modele" class="input-sm form-control input_alpha"
+                                                   placeholder="Nom du modele" class="input-sm form-control"
                                                    required>
                                         </div>
                                         <div class="m-t-lg">
