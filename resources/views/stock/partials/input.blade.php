@@ -1,11 +1,11 @@
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="modal-title text-black">SORTIE : <span class="uppercase"><u>{{$movement->reference}}</u></span>
+    <h4 class="modal-title text-black">ENTRER : <span class="uppercase"><u>{{$movement->reference}}</u></span>
         <span class="capitalize pull-right">{{\Jenssegers\Date\Date::parse($movement->created_at)->format('j M Y')}}</span></h4>
 </div>
 <div class="modal-body" id="print">
-    <p>Liste des pieces sortie le {{$movement->created_at->format('d/m/Y')}}, Reference commande:
-        <a class="uppercase"><u>{{$movement->command}}</u></a></p>
+    <p>Liste des pieces entrées le {{$movement->created_at->format('d/m/Y')}}, Numero bon de livraison commande:
+        <a class="uppercase"><u>{{$movement->delivery->number}}</u></a></p>
     <section class="panel panel-default">
         <div class="table-responsive">
             <table class="table table-striped m-b-none" id="infoTable">
@@ -16,8 +16,8 @@
                     <th>Modele</th>
                     <th>Sous Famille</th>
                     <th>Qté. Stock</th>
-                    <th>Qté. Sortie</th>
-                    <th>Qté. Restant</th>
+                    <th>Qté. Entrée</th>
+                    <th>Qté. Add.</th>
                 </tr>
                 </thead>
                 <tbody class="capitalize" id="outputRow">
@@ -29,7 +29,7 @@
                         <td>{{$item->stock->sub_category->name}}</td>
                         <td class="alert alert-success">{{number_format($item->quantity_old)}}</td>
                         <td class="alert alert-danger">{{number_format($item->quantity)}}</td>
-                        <td class="alert alert-info">{{number_format($item->quantity_old - $item->quantity)}}</td>
+                        <td class="alert alert-info">{{number_format($item->quantity_old + $item->quantity)}}</td>
                     </tr>
                 @endforeach
                 </tbody>

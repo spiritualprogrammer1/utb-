@@ -7,7 +7,7 @@
             </div>
             <section class="panel panel-default">
                 <div class="panel-body">
-                    <form id="deliveryForm" method="post" action="stock" role="form" enctype="multipart/form-data">
+                    <form id="deliveryForm" method="post" role="form" enctype="multipart/form-data">
                         {{csrf_field()}}
                         <input name="delivery" type="hidden" value="1">
                         <div class="form-group has-success">
@@ -44,11 +44,11 @@
                         </div>
                         <div class="form-group m-t-md text-center">
                             <input type="file" class="filestyle" id="image" name="image"
-                                   data-classButton="btn btn-default btn-sm"
+                                   data-classButton="btn btn-info btn-sm"
                                    data-classInput="form-control inline v-middle input-sm"
                                    data-buttonText="Charge le Bon de Livraison..">
                         </div>
-                        <button type="submit" class="btn btn-sm btn-default btn-group-justified uppercase m-t-md"
+                        <button type="submit" class="btn btn-sm btn-success btn-group-justified uppercase m-t-md"
                                 id="submit"><i class="fa fa-floppy-o"></i> enregistrer le bon
                         </button>
                     </form>
@@ -64,32 +64,23 @@
                                 <i class="fa fa-caret-right text fa-lg"></i>
                                 <i class="fa fa-caret-left text-active fa-lg"></i>
                             </a>
-                            <form id="periodForm" method="get" novalidate>
+                            <form id="searchForm" method="get" novalidate>
                                 {{csrf_field()}}
+                                <input type="hidden" name="delivery" value="1">
                                 <div class="form-group col-sm-4 m-r-n-md has-warning">
                                     <input class="input-sm datepicker form-control" placeholder="Date debut"
-                                           name="begin"
-                                           id="begin">
+                                           name="begin">
                                 </div>
                                 <div class="form-group col-sm-4 m-r-n-sm has-warning">
                                     <input class="input-sm col-sm-3 form-control datepicker" placeholder="Date fin"
-                                           name="end"
-                                           id="end">
+                                           name="end">
                                 </div>
                                 <div class="form-group col-sm-1  m-l-n-sm">
-                                    <button type="submit" class="btn btn-sm col-sm-3 btn-icon btn-success"><i
+                                    <button type="submit" id="submit_search" class="btn btn-sm col-sm-3 btn-icon btn-success"><i
                                                 class="fa fa-search"></i>
                                     </button>
                                 </div>
                             </form>
-                        </div>
-                        <div class="col-sm-3 m-b-xs">
-                            <div class="input-group">
-                                <input type="text" id="search" class="input-sm form-control" placeholder="Recherche">
-                                <span class="input-group-btn">
-                          <button class="btn btn-sm btn-default" type="button">Go!</button>
-                        </span>
-                            </div>
                         </div>
                         <div class="btn-group pull-right" data-toggle="buttons">
                             <a href="#" class="btn btn-sm btn-bg btn-rounded btn-default"
@@ -109,13 +100,8 @@
                 </header>
 
                 <section class="scrollable wrapper w-f">
-                    <div class="cssload-container m-t-n-lg none">
-                        <div class="cssload-progress cssload-float cssload-shadow m-t-n-lg">
-                            <div class="cssload-progress-item"></div>
-                        </div>
-                    </div>
-                    <section class="panel panel-default" id="view">
-                        <div class="table-responsive">
+                    <section class="panel panel-default">
+                        <div class="table-responsive" id="view">
                             <table class="table table-striped e b-info capitalize" id="deliveryTable">
                                 <thead>
                                 <tr>
@@ -129,7 +115,7 @@
                                 </tr>
                                 </thead>
                                 <tbody id="deliveryRow">
-                                @forelse($deliveries as $key=>$delivery)
+                                @foreach($deliveries as $key=>$delivery)
                                     <tr id="delivery{{$delivery->ids}}" class="animated fadeInDown">
                                         <td>
                                             <a href="#" id="{{$delivery->ids}}" data-number="{{$delivery->number}}"
@@ -144,25 +130,17 @@
                                         <td>{{\Jenssegers\Date\Date::parse($delivery->delivered_at)->format('d/m/Y')}}</td>
                                     <!--<td>{{$delivery->created_at->format('d/m/Y')}}</td>-->
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center">Aucune données disponible</td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </section>
                 </section>
-                <footer class="footer bg-white b-t">
-                    <div class="row text-center-xs">
-                        <div class="col-md-6 hidden-sm">
-                            <!--<p class="text-muted m-t"></p>-->
-                        </div>
-                        <div class="col-md-6 col-sm-12 text-right text-center-xs" id="pagination">
-                        </div>
+                <div class="cssload-container m-t-n-lg none">
+                    <div class="cssload-progress cssload-float cssload-shadow m-t-n-lg">
+                        <div class="cssload-progress-item"></div>
                     </div>
-                </footer>
+                </div>
             </section>
         </aside>
     </section>
@@ -181,6 +159,5 @@
 @endsection
 @section('scripts')
     <script src="{{asset('assets/js/file-input/bootstrap-filestyle.min.js')}}"></script>
-    <script src="{{asset('assets/js/paging/paging.js')}}"></script>
     <script src="{{asset('assets/js/scripts/stock.delivery.js')}}"></script>
 @endsection
