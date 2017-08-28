@@ -1,4 +1,4 @@
-@section('title') Entrées/Sorties  Stock @endsection
+@section('title') Sorties de pieces @endsection
 @section('styles')
     <style>
         @media print {
@@ -15,10 +15,10 @@
             <section>
                 <form method="post" id="outputForm" role="form" class="panel b-a bg-light lter">
                     {{csrf_field()}}
-                    <h5 class="uppercase m-l-sm">Sortie du stock
+                    <h5 class="uppercase m-l-sm">Sortie de pieces
                         <button type="submit" id="submit_output"
                                 class="btn btn-success btn-sm btn-rounded pull-right m-r-sm m-t-n-xs"
-                                title="Ajouter un stock">
+                                title="Valider la sortie de pieces">
                             <i class="fa fa-check-circle"></i> VALIDER
                         </button>
                         <a id="add_output" class="btn btn-icon btn-info btn-sm btn-rounded pull-right m-r-md m-t-n-xs"
@@ -83,7 +83,7 @@
                                 <i class="fa fa-caret-right text fa-lg"></i>
                                 <i class="fa fa-caret-left text-active fa-lg"></i>
                             </a>
-                            <h4><i class="i i-stack"></i> SORTIE DE STOCK</h4>
+                            <h4><i class="i i-stack"></i> SORTIE DE PIECES</h4>
                         </div>
 
                         <form id="searchForm" class="col-md-4 m-t-xs has-success">
