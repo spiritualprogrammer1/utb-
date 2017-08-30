@@ -2,7 +2,7 @@
 @extends('layouts.master')
 @section('content')
     <section class="vbox">
-        <header class="header bg-light lt b-b b-light">
+        <header class="header bg-light lter b-b b-light">
             <p class="h4 font-thin pull-left m-r m-b-sm">Liste des <span id="list_type">Pieces</span></p>
             <a class="btn btn-sm btn-info btn-rounded btn-icon"><i class="i i-cloud-upload"></i></a>
             <form class="form-inline m-t-sm pull-right pull-none-xs m-b-sm has-success" role="form">
@@ -60,7 +60,7 @@
                     </div>
                 </div>
                 <div class="col-md-9 col-md-pull-3">
-                    <div class="row">
+                    <div class="row-sm">
                         <div class="table-responsive">
                             <table class="table table-responsive table-striped b-primary capitalize" id="pieceTable">
                                 <thead>
