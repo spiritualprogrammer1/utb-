@@ -4,9 +4,8 @@
     <section class="hbox stretch">
         <aside class="aside-lg bg-light dker b-r" id="subNav">
             <section>
-                <form method="post" id="busForm" role="form" action="../vehicle" class="panel b-a bg-light lter">
+                <form method="post" id="busForm" role="form" class="panel b-a bg-light lter">
                     {{csrf_field()}}
-                    {{method_field('put')}}
                     <div class="panel-body panel-danger">
                         <h4 class="font-thin m-t-n-sm text-dark">AJOUTER UN CAR
                             <a href="#" class="btn btn-icon btn-default btn-rounded pull-right btn-info none"
