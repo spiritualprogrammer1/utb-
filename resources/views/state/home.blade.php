@@ -249,9 +249,9 @@
                 e.preventDefault();
                 var formData = $(this).serialize(),
                     type = 'post',
-                    url = 'state',
+                    url = 'home',
                     status = "success",
-                    msg = "Le Car a bien été enregistrer";
+                    msg = "La Reception a bien été enregistrer";
                 $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
                 $submit.button('loading');
                 $.ajax({
