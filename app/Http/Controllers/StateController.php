@@ -77,6 +77,7 @@ class StateController extends Controller
                     'reference' => 'ot-' . Carbon::now()->timestamp,
                     'state_id' => $state->id,
                     'site_id' => '1',
+                    'type' => '1',
                     'user_id' => Auth::user()->id,
                 ]);
                 for ($i = 0; $i < count($request->field); $i++) {
