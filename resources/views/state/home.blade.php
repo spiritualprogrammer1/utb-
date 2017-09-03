@@ -1,4 +1,4 @@
-@section('title') Etat du vehicule @endsection
+@section('title') Etat du Car @endsection
 @section('styles')
 @endsection
 @extends('layouts.master')
