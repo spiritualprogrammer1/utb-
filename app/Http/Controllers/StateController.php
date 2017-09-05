@@ -68,7 +68,7 @@ class StateController extends Controller
                     'incident' => $request->incident,
                     'remark' => $request->remark,
                     'kilometer' => $request->kilometer,
-                    'type' => '1',
+                    'state' => '1',
                     'site_id' => '1',
                     'user_id' => Auth::user()->id,
                 ]);
