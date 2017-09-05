@@ -132,16 +132,6 @@ class DiagnosticController extends Controller
     public function show(Request $request, $id)
     {
         if ($request->ajax()) {
-            $states = State::where('state', '1')->orderBy('created_at', 'desc')->get();
-            return view('diagnostic.includes.home', ['states' => $states]);
-        } else {
-            return view('errors.500');
-        }
-    }
-
-    public function edit(Request $request, $id)
-    {
-        if ($request->ajax()) {
             $state = State::findOrFail($id);
             return response()->json(['matriculation' => $state->bus->matriculation, 'ot' => $state->reference,
                 'bus' => $state->bus->model->brand->name . ' ' . $state->bus->model->name,
@@ -149,6 +139,11 @@ class DiagnosticController extends Controller
         } else {
             return view('errors.500');
         }
+    }
+
+    public function edit(Request $request, $id)
+    {
+       //
     }
 
     public function update(Request $request, $id)
