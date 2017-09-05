@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Diagnostic extends Model
 {
-    protected $fillable = ['ids', 'reference', 'state', 'type', 'process_id', 'user_id'];
+    protected $fillable = ['ids', 'reference', 'state', 'type', 'state_id', 'user_id'];
 
-    public function process()
+    public function state()
     {
-        return $this->belongsTo(Process::class);
+        return $this->hasMany(State::class);
     }
 
     public function diagnostic_employee()
