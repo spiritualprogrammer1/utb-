@@ -10,7 +10,7 @@ class Diagnostic extends Model
 
     public function state()
     {
-        return $this->hasMany(State::class);
+        return $this->belongsTo(State::class);
     }
 
     public function diagnostic_employee()
