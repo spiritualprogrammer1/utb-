@@ -1,4 +1,4 @@
-@section('title') Diagnostique du Car @endsection
+@section('title') Diagnosti @endsection
 @section('styles')
 @endsection
 @extends('layouts.master')
@@ -48,7 +48,7 @@
                                                                         <div class="row">
                                                                             <div class="table-responsive" id="view">
                                                                                 <table class="table table-striped m-b-none capitalize"
-                                                                                       id="processTable">
+                                                                                       id="stateTable">
                                                                                     <thead>
                                                                                     <tr>
                                                                                         <th></th>
@@ -62,24 +62,25 @@
                                                                                         </th>
                                                                                     </tr>
                                                                                     </thead>
-                                                                                    <tbody id="vehicleRow">
-                                                                                    @foreach($processes as $key=>$process)
-                                                                                        <tr class="animated fadeIn">
+                                                                                    <tbody>
+                                                                                    @foreach($states as $key=>$state)
+                                                                                        <tr class="animated fadeIn"
+                                                                                            id="state{{$state->id}}">
                                                                                             <td>{{$key + 1}}</td>
-                                                                                            <td class="uppercase">{{$process->reference}}</td>
-                                                                                            <td class="text-danger-dk uppercase">{{$process->state->bus->matriculation}}</td>
-                                                                                            <td class="text-danger-dk uppercase">{{$process->state->bus->chassis}}</td>
-                                                                                            <td>{{$process->state->bus->model->brand->name}}</td>
-                                                                                            <td>{{$process->state->bus->model->name}}</td>
-                                                                                            <td>{{$process->created_at->format('d/m/Y')}}</td>
+                                                                                            <td class="uppercase">{{$state->reference}}</td>
+                                                                                            <td class="text-danger-dk uppercase">{{$state->bus->matriculation}}</td>
+                                                                                            <td class="text-danger-dk uppercase">{{$state->bus->chassis}}</td>
+                                                                                            <td>{{$state->bus->model->brand->name}}</td>
+                                                                                            <td>{{$state->bus->model->name}}</td>
+                                                                                            <td>{{$state->created_at->format('d/m/Y')}}</td>
                                                                                             <td width="10">
                                                                                                 <div class="radio i-checks">
                                                                                                     <label class="m-t-n-xl"
                                                                                                            style="width: 5px; height: 50px">
                                                                                                         <input type="radio"
-                                                                                                               name="process"
-                                                                                                               class="process"
-                                                                                                               value="{{$process->id}}"
+                                                                                                               name="state"
+                                                                                                               class="state"
+                                                                                                               value="{{$state->id}}"
                                                                                                                data-trigger="change"
                                                                                                                data-required="true">
                                                                                                         <i></i>
@@ -407,28 +408,7 @@
                                                                                         </tr>
                                                                                         </thead>
                                                                                         <tbody>
-                                                                                        <tr id="piece_row">
-                                                                                            <td>
-                                                                                                <textarea
-                                                                                                        class="form-control input-sm"
-                                                                                                        name="piece[]"
-                                                                                                        id="piece"
-                                                                                                        placeholder="Nom piece + Marque & Model"
-                                                                                                        rows="2"></textarea>
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                <input class="form-control input-sm"
-                                                                                                       name="quantity[]"
-                                                                                                       id="quantity"
-                                                                                                       placeholder="0"
-                                                                                                       type="number">
-                                                                                                <a href="#piece_row"
-                                                                                                   data-dismiss="alert"
-                                                                                                   class="btn btn-default btn-xs pull-right">
-                                                                                                    <i class="fa fa-trash-o text-danger-dker"></i>
-                                                                                                </a>
-                                                                                            </td>
-                                                                                        </tr>
+
                                                                                         </tbody>
                                                                                     </table>
                                                                                 </div>
@@ -439,16 +419,19 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-md-2">
-                                                            <label class="control-label"><i class="fa fa-paper-plane-o"></i> Prestation</label>
+                                                            <label class="control-label"><i
+                                                                        class="fa fa-paper-plane-o"></i>
+                                                                Prestation</label>
                                                             <select class="chosen-select form-control input-sm"
                                                                     data-placeholder="Choissisez la prestation"
                                                                     name="service"
                                                                     data-trigger="change"
                                                                     data-required="true">
                                                                 <option></option>
-                                                                <option class="capitalize" value="2">Reparation</option>
-                                                                <option class="capitalize" value="3">Revision</option>
-                                                                <option class="capitalize" value="4">Visite Technique</option>
+                                                                <option class="capitalize" value="1">Reparation</option>
+                                                                <option class="capitalize" value="2">Revision</option>
+                                                                <option class="capitalize" value="3">Visite Technique
+                                                                </option>
                                                             </select>
                                                             <button type="submit" id="submit"
                                                                     class="btn btn-sm btn-success btn-group-justified uppercase m-t-sm">
@@ -479,14 +462,39 @@
             </section>
         </section>
     </section>
-
+    <table class="table"
+           id="pieceAdd">
+        <tbody>
+        <tr>
+            <td>
+             <textarea class="form-control input-sm"
+                       name="piece[]"
+                       id="piece"
+                       placeholder="Nom piece + Marque & Model"
+                       rows="2" required></textarea>
+            </td>
+            <td>
+                <input class="form-control input-sm"
+                       name="quantity[]"
+                       id="quantity"
+                       placeholder="0"
+                       type="number" required>
+                <a href="#piece_row"
+                   data-dismiss="alert"
+                   class="btn btn-default btn-xs pull-right">
+                    <i class="fa fa-trash-o text-danger-dker"></i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 @endsection
 @section('scripts')
     <script src="{{asset('assets/js/parsley/parsley.min.js')}}"></script>
     <script src="{{asset('assets/js/wizard/jquery.bootstrap.wizard.js')}}"></script>
     <script src="{{asset('assets/js/wizard/demo.js')}}"></script>
     <script>
-        var $table = $('#processTable'),
+        var $table = $('#stateTable'),
             $form = $('#wizardform'),
             $first = $('.first'),
             $file = $('#file'),
@@ -496,7 +504,7 @@
             $matriculation = $('.matriculation'),
             $vehicle = $('.vehicle'),
             $ot = $('.ot'),
-            $process = $('.process'),
+            $state = $('.state'),
             $depart = $('#depart'),
             $arrive = $('#arrive'),
             $distance = $('#distance'),
@@ -512,7 +520,7 @@
             $table.dataTable({
                 "sPaginationType": "full_numbers",
                 "sDom": "<'row'<'col-sm-6'l><'col-sm-6'f>r>t<'row'<'col-sm-6'i><'col-sm-6'p>>",
-                "iDisplayLength": 5,
+                "iDisplayLength": 50,
                 "language": {
                     "url": "../assets/js/datatables/French.json"
                 }
@@ -535,7 +543,7 @@
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
                         $file.removeClass('btn-default disabled');
-                        processes();
+                        $('#state' + data.id).remove();
                         toastr[status](msg, "<span class='uppercase'>" + data.matriculation + "</span>!");
                         toastr.options.preventDuplicates = true;
                         $submit.button('reset');
@@ -563,10 +571,10 @@
                     }
                 });
             });
-            $process.on('click', function () {
+            $state.on('click', function () {
                 $spinner.show();
                 var id = $(this).val();
-                $.get('home/' + id + '/edit', function (data) {
+                $.get('home/' + id, function (data) {
                     $incident.html(data.incident);
                     $remark.html(data.remark);
                     $matriculation.html(data.matriculation);
@@ -598,7 +606,7 @@
             });
             $piece_add.on('click', function () {
                 var $table = $('#pieceTable tbody');
-                $table.append($('#pieceTable tbody tr:last').clone());
+                $table.append($('#pieceAdd tbody tr:last').clone());
                 var rows = $('#pieceTable tr');
 
                 var count = rows.length,
@@ -608,8 +616,6 @@
 
                 text_area.eq(0).attr('id', 'piece' + count);
                 text_input.eq(0).attr('id', 'quantity' + count);
-                text_area.eq(0).attr('required', true);
-                text_input.eq(0).attr('required', true);
                 $('#quantity' + count).val('');
                 $('#piece' + count).val('');
             });
@@ -632,13 +638,5 @@
                 $('#diagnostic' + count).val('');
             });
         });
-        function processes() {
-            $spinner2.show();
-            var id = '0';
-            $.get('home/' + id, function (data) {
-                $view.html(data);
-                $spinner2.hide();
-            })
-        }
     </script>
 @endsection
