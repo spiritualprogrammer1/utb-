@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Before_work;
+use App\Demand;
 use App\Diagnostic;
 use App\Diagnostic_employee;
-use App\Diagnostic_piece;
+use App\Demand_piece;
 use App\Employee;
 use App\Process;
+use App\State;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,8 +25,8 @@ class DiagnosticController extends Controller
     public function index()
     {
         $technicians = Employee::where('post_id', '1')->get();
-        $processes = Process::where('type', '1')->orderBy('created_at', 'desc')->get();
-        return view('diagnostic.home', ['processes' => $processes, 'technicians' => $technicians]);
+        $states = State::where('state', '1')->orderBy('created_at', 'desc')->get();
+        return view('diagnostic.home', ['states' => $states, 'technicians' => $technicians]);
     }
 
     public function create()
@@ -40,8 +42,25 @@ class DiagnosticController extends Controller
                 'technician.required' => "Le choix du technicien du diagnostic est obligatoire",
                 'service.required' => "Choisissez une Prestation SVP!",
             );
+            if ($request->has('piece')){
+                $rules = array(
+                    'state' => 'bail|required|min:1',
+                    'tester' => 'bail|required|min:1',
+                    'distance' => 'bail|required|min:1',
+                    'place' => 'bail|required|min:3',
+                    'description' => 'bail|required|min:6',
+                    'technician' => 'bail|required|min:1',
+                    //'title' => 'bail|required|min:3',
+                    //'diagnostic' => 'bail|required|min:6',
+                    'piece' => 'bail|required|min:1',
+                    'quantity' => 'bail|required|min:1',
+                    'service' => 'bail|required|min:1',
+                );
+            }else{
+
+            }
             $rules = array(
-                'process' => 'bail|required|min:1',
+                'state' => 'bail|required|min:1',
                 'tester' => 'bail|required|min:1',
                 'distance' => 'bail|required|min:1',
                 'place' => 'bail|required|min:3',
@@ -49,8 +68,6 @@ class DiagnosticController extends Controller
                 'technician' => 'bail|required|min:1',
                 //'title' => 'bail|required|min:3',
                 //'diagnostic' => 'bail|required|min:6',
-                'piece' => 'bail|required|min:1',
-                'quantity' => 'bail|required|min:1',
                 'service' => 'bail|required|min:1',
             );
             $validator = Validator::make($request->all(), $rules, $messages);
@@ -63,10 +80,12 @@ class DiagnosticController extends Controller
                     'message' => $errors
                 ], 422);
             } else {
+                $state = State::findOrFail($request->state)->update(['state'=>'0']);
                 $diagnostic = Diagnostic::create([
                     'ids' => Carbon::now()->timestamp,
-                    'reference' => 'diag|' . Carbon::now()->timestamp,
-                    'process_id' => $request->process,
+                    'reference' => 'DIAG-' . Carbon::now()->timestamp,
+                    'state_id' => $request->state,
+                    'type' => $request->service,
                     'user_id' => Auth::user()->id,
                 ]);
                 $before_works = Before_work::create([
@@ -77,7 +96,6 @@ class DiagnosticController extends Controller
                     'employee_id' => $request->tester,
                     'diagnostic_id' => $diagnostic->id,
                 ]);
-
                 for ($i = 0; $i < count($request->technician); $i++) {
                     $diagnostic_employee = Diagnostic_employee::create([
                         'diagnostic_id' => $diagnostic->id,
@@ -86,17 +104,25 @@ class DiagnosticController extends Controller
                         'description' => $request->description[$i],
                     ]);
                 }
-                for ($i = 0; $i < count($request->piece); $i++) {
-                    $diagnostic_piece = Diagnostic_piece::create([
+                if ($request->has('piece')) {
+                    $demand = Demand::create([
+                        'ids' => Carbon::now()->timestamp,
+                        'reference' => 'dmd-' . Carbon::now()->timestamp,
                         'diagnostic_id' => $diagnostic->id,
-                        'piece' => $request->piece[$i],
-                        'quantity' => $request->quantity[$i],
                     ]);
+                    for ($i = 0; $i < count($request->piece); $i++) {
+                        $demand_piece = Demand_piece::create([
+                            'demand_id' => $demand->id,
+                            'piece' => $request->piece[$i],
+                            'quantity' => $request->quantity[$i],
+                        ]);
+                    }
+                } else {
+                    //State = 2 : no demand
+                    $diagnostic->update(['state' => '2']);
                 }
-                $process = Process::findOrFail($request->process)->update(['type' => $request->service]);
-                $process = Process::findOrFail($request->process);
-                return response()->json(['id' => $process->id, 'ot' => $process->reference,
-                    'matriculation' => $process->state->bus->matriculation]);
+                return response()->json(['id' => $request->state, 'ot' => $diagnostic->state->reference,
+                    'matriculation' => $diagnostic->state->bus->matriculation]);
             }
         } else {
             return view('errors.500');
@@ -106,8 +132,8 @@ class DiagnosticController extends Controller
     public function show(Request $request, $id)
     {
         if ($request->ajax()) {
-            $processes = Process::where('type', '1')->orderBy('created_at', 'desc')->get();
-            return view('diagnostic.includes.home', ['processes' => $processes]);
+            $states = State::where('state', '1')->orderBy('created_at', 'desc')->get();
+            return view('diagnostic.includes.home', ['states' => $states]);
         } else {
             return view('errors.500');
         }
@@ -116,10 +142,10 @@ class DiagnosticController extends Controller
     public function edit(Request $request, $id)
     {
         if ($request->ajax()) {
-            $process = Process::findOrFail($id);
-            return response()->json(['matriculation' => $process->state->bus->matriculation, 'ot' => $process->reference,
-                'bus' => $process->state->bus->model->brand->name . ' ' . $process->state->bus->model->name,
-                'incident' => $process->state->incident, 'remark' => $process->state->remark, 'depart' => $process->state->kilometer]);
+            $state = State::findOrFail($id);
+            return response()->json(['matriculation' => $state->bus->matriculation, 'ot' => $state->reference,
+                'bus' => $state->bus->model->brand->name . ' ' . $state->bus->model->name,
+                'incident' => $state->incident, 'remark' => $state->remark, 'depart' => $state->kilometer]);
         } else {
             return view('errors.500');
         }
