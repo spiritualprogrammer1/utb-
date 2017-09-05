@@ -64,20 +64,13 @@ class StateController extends Controller
             } else {
                 $state = State::create([
                     'ids' => Carbon::now()->timestamp,
+                    'reference' => "OT-".Carbon::now()->timestamp,
                     'bus_id' => $request->bus,
                     'incident' => $request->incident,
                     'remark' => $request->remark,
                     'kilometer' => $request->kilometer,
                     'state' => '1',
                     'site_id' => '1',
-                    'user_id' => Auth::user()->id,
-                ]);
-                $process = Process::create([
-                    'ids' => Carbon::now()->timestamp,
-                    'reference' => 'ot-' . Carbon::now()->timestamp,
-                    'state_id' => $state->id,
-                    'site_id' => '1',
-                    'type' => '1',
                     'user_id' => Auth::user()->id,
                 ]);
                 for ($i = 0; $i < count($request->field); $i++) {
