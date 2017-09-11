@@ -73,7 +73,8 @@
                                                                                                            name="bus"
                                                                                                            value="{{$bus->id}}"
                                                                                                            data-trigger="change"
-                                                                                                           data-required="true">
+                                                                                                           data-required="true"
+                                                                                                           data-error-message ="Choissisez un Car, SVP!">
                                                                                                     <i></i>
                                                                                                 </label>
                                                                                             </div>
@@ -102,14 +103,18 @@
                                                                             <label class="col-sm-3 control-label m-t-xl"><b>Description de l'incident</b></label>
                                                                             <div class="col-sm-8">
                                                                                 <textarea id="incident" name="incident" class="form-control input-sm" placeholder="Veuillez decrire l'incident survenu..."
-                                                                                          data-trigger="change" data-required="true" minlength="6"  style="overflow:scroll;height:150px;max-height:150px"></textarea>
+                                                                                          data-trigger="change" data-required="true" data-length="[6,300]"
+                                                                                          data-error-message ="Saissisez la Description de l'incident, SVP!"
+                                                                                          style="overflow:scroll;height:150px;max-height:150px"></textarea>
                                                                             </div>
                                                                         </div>
                                                                         <div class="form-group m-b-sm">
                                                                             <label class="col-sm-3 control-label m-t-xl"><b>Remarques eventuelles</b></label>
                                                                             <div class="col-sm-8">
                                                                                 <textarea id="remark" name="remark" class="form-control m-t-md input-sm" placeholder="Veuillez decrire les Remarques eventuelles constatées..."
-                                                                                          data-trigger="change" data-required="true" minlength="6"  style="overflow:scroll;height:150px;max-height:150px"></textarea>
+                                                                                          data-trigger="change" data-required="true" minlength="6"
+                                                                                          data-error-message ="Saissisez les Remarques eventuelles, SVP!"
+                                                                                          style="overflow:scroll;height:150px;max-height:150px"></textarea>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -121,7 +126,8 @@
                                                         <label class="control-label">Kilometrage</label>
                                                         <div class="input-group">
                                                             <input type="number" name="kilometer" class="form-control input-sm input-numeric"
-                                                                   data-trigger="change" data-required="true" data-typr="number" placeholder="0">
+                                                                   data-trigger="change" data-required="true" data-typr="number" placeholder="0"
+                                                                   data-error-message ="Entrer le kilmetrage du moteur, SVP!">
                                                             <span class="input-group-btn">
                                                                 <button class="btn btn-default btn-sm" type="button">km</button>
                                                                 </span>
@@ -141,7 +147,7 @@
                                                                             @forelse($fields as $key=>$field)
                                                                                 <div class="col-sm-3">
                                                                                     <label class="checkbox-inlinet i-checks m-r-md m-b-sm">
-                                                                                        <input type="checkbox" value="{{$field->id}}" name="field[]"><i></i> {{strtoupper($field->name)}}
+                                                                                        <input type="checkbox" value="{{$field->id}}" name="field[]" required><i></i> {{strtoupper($field->name)}}
                                                                                     </label>
                                                                                 </div>
                                                                             @empty
@@ -159,7 +165,7 @@
                                                                                             <div class="text-center uppercase">
                                                                                                 @forelse($trims as $key=>$trim)
                                                                                                     <label class="radio-inline i-checks">
-                                                                                                        <input type="checkbox" class="input-sm" value="{{$trim->id}}" name="trim[]" ><i></i>{{$trim->name}}
+                                                                                                        <input type="checkbox" class="input-sm" value="{{$trim->id}}" name="trim[]" required><i></i>{{$trim->name}}
                                                                                                     </label>
                                                                                                 @empty
                                                                                                     Aucun enjoliveur disponible
