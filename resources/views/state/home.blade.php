@@ -101,14 +101,14 @@
                                                                         <div class="form-group m-b-md">
                                                                             <label class="col-sm-3 control-label m-t-xl"><b>Description de l'incident</b></label>
                                                                             <div class="col-sm-8">
-                                                                                <textarea id="incident" name="incident" class="form-control" placeholder="Veuillez decrire l'incident survenu..."
+                                                                                <textarea id="incident" name="incident" class="form-control input-sm" placeholder="Veuillez decrire l'incident survenu..."
                                                                                           data-trigger="change" data-required="true" minlength="6"  style="overflow:scroll;height:150px;max-height:150px"></textarea>
                                                                             </div>
                                                                         </div>
                                                                         <div class="form-group m-b-sm">
                                                                             <label class="col-sm-3 control-label m-t-xl"><b>Remarques eventuelles</b></label>
                                                                             <div class="col-sm-8">
-                                                                                <textarea id="remark" name="remark" class="form-control m-t-md" placeholder="Veuillez decrire les Remarques eventuelles constatées..."
+                                                                                <textarea id="remark" name="remark" class="form-control m-t-md input-sm" placeholder="Veuillez decrire les Remarques eventuelles constatées..."
                                                                                           data-trigger="change" data-required="true" minlength="6"  style="overflow:scroll;height:150px;max-height:150px"></textarea>
                                                                             </div>
                                                                         </div>
@@ -251,7 +251,7 @@
                     type = 'post',
                     url = 'home',
                     status = "success",
-                    msg = "La Reception a bien été enregistrer";
+                    msg = "LA RECEPTION A ETE ENREGISTRE";
                 $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
                 $submit.button('loading');
                 $.ajax({
