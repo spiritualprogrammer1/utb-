@@ -118,8 +118,8 @@ class DiagnosticController extends Controller
                         ]);
                     }
                 } else {
-                    //State = 2 : no demand
-                    $diagnostic->update(['state' => '2']);
+                    //active = 2 : no demand
+                    $diagnostic->update(['active' => '1']);
                 }
                 return response()->json(['id' => $request->state, 'ot' => $diagnostic->state->reference,
                     'matriculation' => $diagnostic->state->bus->matriculation]);
