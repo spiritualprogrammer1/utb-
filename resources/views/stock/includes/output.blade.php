@@ -1,13 +1,13 @@
 <table class="table table-striped m-b-none capitalize" id="demandTable">
     <thead>
     <tr>
-        <th></th>
         @if($id == "demand")
         @else
             <th></th>
+            <th></th>
         @endif
         <th>Reference OT</th>
-        <th>Reference demande</th>
+        <th>Réf. demande</th>
         <th>Qté Dmdé</th>
         <th>Qté Livrée</th>
         <th>Car</th>
@@ -21,26 +21,26 @@
     <tbody>
     @foreach($demands as $key=>$demand)
         <tr id="output{{$demand->id}}" class="animated fadeInDown">
-            <td>{{$key + 1}}</td>
             @if($id == "demand")
             @else
+                <td>{{$key + 1}}</td>
                 <td><a href="#" id="{{$demand->id}}" onclick="information(this)">
                         <i class="fa fa-search-plus text-muted"></i></a></td>
             @endif
-            <td class="uppercase text-danger-dker">{{$demand->diagnostic->process->reference}}</td>
+            <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
             <td class="uppercase text-danger-dker">{{$demand->reference}}</td>
             <td>{{number_format($demand->demand_piece->sum('quantity'))}}</td>
             <td>{{number_format($demand->demand_piece->sum('delivered'))}}</td>
-            <td>{{$demand->diagnostic->process->state->bus->model->brand->name." ".$demand->diagnostic->process->state->bus->model->name}}</td>
+            <td>{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}</td>
             @if($id == "demand")
-                <td>{{$demand->created_at->format('d/m/Y')}}</td>
+                <td>{{Jenssegers\Date\Date::parse($demand->created_at)->format('j M Y')}}</td>
                 <td><a href="#" id="{{$demand->id}}" onclick="validate(this)"
-                       data-car="{{$demand->diagnostic->process->state->bus->model->brand->name." ".$demand->diagnostic->process->state->bus->model->name}}"
+                       data-car="{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}"
                        data-demand="{{$demand->reference}}"
-                       data-ot="{{$demand->diagnostic->process->reference}}" data-key="{{$key + 1}}">
+                       data-ot="{{$demand->diagnostic->state->reference}}" data-key="{{$key + 1}}">
                         <i class="fa fa-pencil"></i></a></td>
             @else
-                <td>{{$demand->updated_at->format('d/m/Y')}}</td>
+                <td>{{Jenssegers\Date\Date::parse($demand->updated_at)->format('j M Y')}}</td>
             @endif
         </tr>
     @endforeach
