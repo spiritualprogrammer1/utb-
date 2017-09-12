@@ -5,7 +5,7 @@
 @section('content')
     <section class="hbox stretch">
         <aside class="aside-xxl bg-light dker b-r hide" id="subNav">
-            <form id="createForm" class="panel panel-default">
+            <form id="createForm" method="post" action="" class="panel panel-default">
                 {{csrf_field()}}
                 <header class="panel-heading">
                     <div class="row">
@@ -14,7 +14,8 @@
                                     id="diagnostic" data-placeholder="Choissisez l'ordre de travail">
                                 <option></option>
                                 @foreach($diagnostics as $diagnostic)
-                                    <option value="{{$diagnostic->id}}" name="diagnostic" id="diagnostic{{$diagnostic->id}}"
+                                    <option value="{{$diagnostic->id}}" name="diagnostic"
+                                            id="diagnostic{{$diagnostic->id}}"
                                             data-bus="{{$diagnostic->state->bus->model->brand->name." ".$diagnostic->state->bus->model->brand->name}}"
                                             data-matriculation="{{$diagnostic->state->bus->matriculation}}">
                                         {{$diagnostic->state->reference}}</option>
@@ -58,7 +59,8 @@
                                         <header class="panel-heading">
                                             <div class="row">
                                                 <div class="col-md-11">
-                                                    <input class="form-control input-sm" name="title[]" id="reference_title"
+                                                    <input class="form-control input-sm" name="title[]"
+                                                           id="reference_title"
                                                            minlength="3"
                                                            placeholder="Intitulé de la réparation (ex: reglage des freins)"
                                                            required>
@@ -103,16 +105,11 @@
                         <i class="fa fa-file-pdf-o"></i>
                     </a>
                 </header>
-                <section class="scrollable wrapper w-f">
+                <section class="scrollable wrapper bg-light dker w-f">
                     <section class="panel panel-default">
                         <header class="panel-heading">
-                            <div class="row">
-
-                                    Reparation en cours ...
-
-                            </div>
+                                Reparation en cours ...
                         </header>
-
                         <div class="table-responsive">
                             <table class="table table-striped m-b-none capitalize" id="repairTable">
                                 <thead>
@@ -128,17 +125,17 @@
                                 </thead>
                                 <tbody id="repairRow">
                                 @foreach($repairs as $key=>$repair)
-                                    <tr>
+                                    <tr id="repair{{$repair->id}}">
                                         <td>{{$key + 1}}</td>
-                                        <td class="uppercase">{{$repair->diagnostic->state->reference}}</td>
-                                        <td class="uppercase">{{$repair->diagnostic->state->bus->matriculation}}</td>
-                                        <td class="uppercase">{{$repair->diagnostic->state->bus->chassis}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->chassis}}</td>
                                         <td>{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}</td>
-                                        <td>{{$repair->updated_at->format('d/m/Y')}}</td>
-                                        <td><a href="#" id="{{$repair->id}}" class="waiting"
+                                        <td>{{\Jenssegers\Date\Date::parse($repair->updated_at)->format('j M Y')}}</td>
+                                        <td><a href="#" id="{{$repair->id}}" class="repair"
                                                data-car="{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}"
                                                data-matriculation="{{$repair->diagnostic->state->bus->matriculation}}"
-                                               data-ot="{{$repair->diagnostic->reference}}">
+                                               data-ot="{{$repair->diagnostic->state->reference}}">
                                                 <i class="fa fa-pencil"></i></a></td>
                                     </tr>
                                 @endforeach
@@ -146,16 +143,99 @@
                             </table>
                         </div>
                     </section>
+                    <div class="cssload-container m-t-n-md none" id="spinner">
+                        <div class="cssload-progress cssload-float cssload-shadow m-t-n-md">
+                            <div class="cssload-progress-item"></div>
+                        </div>
+                    </div>
                 </section>
             </section>
         </aside>
     </section>
+    <div class="modal fade" id="validateModal">
+        <div class="modal-dialog modal-lg">
+            <form id="validateForm" class="modal-content">
+                {{csrf_field()}}
+                <input name="reference" id="ot_reference" type="hidden">
+                <div class="modal-header">
+                    <section class="panel panel-info m-b-n-sm">
+                        <div class="panel-body">
+                            <a href="#" class="thumb-md pull-right m-l m-t-xs">
+                                <img src="{{asset('assets/images/car_wrench.png')}}"> <i
+                                        class="on md b-white bottom"></i>
+                            </a>
+                            <div class="clear font-bold"><a href="#" class="text-primary-dk uppercase">@<span
+                                            id="matriculation"></span></a>
+                                <small class="block  uppercase text-danger-dker" id="ot"></small>
+                                <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car"></a>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-info m-b-none">
+                        <section class="panel panel-info" id="view">
+                        </section>
+                    </div>
+                </div>
+                <div class="modal-footer m-t-non">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="ro pull-left">
+                                <div class="checkbox i-checks text-danger-dker">
+                                    <label>
+                                        <input type="checkbox" name="finish" value="1" id="finish"><i></i>
+                                        <u class=" font-bold">Cochez si réparation terminée!</u>
+                                    </label>
+                                </div>
 
+                            </div>
+                        </div>
+                        <div class="col-md-6 pull-right">
+                            <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                                        class="fa fa-close"></i></button>
+                            <button type="submit" id="submit" class="btn btn-success btn-rounded uppercase">
+                                <i class="i i-checked"></i> Mettre à jour la réparation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+    <table class="table"
+           id="pieceAdd">
+        <tbody>
+        <tr>
+            <td>
+             <textarea class="form-control input-sm"
+                       name="piece[]"
+                       id="piece"
+                       placeholder="Nom piece + Marque & Model"
+                       rows="2" required></textarea>
+            </td>
+            <td>
+                <input class="form-control input-sm"
+                       name="quantity[]"
+                       id="quantity"
+                       placeholder="0"
+                       type="number" required>
+                <a href="#piece_row"
+                   data-dismiss="alert"
+                   class="btn btn-default btn-xs pull-right">
+                    <i class="fa fa-trash-o text-danger-dker"></i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 @endsection
 @section('scripts')
     <script>
         var $table = $('#repairTable'),
             $form_create = $('#createForm'),
+            $form = $('#validateForm'),
             $file = $('#file'),
             $submit_create = $('#submit_create'),
             $diagnostic = $('#diagnostic'),
@@ -164,7 +244,21 @@
             $repair_row = $('#repairRow'),
             $sub_nav = $('#subNav'),
             $repair_add = $('#repairAdd'),
-            $diagnostic_add = $('#diagnostic_add');
+            $repair = $('.repair'),
+            $car = $('#car'),
+            $ot = $('#ot'),
+            $matriculation = $('#matriculation'),
+            $diagnostic_add = $('#diagnostic_add'),
+            $modal_validate = $('#validateModal'),
+            $description_row = $('#descriptionRow'),
+            $table_description = $('#descriptionTable'),
+            $pieces_table = $('#piecesTable'),
+            $pieces_row = $('#piecesRow'),
+            $view = $('#view'),
+            $submit = $('#submit'),
+            $ot_reference = $('#ot_reference'),
+            $spinner = $('#spinner'),
+            $finish = $('#finish');
         $(function () {
             $table.dataTable({
                 "sPaginationType": "full_numbers",
@@ -204,7 +298,7 @@
                             '<td><a href="#" id="' + data.id + '" onclick="stockEdit(this)"><i class="fa fa-pencil"></i></a></td>' +
                             '<tr>';
                         $repair_row.before(row);
-                        $('#diagnostic'+data.diagnostic);
+                        $('#diagnostic' + data.diagnostic);
                         diagnostics();
                         $sub_nav.addClass('hide');
                         $submit_create.button('reset');
@@ -246,28 +340,112 @@
                 $('#reference_title' + count).val('');
                 $('#reference_description' + count).val('');
             });
-            /*$diagnostic.on('change', function () {
-                console.log($(this).attr('data-bus'));
-                $reference_bus.html($(this).attr('data-bus'));
-                $reference_matriculation.html($(this).attr('data-matriculation'))
-
-            });*/
-            //diagnostics();
-            function diagnostics() {
-                var id = '0';
-                $.get('home/'+id, function (data) {
-                    console.log(data.length);
-                    if (data.length === 0){
-                        $repair_add.addClass('disabled')
+            $repair.on('click', function () {
+                repair($(this))
+            });
+            $form.on('submit', function (e) {
+                e.preventDefault();
+                var formData = $(this).serialize(),
+                    type = 'put',
+                    url = $(this).attr('action'),
+                    status = "info",
+                    msg = "LA REPARATION A ETE MIS A JOUR";
+                if ($finish.is(":checked")){
+                    status = "success";
+                    msg = "LA REPARATION EST TERMINEE";
+                }
+                $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
+                $submit.button('loading');
+                $.ajax({
+                    url: url,
+                    type: type,
+                    data: formData,
+                    success: function (data) {
+                        $form.trigger('reset');
+                        $file.attr('data-value', data.id);
+                        $file.addClass('btn-danger');
+                        $file.removeClass('btn-default disabled');
+                        toastr[status](msg, "<span class='uppercase font-bold'>" + data.reference + "</span>!");
+                        toastr.options.preventDuplicates = true;
+                        if (data.finish === '1'){
+                            $('#repair'+data.id).remove();
+                        }else {
+                            $('#repair'+data.id).addClass('alert alert-info text-danger-dk font-bold');
+                        }
+                        $submit.button('reset');
+                        $modal_validate.modal('hide')
+                    },
+                    error: function (jqXhr) {
+                        if (jqXhr.status === 401)
+                            window.location.href = "/";
+                        if (jqXhr.status === 422) {
+                            var errors = jqXhr.responseJSON.message;
+                            var errorsHtml = '';
+                            $.each(errors, function (key, value) {
+                                errorsHtml += value[0] + '</br>';
+                            });
+                            swal(
+                                'Oops...',
+                                errorsHtml,
+                                'error'
+                            );
+                            $submit.button('reset');
+                        } else {
+                            alert("Une erreur s'est produite, Recharger la page, puis réesayer SVP \nSi l'erreur persiste veullez contactez l'administrateur \nErreur: " + jqXhr.statusText);
+                            $submit.button('reset');
+                        }
                     }
-                    $diagnostic.empty();
-                    $diagnostic.append('<option></option>');
-                    $.each(data, function (index, modelObj) {
-                        $diagnostic.append('<option value="' + modelObj['state'].id + '" class="uppercase">' + modelObj['state'].reference + '</option>');
-                        $diagnostic.trigger("chosen:updated");
-                    })
-                })
+                });
+            });
+            $finish.on('click', function () {
+                var check;
+                check = $finish.is(":checked");
+                if (check) {
+                    $submit.removeClass('btn-success');
+                    $submit.addClass('btn-danger');
+                    $submit.html('<i class="fa fa-lock"></i> Terminer la réparation')
+                } else {
+                    $submit.removeClass('btn-danger');
+                    $submit.addClass('btn-success');
+                    $submit.html('<i class="i i-checked"></i> Mettre à jour la réparation')
+                }
+            });
+            /*$diagnostic.on('change', function () {
+             console.log($(this).attr('data-bus'));
+             $reference_bus.html($(this).attr('data-bus'));
+             $reference_matriculation.html($(this).attr('data-matriculation'))
+
+             });*/
+            //diagnostics();
+            function repair(obj) {
+                $spinner.show();
+                var id = $(obj).attr('id');
+                $.get('home/' + id, function (data) {
+                    $car.html($(obj).attr('data-car'));
+                    $matriculation.html($(obj).attr('data-matriculation'));
+                    $ot_reference.val($(obj).attr('data-ot'));
+                    $ot.html($(obj).attr('data-ot'));
+                    $form.attr('action', 'home/'+id);
+                    $view.html(data);
+                    $modal_validate.modal('show');
+                    $spinner.hide()
+                });
             }
-        })
+        });
+        function diagnostics() {
+            var id = '0';
+            $.get('home/' + id, function (data) {
+                console.log(data.length);
+                if (data.length === 0) {
+                    $repair_add.addClass('disabled')
+                }
+                $diagnostic.empty();
+                $diagnostic.append('<option></option>');
+                $.each(data, function (index, modelObj) {
+                    $diagnostic.append('<option value="' + modelObj['state'].id + '" class="uppercase">' + modelObj['state'].reference + '</option>');
+                    $diagnostic.trigger("chosen:updated");
+                })
+            })
+        }
     </script>
 @endsection
