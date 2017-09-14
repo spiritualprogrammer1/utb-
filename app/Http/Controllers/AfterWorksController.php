@@ -95,6 +95,7 @@ class AfterWorksController extends Controller
                 'employee_id' => $request->tester,
                 'diagnostic_id' => $diagnostic->id,
                 'user_id' => Auth::user()->id,
+                'site_id' => Auth::user()->id,
             ]);
             return response()->json(['id' => $id, 'reference' => $diagnostic->state->reference]);
         }
