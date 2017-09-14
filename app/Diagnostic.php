@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Diagnostic extends Model
 {
-    protected $fillable = ['ids', 'reference', 'state', 'type', 'state_id', 'user_id'];
+    protected $fillable = ['ids', 'reference', 'active', 'type', 'state_id', 'user_id'];
 
     public function state()
     {
@@ -26,6 +26,21 @@ class Diagnostic extends Model
     public function repair()
     {
         return $this->hasMany(Repair::class);
+    }
+
+    function before_work()
+    {
+        return $this->hasOne(Before_work::class);
+    }
+
+    function after_work()
+    {
+        return $this->hasMany(After_work::class);
+    }
+
+    function approval()
+    {
+        return $this->hasMany(Approval::class);
     }
 
     public function visit_technique()
