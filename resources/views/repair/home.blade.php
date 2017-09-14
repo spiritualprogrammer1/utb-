@@ -23,7 +23,6 @@
                             </select>
                         </div>
                         <div class="col-md-8 text-danger-dker font-bold">
-                            <span id="reference_matriculation"></span>
                             <span id="reference_bus"></span>
                             <button type="submit" id="submit_create"
                                     class="btn btn-success btn-success btn-sm pull-right uppercase">
@@ -104,6 +103,17 @@
                        title="Fiche d'etat...">
                         <i class="fa fa-file-pdf-o"></i>
                     </a>
+                    <div class="btn-group pull-right" data-toggle="buttons">
+                        <a href="#" class="btn btn-sm btn-bg btn-default btn-rounded" onclick="$('#repairTable').tableExport({type:'xlsx',escape:'false'});">
+                            <img src="{{asset('assets/images/icons/xls.png')}}" width="20"> Excel
+                        </a>
+                        <a href="#" class="btn btn-sm btn-bg btn-default" onclick="$('#repairTable').tableExport({type:'pdf',escape:'false'});">
+                            <img src="{{asset('assets/images/icons/pdf.png')}}" width="20"> PDF
+                        </a>
+                        <a href="#" class="btn btn-sm btn-bg btn-default btn-rounded" onclick="$('#repairTable').tableExport({type:'csv',escape:'false'});">
+                            <img src="{{asset('assets/images/icons/csv.png')}}" width="20"> CSV
+                        </a>
+                    </div>
                 </header>
                 <section class="scrollable wrapper bg-light dker w-f">
                     <section class="panel panel-default">
@@ -137,7 +147,7 @@
                                                 <i class="fa fa-pencil"></i></a></td>
                                         <td class="text-lowercase">@if($repair->state == 4)
                                                 <span class="badge bg-danger">retour {{$repair->diagnostic->after_work->count()}}</span>
-                                                @else <span class="badge bg-success">en cours</span> @endif
+                                            @else <span class="badge bg-success">en cours</span> @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -177,8 +187,8 @@
                     </section>
                 </div>
                 <div class="modal-body m-b-n-lg">
-                        <section class="panel panel-info" id="view">
-                        </section>
+                    <section class="panel panel-info" id="view">
+                    </section>
                 </div>
                 <div class="modal-footer m-t-non">
                     <div class="row">
@@ -205,7 +215,6 @@
             </form><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div>
-
     <table class="table"
            id="pieceAdd">
         <tbody>
@@ -241,8 +250,6 @@
             $file = $('#file'),
             $submit_create = $('#submit_create'),
             $diagnostic = $('#diagnostic'),
-            $reference_matriculation = $('#reference_matriculation'),
-            $reference_bus = $('#reference_bus'),
             $repair_row = $('#repairRow'),
             $sub_nav = $('#subNav'),
             $repair_add = $('#repairAdd'),
@@ -252,10 +259,6 @@
             $matriculation = $('#matriculation'),
             $diagnostic_add = $('#diagnostic_add'),
             $modal_validate = $('#validateModal'),
-            $description_row = $('#descriptionRow'),
-            $table_description = $('#descriptionTable'),
-            $pieces_table = $('#piecesTable'),
-            $pieces_row = $('#piecesRow'),
             $view = $('#view'),
             $submit = $('#submit'),
             $ot_reference = $('#ot_reference'),
@@ -302,7 +305,6 @@
                         $repair_row.before(row);
                         $('#diagnostic' + data.diagnostic);
                         diagnostics();
-                        $sub_nav.addClass('hide');
                         $submit_create.button('reset');
                     },
                     error: function (jqXhr) {
@@ -352,7 +354,7 @@
                     url = $(this).attr('action'),
                     status = "info",
                     msg = "LA REPARATION A ETE MIS A JOUR";
-                if ($finish.is(":checked")){
+                if ($finish.is(":checked")) {
                     status = "success";
                     msg = "LA REPARATION EST TERMINEE";
                 }
@@ -369,10 +371,10 @@
                         $file.removeClass('btn-default disabled');
                         toastr[status](msg, "<span class='uppercase font-bold'>" + data.reference + "</span>!");
                         toastr.options.preventDuplicates = true;
-                        if (data.finish === '1'){
-                            $('#repair'+data.id).remove();
-                        }else {
-                            $('#repair'+data.id).addClass('alert alert-info text-danger-dk font-bold');
+                        if (data.finish === '1') {
+                            $('#repair' + data.id).remove();
+                        } else {
+                            $('#repair' + data.id).addClass('alert alert-info text-danger-dk font-bold');
                         }
                         $submit.button('reset');
                         $modal_validate.modal('hide')
@@ -427,7 +429,7 @@
                     $matriculation.html($(obj).attr('data-matriculation'));
                     $ot_reference.val($(obj).attr('data-ot'));
                     $ot.html($(obj).attr('data-ot'));
-                    $form.attr('action', 'home/'+id);
+                    $form.attr('action', 'home/' + id);
                     $view.html(data);
                     $modal_validate.modal('show');
                     $spinner.hide()
@@ -437,9 +439,10 @@
         function diagnostics() {
             var id = '0';
             $.get('home/' + id, function (data) {
-                console.log(data.length);
                 if (data.length === 0) {
-                    $repair_add.addClass('disabled')
+                    $repair_add.addClass('disabled');
+                    $sub_nav.removeClass('show');
+                    $sub_nav.addClass('hide')
                 }
                 $diagnostic.empty();
                 $diagnostic.append('<option></option>');
