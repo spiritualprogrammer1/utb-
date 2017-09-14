@@ -1,8 +1,8 @@
 <header class="panel-heading text-right bg-light">
-    <ul class="nav nav-tabs pull-left">
-        <li class="dropdown active">
+    <ul class="nav nav-tabs nav-justified  uppercase">
+        <li class="dropdown @if($repair->state == 4) @else active @endif">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
-                        class="fa fa-comments text-muted"></i> Details de la réparation <b class="caret"></b></a>
+                        class="fa fa-comments text-muted"></i> Details <b class="caret"></b></a>
             <ul class="dropdown-menu text-left">
                 <li><a href="#repair-description" data-toggle="tab">
                         <i class="i i-list"></i> Liste des details</a>
@@ -12,7 +12,6 @@
                 </li>
             </ul>
         </li>
-
         <li><a href="#technicians" data-toggle="tab">
                 <i class="i i-users2 text-muted"></i> Techniciens</a>
         </li>
@@ -20,35 +19,42 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
                         class="fa fa-cog text-muted"></i> Pieces de réparation <b class="caret"></b></a>
             <ul class="dropdown-menu text-left">
-                <li><a href="#repair-pieces" data-toggle="tab">Liste des piéces attribuées</a></li>
-                <li><a href="#repair-piece" data-toggle="tab">Demande des pieces</a></li>
+                <li><a href="#repair-pieces" data-toggle="tab"><i class="i i-stack"></i> Liste des piéces attribuées</a>
+                </li>
+                <li><a href="#repair-piece" data-toggle="tab"><i class="i i-stack2"></i> Demande des pieces</a></li>
             </ul>
         </li>
+        @if($repair->state == 4)
+            <li class="active"><a href="#afterworks" data-toggle="tab" class="uppercase text-danger-dker">
+                    <i class="fa fa-warning"></i> Remarques Apres test
+                </a>
+            </li>
+        @endif
     </ul>
-    <span class="hidden-sm">Left</span>
+
 </header>
 <div class="panel-body">
     <div class="tab-content">
-        <div class="tab-pane fade active in" id="repair-description">
-            <table class="table table-striped m-b-none">
-                <thead>
-                <tr>
-                    <th width="25%">Intitulé</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
+        <div class="tab-pane fade @if($repair->state == 4) @else active in @endif" id="repair-description">
+            <div class="panel-group m-b" id="accordionDescription">
                 @foreach($descriptions as $key=>$description)
-                    <tr>
-                        <td class="capitalize">{{$description->title}}<br/>
-                            <small class="text-muted m-t-md">
-                                <i class="fa fa-clock-o"></i>
-                                {{\Jenssegers\Date\Date::parse($description->created_at)->format('j M Y')}}</small></td>
-                        <td>{{$description->description}}</td>
-                    </tr>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <a class="accordion-toggle @if($key > 0) collapsed @endif" data-toggle="collapse" data-parent="#accordionDescription" href="#description{{$key}}">
+                                <span class="capitalize">{{$description->title}}</span>
+                                <span class="pull-right">
+                                       {{\Jenssegers\Date\Date::parse($description->created_at)->format('j M Y')}}
+                                   </span>
+                            </a>
+                        </div>
+                        <div id="description{{$key}}" class="panel-collapse collapse @if($key == 0) in @endif" style="height: auto;">
+                            <div class="panel-body">
+                                {{$description->description}}
+                            </div>
+                        </div>
+                    </div>
                 @endforeach
-                </tbody>
-            </table>
+            </div>
         </div>
         <div class="tab-pane fade" id="repair-new">
             <a href="#"
@@ -81,7 +87,8 @@
                             </tr>
                         @endforeach
                     @else
-                        <tr><td colspan="3" class="text-center"><span class="badge bg-danger">
+                        <tr>
+                            <td colspan="3" class="text-center"><span class="badge bg-danger">
                                     {{$demand->where('state','0')->count()}}</span>
                                 Demande de piece en attente
                             </td>
@@ -144,8 +151,7 @@
                             réparation
                         </small>
                     </p>
-
-                    <select class="chosen-selectz form-control input-sm"
+                    <select class="chosen-select form-control input-sm"
                             data-placeholder="Choissisez les technicien"
                             name="technician[]"
                             id="technician" multiple>
@@ -158,12 +164,33 @@
                 </div>
             </div>
         </div>
+        <div class="tab-pane fade @if($repair->state == 4) active in @endif" id="afterworks">
+            <div class="panel-group m-b" id="accordionRemark">
+                @foreach($repair->diagnostic->after_work->sortByDesc('created_at') as $key=>$item)
+                        <div class="panel panel-danger">
+                            <div class="panel-heading">
+                                <a class="accordion-toggle @if($key > 0) collapsed @endif" data-toggle="collapse" data-parent="#accordionRemark" href="#remark{{$key}}">
+                                    <span class="capitalize">{{$item->employee->username}}</span>
+                                   <span class="pull-right">
+                                       {{\Jenssegers\Date\Date::parse($item->created_at)->format('j M Y')}}
+                                   </span>
+                                </a>
+                            </div>
+                            <div id="remark{{$key}}" class="panel-collapse collapse @if($key == 0) in @endif" style="height: auto;">
+                                <div class="panel-body text-danger-dker">
+                                    {{$item->description}}
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     var $piece_add = $('#piece_add'),
-    $detail_new = $('#detail_add');
+        $detail_new = $('#detail_add');
     $piece_add.on('click', function () {
         var $table = $('#pieceTable tbody');
         $table.append($('#pieceAdd tbody tr:last').clone());
