@@ -107,9 +107,6 @@
                 </header>
                 <section class="scrollable wrapper bg-light dker w-f">
                     <section class="panel panel-default">
-                        <header class="panel-heading">
-                                Reparation en cours ...
-                        </header>
                         <div class="table-responsive">
                             <table class="table table-striped m-b-none capitalize" id="repairTable">
                                 <thead>
@@ -121,6 +118,7 @@
                                     <th>Car</th>
                                     <th>Date</th>
                                     <th><i class="fa fa-cog"></i></th>
+                                    <th>Status</th>
                                 </tr>
                                 </thead>
                                 <tbody id="repairRow">
@@ -137,6 +135,10 @@
                                                data-matriculation="{{$repair->diagnostic->state->bus->matriculation}}"
                                                data-ot="{{$repair->diagnostic->state->reference}}">
                                                 <i class="fa fa-pencil"></i></a></td>
+                                        <td class="text-lowercase">@if($repair->state == 4)
+                                                <span class="badge bg-danger">retour {{$repair->diagnostic->after_work->count()}}</span>
+                                                @else <span class="badge bg-success">en cours</span> @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -169,14 +171,14 @@
                                 <small class="block  uppercase text-danger-dker" id="ot"></small>
                                 <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car"></a>
                             </div>
+                            <h4 style="" class="text-center m-t-n-xl font-thin m-l-lg text-dark-dker">TRAVAUX DE
+                                <span class="font-bold">REPARATION</span></h4>
                         </div>
                     </section>
                 </div>
-                <div class="modal-body">
-                    <div class="panel panel-info m-b-none">
+                <div class="modal-body m-b-n-lg">
                         <section class="panel panel-info" id="view">
                         </section>
-                    </div>
                 </div>
                 <div class="modal-footer m-t-non">
                     <div class="row">
@@ -263,7 +265,7 @@
             $table.dataTable({
                 "sPaginationType": "full_numbers",
                 "sDom": "<'row'<'col-sm-6'l><'col-sm-6'f>r>t<'row'<'col-sm-6'i><'col-sm-6'p>>",
-                "iDisplayLength": 5,
+                "iDisplayLength": 50,
                 "language": {
                     "url": "../assets/js/datatables/French.json"
                 }
