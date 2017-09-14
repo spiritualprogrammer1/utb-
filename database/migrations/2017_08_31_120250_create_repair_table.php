@@ -87,12 +87,39 @@ class CreateRepairTable extends Migration
             $table->string('process_id');
             $table->integer('process_id');
             $table->integer('employee_id');
+            $table->integer('user_id');
             $table->timestamps();
 
             $table->foreign('process_id')->references('id')->on('processes')
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->foreign('employee_id')->references('id')->on('employees')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+        });
+
+        Schema::create('after_works', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('ids')->unique();
+            $table->enum('type', ['0','4']);
+            $table->integer('distance');
+            $table->string('place');
+            $table->string('description');
+            $table->string('process_id');
+            $table->integer('process_id');
+            $table->integer('employee_id');
+            $table->integer('user_id');
+            $table->timestamps();
+
+            $table->foreign('process_id')->references('id')->on('processes')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('employee_id')->references('id')->on('employees')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
