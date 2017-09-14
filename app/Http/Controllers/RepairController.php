@@ -36,7 +36,8 @@ class RepairController extends Controller
             $active = '0';
         }
         $repairs = Repair::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
-        return view('repair.home', ['diagnostics' => $diagnostics, 'technicians' => $technicians, 'repairs' => $repairs, 'active' => $active]);
+        return view('repair.home', ['diagnostics' => $diagnostics, 'technicians' => $technicians,
+            'repairs' => $repairs, 'active' => $active]);
     }
 
     public function create()
@@ -70,12 +71,12 @@ class RepairController extends Controller
                 ], 422);
             } else {
                 $diagnostic = Diagnostic::findOrFail($request->diagnostic)->update(['active' => '0']);
-                $repair = Repair::create([
+               $repair = Repair::create([
                     'ids' => Carbon::now()->timestamp,
                     'diagnostic_id' => $request->diagnostic,
                     // state = 1 : repair create
                     'state' => '1',
-                    'site_id' => '1',
+                    'site_id' => Auth::user()->id,
                     'user_id' => Auth::user()->id,
                 ]);
                 for ($i = 0; $i < count($request->technician); $i++) {
