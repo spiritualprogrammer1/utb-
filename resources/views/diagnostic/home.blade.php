@@ -471,8 +471,7 @@
             </section>
         </section>
     </section>
-    <table class="table"
-           id="pieceAdd">
+    <table class="table" id="pieceAdd">
         <tbody>
         <tr>
             <td>
@@ -520,10 +519,6 @@
             $test = $('#test'),
             $piece_add = $('#piece_add'),
             $diagnostic_add = $('#diagnostic_add'),
-            $view = $('#view'),
-            $spinner2 = $('#spinner2'),
-            $before = $('#before_works'),
-            $before_input = $('.before_works');
         $spinner = $('#spinner');
         $(function () {
             $table.dataTable({
