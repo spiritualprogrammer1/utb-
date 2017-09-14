@@ -110,7 +110,7 @@
                             </div>
                             <h4 style="" class="text-center m-t-n-xl font-thin m-l-lg text-dark-dker">APPROBATION DES
                                 TRAVAUX DE
-                                <span class="font-bold">REPARATION</span></h4>
+                                <span class="font-bold uppercase">Réparation</span></h4>
                         </div>
                     </section>
                 </div>
@@ -244,8 +244,8 @@
                                         </div>
                                     </div>
                                     <div class="tab-pane" id="works">
-                                        <section class="panel" id="descriptions">
-                                        </section>
+                                        <div class="panel-group m-b" id="accordionDescriptions">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -271,7 +271,7 @@
             $ot = $('#ot'),
             $matriculation = $('#matriculation'),
             $form = $('#validateForm'),
-            $descriptions = $('#descriptions'),
+            $descriptions = $('#accordionDescriptions'),
             $valid = $('.valid'),
             $remark = $('#remark'),
             $file = $('#file'),
@@ -294,7 +294,8 @@
             $repair.on('click', function () {
                 $spinner.show();
                 var id = $(this).attr('id'),
-                    $i = '0';
+                    active = '',
+                    collapse = '';
                 $car.html($(this).attr('data-car'));
                 $matriculation.html($(this).attr('data-matriculation'));
                 $ot.html($(this).attr('data-ot'));
@@ -302,20 +303,20 @@
                 $form.attr('action', 'home/' + id);
                 $.get('home/' + id, function (data) {
                     $descriptions.empty();
-                    $descriptions.append('<div class="panel-group m-b" id="accordionDescriptions">');
                     $.each(data, function (index, modelObj) {
                         if (index === 0) {
-                            $i = 'in'
-                        } else {
-                            $i = 'collapsed'
+                            active = 'in'
+                        }else {
+                            collapse = 'collapsed';
+                            active = ''
                         }
-                        $descriptions.append('<div class="panel panel-info m-b-none m-b-xs"><div class="panel-heading"> ' +
-                            '<a class="accordion-toggle capitalize" data-toggle="collapse" data-parent="#accordionDescriptions" href="#descriptions' + index + '">' +
-                            '' + modelObj.title + '</a></div> ' +
-                            '<div id="descriptions' + index + '" class="panel-collapse collapse ' + $i + '" style="height: auto;"> ' +
-                            '<div class="panel-body text-sm">' + modelObj.description + '</div></div> </div>');
+                        $descriptions.append('<div class="panel panel-info"><div class="panel-heading">' +
+                            '<a class="accordion-toggle '+collapse+' capitalize" data-toggle="collapse" data-parent="#accordionDescriptions" href="#detail' + index + '">' +
+                            '' + modelObj.title + ' <small class="pull-right text-muted"><i class="fa fa-clock-o"></i> ' +
+                            '' + modelObj.created_at + '</small></a></div>' +
+                            '<div id="detail' + index + '" class="panel-collapse collapse ' + active + '" style="height: auto;">' +
+                            '<div class="panel-body text-sm">' + modelObj.description + '</div> </div></div>');
                     });
-                    $descriptions.append('</div>');
                     $spinner.hide();
                     $modal.modal('show');
                 });
