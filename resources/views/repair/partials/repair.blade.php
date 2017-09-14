@@ -5,7 +5,7 @@
                         class="fa fa-comments text-muted"></i> Details <b class="caret"></b></a>
             <ul class="dropdown-menu text-left">
                 <li><a href="#repair-description" data-toggle="tab">
-                        <i class="i i-list"></i> Liste des details</a>
+                        <i class="i i-list"></i> Detail des réparations</a>
                 </li>
                 <li><a href="#repair-new" data-toggle="tab">
                         <i class="i i-add-to-list"></i> Ajouter les details</a>
