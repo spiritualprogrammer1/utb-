@@ -95,6 +95,8 @@ class DiagnosticController extends Controller
                     'description' => $request->description,
                     'employee_id' => $request->tester,
                     'diagnostic_id' => $diagnostic->id,
+                    'user_id' => Auth::user()->id,
+                    'site_id' => Auth::user()->id,
                 ]);
                 for ($i = 0; $i < count($request->technician); $i++) {
                     $diagnostic_employee = Diagnostic_employee::create([
