@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\After_work;
-use App\Before_work;
+use App\Work;
 use App\Employee;
 use App\Repair;
-use App\Repair_description;
+use App\Service_description;
 use App\Revision;
 use App\Visit_technique;
 use Carbon\Carbon;
@@ -41,7 +41,7 @@ class AfterWorksController extends Controller
     public function show(Request $request, $id)
     {
         if ($request->ajax()) {
-            $descriptions = Repair_description::where('repair_id', $id)->get();
+            $descriptions = Repair::findOrFail($id)->diagnostic->service_description;
             return response()->json($descriptions);
         } else {
             return view('errors.500');
@@ -86,9 +86,10 @@ class AfterWorksController extends Controller
             if ($request->has('repair')) {
                 $repair = Repair::findOrFail($id)->update(['state' => $request->valid]);
             }
-            $after_works = After_work::create([
+            $works = Work::create([
                 'ids' => Carbon::now()->timestamp,
-                'type' => $request->valid,
+                'type' => '2',
+                'state' => $request->valid,
                 'distance' => $request->distance,
                 'place' => $request->place,
                 'description' => $request->description,
