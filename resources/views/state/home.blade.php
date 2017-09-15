@@ -147,7 +147,7 @@
                                                                             @forelse($fields as $key=>$field)
                                                                                 <div class="col-sm-3">
                                                                                     <label class="checkbox-inlinet i-checks m-r-md m-b-sm">
-                                                                                        <input type="checkbox" value="{{$field->id}}" name="field[]" required><i></i> {{strtoupper($field->name)}}
+                                                                                        <input type="checkbox" value="{{$field->id}}" name="field[]"><i></i> {{strtoupper($field->name)}}
                                                                                     </label>
                                                                                 </div>
                                                                             @empty
@@ -165,7 +165,7 @@
                                                                                             <div class="text-center uppercase">
                                                                                                 @forelse($trims as $key=>$trim)
                                                                                                     <label class="radio-inline i-checks">
-                                                                                                        <input type="checkbox" class="input-sm" value="{{$trim->id}}" name="trim[]" required><i></i>{{$trim->name}}
+                                                                                                        <input type="checkbox" class="input-sm" value="{{$trim->id}}" name="trim[]"><i></i>{{$trim->name}}
                                                                                                     </label>
                                                                                                 @empty
                                                                                                     Aucun enjoliveur disponible
