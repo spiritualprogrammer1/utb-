@@ -139,7 +139,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <ul class="list-group alt">
-                        @foreach($technicians as $key=>$technician)
+                        @foreach($repair->diagnostic->service_employee as $key=>$technician)
                             <li class="list-group-item">
                                 <div class="media">
                         <span class="pull-left thumb-sm"><img src="{{asset('assets/images/a0.png')}}" alt="John said"
