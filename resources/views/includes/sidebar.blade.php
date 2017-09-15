@@ -84,7 +84,8 @@
 
                         <!-- **** SERVICES LINKS **** -->
                         <li class="{{ Request::path() == 'repair/home' ? 'active' : '' }}
-                        {{ Request::path() == 'revision/home' ? 'active' : '' }}">
+                        {{ Request::path() == 'revision/home' ? 'active' : '' }}
+                        {{ Request::path() == 'visit/home' ? 'active' : '' }}">
                             <a href="#" class="auto">
                                 <span class="pull-right text-muted">
                                   <i class="i i-circle-sm-o text"></i>
@@ -104,8 +105,8 @@
                                         <i class="i i-dot"></i><span>Revision</span>
                                     </a>
                                 </li>
-                                <li class="{{ Request::path() == 'performance/visit' ? 'active' : '' }}">
-                                    <a href="{{url('/performance/visit')}}" class="auto">
+                                <li class="{{ Request::path() == 'visit/home' ? 'active' : '' }}">
+                                    <a href="{{url('visit/home')}}" class="auto">
                                         <i class="i i-dot"></i><span>Visite Technique</span>
                                     </a>
                                 </li>
