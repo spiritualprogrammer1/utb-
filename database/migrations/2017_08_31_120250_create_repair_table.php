@@ -78,19 +78,20 @@ class CreateRepairTable extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::create('before_works', function (Blueprint $table) {
+        Schema::create('works', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('ids')->unique();
+            $table->enum('state',['1','0','4']);
             $table->integer('distance');
             $table->string('place');
             $table->string('description');
-            $table->string('process_id');
-            $table->integer('process_id');
-            $table->integer('employee_id');
-            $table->integer('user_id');
+            $table->integer('diagnostic_id')->unsigned();
+            $table->integer('employee_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->integer('site_id')->unsigned();
             $table->timestamps();
 
-            $table->foreign('process_id')->references('id')->on('processes')
+            $table->foreign('diagnostic_id')->references('id')->on('diagnostics')
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->foreign('employee_id')->references('id')->on('employees')
@@ -98,28 +99,8 @@ class CreateRepairTable extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
-        });
 
-        Schema::create('after_works', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('ids')->unique();
-            $table->enum('type', ['0','4']);
-            $table->integer('distance');
-            $table->string('place');
-            $table->string('description');
-            $table->string('process_id');
-            $table->integer('process_id');
-            $table->integer('employee_id');
-            $table->integer('user_id');
-            $table->timestamps();
-
-            $table->foreign('process_id')->references('id')->on('processes')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->foreign('employee_id')->references('id')->on('employees')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->foreign('user_id')->references('id')->on('users')
+            $table->foreign('site_id')->references('id')->on('sites')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
@@ -143,7 +124,8 @@ class CreateRepairTable extends Migration
             $table->increments('id');
             $table->integer('ids')->unique();
             $table->integer('diagnostic_id');
-            $table->enum('state', ['0', '1', '2', '3', '4']);
+            //0 = finish, 1 = begin, 2 = demand, 3 = demand accepted, 4 = repair return, 5 = output
+            $table->enum('state', ['0', '1', '2', '3', '4','5']);
             $table->integer('site_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->timestamps();
@@ -181,6 +163,25 @@ class CreateRepairTable extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->foreign('employee_id')->references('id')->on('employees')
+                ->onUpdate('cascade')->onDelete('cascade');
+        });
+
+        Schema::create('approvals', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('ids')->unique();
+            $table->text('remark')->nullable();
+            $table->integer('diagnostic_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->integer('site_id')->unsigned();
+            $table->timestamps();
+
+            $table->foreign('diagnostic_id')->references('id')->on('diagnostics')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('site_id')->references('id')->on('sites')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
     }
