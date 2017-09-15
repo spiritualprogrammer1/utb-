@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\After_work;
+use App\Visit;
 use App\Work;
 use App\Employee;
 use App\Repair;
@@ -41,7 +42,7 @@ class AfterWorksController extends Controller
     public function show(Request $request, $id)
     {
         if ($request->ajax()) {
-            $descriptions = Repair::findOrFail($id)->diagnostic->service_description->sortByDesc('created_at');
+            $descriptions = Service_description::where('diagnostic_id',$id)->orderBy('created_at','desc')->get();
             return response()->json($descriptions);
         } else {
             return view('errors.500');
@@ -51,7 +52,16 @@ class AfterWorksController extends Controller
 
     public function edit($id)
     {
-        //
+        if ($id == 1){
+            $repairs = Repair::where('state', '3')->get();
+            return view('afterworks.includes.repair', ['repairs' => $repairs]);
+        }elseif ($id == 2){
+            $revisions = Revision::where('state', '3')->get();
+            return view('afterworks.includes.revision', ['revisions' => $revisions]);
+        }else{
+            //$visits = Visit::where('state', '3')->get();
+            //return view('afterworks.includes.visit', ['revisions' => $visits]);
+        }
     }
 
 
@@ -85,6 +95,8 @@ class AfterWorksController extends Controller
             $diagnostic = $repair->diagnostic;
             if ($request->has('repair')) {
                 $repair = Repair::findOrFail($id)->update(['state' => $request->valid]);
+            }elseif ($request->has('revision')){
+                $revision = Revision::findOrFail($id)->update(['state' => $request->valid]);
             }
             $works = Work::create([
                 'ids' => Carbon::now()->timestamp,
