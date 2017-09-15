@@ -78,12 +78,12 @@
                 </thead>
                 <tbody>
                 @forelse($demands as $key=>$demand)
-                    @if($demand->state == '3')
+                    @if($demand->state == '2' or $demand->state == '3')
                         @foreach($demand->demand_piece as $piece)
                             <tr>
                                 <td class="capitalize">{{$piece->piece}}</td>
-                                <td>{{$piece->quantity}}</td>
-                                <td>{{$piece->delivered}}</td>
+                                <td class="text-center">{{$piece->quantity}}</td>
+                                <td class="text-center">{{$piece->delivered}}</td>
                             </tr>
                         @endforeach
                     @else
@@ -166,17 +166,18 @@
         </div>
         <div class="tab-pane fade @if($repair->state == 4) active in @endif" id="afterworks">
             <div class="panel-group m-b" id="accordionRemark">
-                @foreach($repair->diagnostic->after_work->sortByDesc('created_at') as $key=>$item)
+                <?php $count = $repair->diagnostic->work->where('state','4')->count() ?>
+                @foreach($repair->diagnostic->work->where('state','4')->sortByDesc('created_at') as $key=>$item)
                         <div class="panel panel-danger">
                             <div class="panel-heading">
-                                <a class="accordion-toggle @if($key > 0) collapsed @endif" data-toggle="collapse" data-parent="#accordionRemark" href="#remark{{$key}}">
+                                <a class="accordion-toggle @if($key < $count) collapsed @endif" data-toggle="collapse" data-parent="#accordionRemark" href="#remark{{$key}}">
                                     <span class="capitalize">{{$item->employee->username}}</span>
                                    <span class="pull-right">
                                        {{\Jenssegers\Date\Date::parse($item->created_at)->format('j M Y')}}
                                    </span>
                                 </a>
                             </div>
-                            <div id="remark{{$key}}" class="panel-collapse collapse @if($key == 0) in @endif" style="height: auto;">
+                            <div id="remark{{$key}}" class="panel-collapse collapse @if($key == $count) in @endif" style="height: auto;">
                                 <div class="panel-body text-danger-dker">
                                     {{$item->description}}
                                 </div>
