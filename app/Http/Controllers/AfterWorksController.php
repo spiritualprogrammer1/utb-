@@ -41,7 +41,7 @@ class AfterWorksController extends Controller
     public function show(Request $request, $id)
     {
         if ($request->ajax()) {
-            $descriptions = Repair::findOrFail($id)->diagnostic->service_description;
+            $descriptions = Repair::findOrFail($id)->diagnostic->service_description->sortByDesc('created_at');
             return response()->json($descriptions);
         } else {
             return view('errors.500');
