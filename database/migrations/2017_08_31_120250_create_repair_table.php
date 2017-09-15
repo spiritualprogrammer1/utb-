@@ -140,26 +140,26 @@ class CreateRepairTable extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::create('repairs_descriptions', function (Blueprint $table) {
+        Schema::create('service_descriptions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('ids')->unique();
             $table->string('title');
             $table->text('description');
-            $table->integer('repair_id');
+            $table->integer('diagnostic_id');
             $table->timestamps();
 
-            $table->foreign('repair_id')->references('id')->on('repairs')
+            $table->foreign('diagnostic_id')->references('id')->on('diagnostics')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::create('repair_technician', function (Blueprint $table) {
+        Schema::create('service_employees', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('ids')->unique();
-            $table->integer('repair_id')->unsigned();
+            $table->integer('diagnostic_id')->unsigned();
             $table->integer('employee_id')->unsigned();
             $table->timestamps();
 
-            $table->foreign('repair_id')->references('id')->on('repairs')
+            $table->foreign('diagnostic_id')->references('id')->on('diagnostics')
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->foreign('employee_id')->references('id')->on('employees')
