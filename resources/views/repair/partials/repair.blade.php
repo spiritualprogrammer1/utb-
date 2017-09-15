@@ -37,17 +37,20 @@
     <div class="tab-content">
         <div class="tab-pane fade @if($repair->state == 4) @else active in @endif" id="repair-description">
             <div class="panel-group m-b" id="accordionDescription">
-                @foreach($descriptions as $key=>$description)
+                <?php $count = $repair->diagnostic->service_description->count() ?>
+                @foreach($repair->diagnostic->service_description->sortByDesc('created_at') as $key=>$description)
                     <div class="panel panel-info">
                         <div class="panel-heading">
-                            <a class="accordion-toggle @if($key > 0) collapsed @endif" data-toggle="collapse" data-parent="#accordionDescription" href="#description{{$key}}">
+                            <a class="accordion-toggle @if($key < $count - 1) collapsed @endif" data-toggle="collapse"
+                               data-parent="#accordionDescription" href="#description{{$key}}">
                                 <span class="capitalize">{{$description->title}}</span>
                                 <span class="pull-right">
                                        {{\Jenssegers\Date\Date::parse($description->created_at)->format('j M Y')}}
                                    </span>
                             </a>
                         </div>
-                        <div id="description{{$key}}" class="panel-collapse collapse @if($key == 0) in @endif" style="height: auto;">
+                        <div id="description{{$key}}" class="panel-collapse collapse @if($key == $count - 1) in @endif"
+                             style="height: auto;">
                             <div class="panel-body">
                                 {{$description->description}}
                             </div>
@@ -77,28 +80,39 @@
                 </tr>
                 </thead>
                 <tbody>
-                @forelse($demands as $key=>$demand)
+                <?php $count = '' ?>
+                @forelse($repair->diagnostic->demand as $demand)
+                    @if($repair->diagnostic->demand )
+                        @if($demand->state == '0')
+                            <?php $count = '1' ?>
+                        @endif
+                    @endif
                     @if($demand->state == '2' or $demand->state == '3')
-                        @foreach($demand->demand_piece as $piece)
+                        @forelse($demand->demand_piece as $piece)
                             <tr>
                                 <td class="capitalize">{{$piece->piece}}</td>
                                 <td class="text-center">{{$piece->quantity}}</td>
                                 <td class="text-center">{{$piece->delivered}}</td>
                             </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="3" class="text-center"><span class="badge bg-danger">
-                                    {{$demand->where('state','0')->count()}}</span>
-                                Demande de piece en attente
-                            </td>
-                        </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    Aucune demande de piece en effectuée
+                                </td>
+                            </tr>
+                        @endforelse
                     @endif
                 @empty
                     <tr>
                         <td colspan="3" class="text-center capitalize">Aucune demande de pieces effectuée</td>
                     </tr>
                 @endforelse
+                @if($count)
+                    <span class="text-center" style="margin-left: 40%;">
+                        <span class="badge bg-danger badge-sm">{{$repair->diagnostic->demand->where('state','0')->count()}}</span>
+                        Demande de piece en attente
+                    </span>
+                @endif
                 </tbody>
             </table>
         </div>
@@ -118,7 +132,6 @@
                 </tr>
                 </thead>
                 <tbody>
-
                 </tbody>
             </table>
         </div>
@@ -160,30 +173,31 @@
                                     value="{{$item->id}}">{{$item->username}}</option>
                         @endforeach
                     </select>
-
                 </div>
             </div>
         </div>
         <div class="tab-pane fade @if($repair->state == 4) active in @endif" id="afterworks">
             <div class="panel-group m-b" id="accordionRemark">
-                <?php $count = $repair->diagnostic->work->where('state','4')->count() ?>
+                <?php $count = $repair->diagnostic->work->where('state', '4')->count() ?>
                 @foreach($repair->diagnostic->work->where('state','4')->sortByDesc('created_at') as $key=>$item)
-                        <div class="panel panel-danger">
-                            <div class="panel-heading">
-                                <a class="accordion-toggle @if($key < $count) collapsed @endif" data-toggle="collapse" data-parent="#accordionRemark" href="#remark{{$key}}">
-                                    <span class="capitalize">{{$item->employee->username}}</span>
-                                   <span class="pull-right">
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">
+                            <a class="accordion-toggle @if($key < $count) collapsed @endif" data-toggle="collapse"
+                               data-parent="#accordionRemark" href="#remark{{$key}}">
+                                <span class="capitalize">{{$item->employee->username}}</span>
+                                <span class="pull-right">
                                        {{\Jenssegers\Date\Date::parse($item->created_at)->format('j M Y')}}
                                    </span>
-                                </a>
-                            </div>
-                            <div id="remark{{$key}}" class="panel-collapse collapse @if($key == $count) in @endif" style="height: auto;">
-                                <div class="panel-body text-danger-dker">
-                                    {{$item->description}}
-                                </div>
+                            </a>
+                        </div>
+                        <div id="remark{{$key}}" class="panel-collapse collapse @if($key == $count) in @endif"
+                             style="height: auto;">
+                            <div class="panel-body text-danger-dker">
+                                {{$item->description}}
                             </div>
                         </div>
-                    @endforeach
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
