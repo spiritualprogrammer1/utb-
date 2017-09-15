@@ -1,6 +1,4 @@
 @section('title') Reparation du Car @endsection
-@section('styles')
-@endsection
 @extends('layouts.master')
 @section('content')
     <section class="hbox stretch">
@@ -104,13 +102,16 @@
                         <i class="fa fa-file-pdf-o"></i>
                     </a>
                     <div class="btn-group pull-right" data-toggle="buttons">
-                        <a href="#" class="btn btn-sm btn-bg btn-default btn-rounded" onclick="$('#repairTable').tableExport({type:'xlsx',escape:'false'});">
+                        <a href="#" class="btn btn-sm btn-bg btn-default btn-rounded"
+                           onclick="$('#repairTable').tableExport({type:'xlsx',escape:'false'});">
                             <img src="{{asset('assets/images/icons/xls.png')}}" width="20"> Excel
                         </a>
-                        <a href="#" class="btn btn-sm btn-bg btn-default" onclick="$('#repairTable').tableExport({type:'pdf',escape:'false'});">
+                        <a href="#" class="btn btn-sm btn-bg btn-default"
+                           onclick="$('#repairTable').tableExport({type:'pdf',escape:'false'});">
                             <img src="{{asset('assets/images/icons/pdf.png')}}" width="20"> PDF
                         </a>
-                        <a href="#" class="btn btn-sm btn-bg btn-default btn-rounded" onclick="$('#repairTable').tableExport({type:'csv',escape:'false'});">
+                        <a href="#" class="btn btn-sm btn-bg btn-default btn-rounded"
+                           onclick="$('#repairTable').tableExport({type:'csv',escape:'false'});">
                             <img src="{{asset('assets/images/icons/csv.png')}}" width="20"> CSV
                         </a>
                     </div>
@@ -146,7 +147,7 @@
                                                data-ot="{{$repair->diagnostic->state->reference}}">
                                                 <i class="fa fa-pencil"></i></a></td>
                                         <td class="text-lowercase">@if($repair->state == 4)
-                                                <span class="badge bg-danger">retour {{$repair->diagnostic->after_work->count()}}</span>
+                                                <span class="badge bg-danger">retour {{$repair->diagnostic->work->where('state','4')->count()}}</span>
                                             @else <span class="badge bg-success">en cours</span> @endif
                                         </td>
                                     </tr>
@@ -300,8 +301,9 @@
                             '<td class="uppercase">' + data.chassis + '</td>' +
                             '<td>' + data.bus + '</td>' +
                             '<td>' + data.date + '</td>' +
-                            '<td><a href="#" id="' + data.id + '" onclick="stockEdit(this)"><i class="fa fa-pencil"></i></a></td>' +
-                            '<tr>';
+                            '<td><a href="#" id="' + data.id + '" onclick="repair(this)" data-car="'+data.bus+'" data-matriculation="'+data.matriculation+'" data-ot="'+data.reference+'">' +
+                            '<i class="fa fa-pencil"></i></a></td>' +
+                            '<td><span class="badge bg-success">en cours</span></td><tr>';
                         $repair_row.before(row);
                         $('#diagnostic' + data.diagnostic);
                         diagnostics();
@@ -414,27 +416,6 @@
                     $submit.html('<i class="i i-checked"></i> Mettre à jour la réparation')
                 }
             });
-            /*$diagnostic.on('change', function () {
-             console.log($(this).attr('data-bus'));
-             $reference_bus.html($(this).attr('data-bus'));
-             $reference_matriculation.html($(this).attr('data-matriculation'))
-
-             });*/
-            //diagnostics();
-            function repair(obj) {
-                $spinner.show();
-                var id = $(obj).attr('id');
-                $.get('home/' + id, function (data) {
-                    $car.html($(obj).attr('data-car'));
-                    $matriculation.html($(obj).attr('data-matriculation'));
-                    $ot_reference.val($(obj).attr('data-ot'));
-                    $ot.html($(obj).attr('data-ot'));
-                    $form.attr('action', 'home/' + id);
-                    $view.html(data);
-                    $modal_validate.modal('show');
-                    $spinner.hide()
-                });
-            }
         });
         function diagnostics() {
             var id = '0';
@@ -451,6 +432,20 @@
                     $diagnostic.trigger("chosen:updated");
                 })
             })
+        }
+        function repair(obj) {
+            $spinner.show();
+            var id = $(obj).attr('id');
+            $.get('home/' + id, function (data) {
+                $car.html($(obj).attr('data-car'));
+                $matriculation.html($(obj).attr('data-matriculation'));
+                $ot_reference.val($(obj).attr('data-ot'));
+                $ot.html($(obj).attr('data-ot'));
+                $form.attr('action', 'home/' + id);
+                $view.html(data);
+                $modal_validate.modal('show');
+                $spinner.hide()
+            });
         }
     </script>
 @endsection
