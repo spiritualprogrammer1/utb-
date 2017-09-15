@@ -281,7 +281,7 @@
                     url = 'home',
                     status = "success",
                     msg = "La Reception a bien été enregistrer";
-                $submit_create.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
+                $submit_create.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> traitement en cours...'});
                 $submit_create.button('loading');
                 $.ajax({
                     url: url,
@@ -303,7 +303,7 @@
                             '<td>' + data.date + '</td>' +
                             '<td><a href="#" id="' + data.id + '" onclick="repair(this)" data-car="'+data.bus+'" data-matriculation="'+data.matriculation+'" data-ot="'+data.reference+'">' +
                             '<i class="fa fa-pencil"></i></a></td>' +
-                            '<td><span class="badge bg-success">en cours</span></td><tr>';
+                            '<td><span class="badge bg-success text-lowercase">en cours</span></td><tr>';
                         $repair_row.before(row);
                         $('#diagnostic' + data.diagnostic);
                         diagnostics();
