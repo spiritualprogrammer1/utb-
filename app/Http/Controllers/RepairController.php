@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Demand;
 use App\Demand_piece;
-use App\Repair_description;
+use App\Service_description;
 use App\Repairdescription;
 use App\Diagnostic;
 use App\Diagnostic_employee;
 use App\Employee;
 use App\Repair;
-use App\Repair_employee;
+use App\service_employee;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,11 +26,8 @@ class RepairController extends Controller
     public function index()
     {
         $technicians = Employee::where('post_id', '1')->get();
-        $diagnostics = Diagnostic::whereHas('demand', function ($query) {
-            $query->where('state', '3');
-            $query->orderBy('updated_at', 'desc');
-        })->orWhere('active', '1')->orderBy('updated_at', 'desc')->get();
-
+        $diagnostics = Diagnostic::where('type', '1')->where('active', '1')
+            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
         $active = '';
         if ($diagnostics->count() == '0') {
             $active = '0';
@@ -80,14 +77,14 @@ class RepairController extends Controller
                     'user_id' => Auth::user()->id,
                 ]);
                 for ($i = 0; $i < count($request->technician); $i++) {
-                    $technician = Repair_employee::create([
-                        'repair_id' => $repair->id,
+                    $technician = Service_employee::create([
+                        'diagnostic_id' => $request->diagnostic,
                         'employee_id' => $request->technician[$i],
                     ]);
                 }
                 for ($i = 0; $i < count($request->title); $i++) {
-                    $description = Repair_description::create([
-                        'repair_id' => $repair->id,
+                    $description = Service_description::create([
+                        'diagnostic_id' => $request->diagnostic,
                         'description' => $request->description[$i],
                         'title' => $request->title[$i],
                     ]);
@@ -96,7 +93,8 @@ class RepairController extends Controller
                 return response()->json(['id' => $repair->id, 'matriculation' => $repair->diagnostic->state->bus->matriculation,
                     'chassis' => $repair->diagnostic->state->bus->chassis, 'date' => $repair->created_at->format('d/m/Y'),
                     'bus' => $repair->diagnostic->state->bus->model->brand->name . " " . $repair->diagnostic->state->bus->model->name,
-                    'reference' => $repair->diagnostic->state->reference, 'count' => $repair->count('id'),
+                    'reference' => $repair->diagnostic->state->reference,
+                    'count' => $repair->where('state','1')->orWhere('state','2')->orWhere('state','4')->count('id'),
                     'diagnostic' => $request->diagnostic]);
             }
         } else {
@@ -108,19 +106,13 @@ class RepairController extends Controller
     {
         if ($request->ajax()) {
             if ($id == "0") {
-                $diagnostics = Diagnostic::with('state')->whereHas('demand', function ($query) {
-                    $query->where('state', '3');
-                    $query->orderBy('updated_at', 'desc');
-                })->orWhere('active', '1')->orderBy('updated_at', 'desc')->get();
+                $diagnostics = Diagnostic::where('type', '1')->where('active', '1')
+                    ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
                 return response()->json($diagnostics);
             } else {
-                $descriptions = Repair_description::where('repair_id', $id)->orderBy('created_at','desc')->get();
-                $demands = Demand::where('diagnostic_id', $id)->get();
-                $technicians = Repair_employee::where('repair_id', $id)->get();
-                $employees = Employee::where('post_id', '1')->get();
                 $repair = Repair::findOrFail($id);
-                return view('repair.partials.repair', ['descriptions' => $descriptions, 'repair' => $repair,
-                    'demands' => $demands, 'technicians' => $technicians, 'employees' => $employees]);
+                $employees = Employee::where('post_id', '1')->get();
+                return view('repair.partials.repair', ['repair' => $repair, 'employees' => $employees]);
             }
         } else {
             return view('errors.500');
@@ -169,30 +161,30 @@ class RepairController extends Controller
                     'message' => $errors
                 ], 422);
             } else {
+                $diagnostic = Repair::findOrFail($id)->diagnostic_id;
                 for ($i = 0; $i < count($request->technician); $i++) {
-                    $technicians = Repair_employee::where('employee_id', $request->technician[$i])->get();
+                    $technicians = service_employee::where('employee_id', $request->technician[$i])->get();
                     //if ($technicians) {
 
                     //} else {
-                    $technician = Repair_employee::create([
-                        'repair_id' => $id,
+                    $technician = service_employee::create([
+                        'diagnostic_id' => $diagnostic,
                         'employee_id' => $request->technician[$i],
                     ]);
                     //}
                 };
                 for ($i = 0; $i < count($request->title); $i++) {
-                    $description = Repair_description::create([
-                        'repair_id' => $id,
+                    $description = Service_description::create([
+                        'diagnostic_id' => $diagnostic,
                         'description' => $request->description[$i],
                         'title' => $request->title[$i],
                     ]);
                 }
                 if ($request->has('piece')) {
-                    $repair = Repair::findOrFail($id);
                     $demand = Demand::create([
                         'ids' => Carbon::now()->timestamp,
                         'reference' => 'dmd-' . Carbon::now()->timestamp,
-                        'diagnostic_id' => $repair->diagnostic_id,
+                        'diagnostic_id' => $diagnostic,
                     ]);
                     for ($i = 0; $i < count($request->piece); $i++) {
                         $demand_piece = Demand_piece::create([
@@ -217,7 +209,7 @@ class RepairController extends Controller
     public function descriptions(Request $request, $id)
     {
         if ($request->ajax()) {
-            $descriptions = Repair_description::where('repair_id', $id)->get();
+            $descriptions = Service_description::where('repair_id', $id)->get();
             return response()->json($descriptions);
         } else {
             return view('errors.500');
