@@ -5,15 +5,15 @@
         <aside class="aside-md bg-light dker b-r" id="subNav">
             <div class="wrapper b-b header">Filtre des travaux</div>
             <ul class="nav">
-                <li class="b-b "><a href="#">
+                <li class="b-b "><a href="#" class="filter" id="1">
                         <i class="fa fa-chevron-right pull-right m-t-xs text-xs icon-muted"></i>
                         <i class="i i-settings"></i> Réparation</a>
                 </li>
-                <li class="b-b "><a href="#">
+                <li class="b-b "><a href="#" class="filter" id="2">
                         <i class="fa fa-chevron-right pull-right m-t-xs text-xs icon-muted"></i>
                         <i class="i i-gauge"></i> Révision</a>
                 </li>
-                <li class="b-b "><a href="#">
+                <li class="b-b "><a href="#" class="filter" id="3">
                         <i class="fa fa-chevron-right pull-right m-t-xs text-xs icon-muted"></i>
                         <i class="i i-params"></i> Visite Technique</a>
                 </li>
@@ -47,7 +47,7 @@
                 </header>
                 <section class="scrollable wrapper w-f">
                     <section class="panel panel-default bg-light lter">
-                        <div class="table-responsive">
+                        <div class="table-responsive" id="view">
                             <table class="table table-striped m-b-none capitalize" id="approvalTable">
                                 <thead>
                                 <tr>
@@ -62,18 +62,18 @@
                                 </thead>
                                 <tbody>
                                 @foreach($repairs as $key=>$repair)
-                                    <tr id="repair{{$repair->id}}">
+                                    <tr id="approval{{$repair->id}}">
                                         <td>{{$key + 1}}</td>
                                         <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
                                         <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
                                         <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->chassis}}</td>
                                         <td>{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}</td>
                                         <td>{{Jenssegers\Date\Date::parse($repair->update_at)->format('j M Y')}}</td>
-                                        <td><a href="#" id="{{$repair->id}}" class="repair"
+                                        <td><a href="#" id="{{$repair->diagnostic_id}}" class="repair"
                                                data-car="{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}"
                                                data-matriculation="{{$repair->diagnostic->state->bus->matriculation}}"
                                                data-ot="{{$repair->diagnostic->state->reference}}"
-                                               data-kilometer="{{$repair->diagnostic->before_work->distance + $repair->diagnostic->state->kilometer}}">
+                                               data-kilometer="@if($repair->diagnostic->work->where('state','4')->isNotEmpty()){{$repair->diagnostic->work->where('state','4')->sum('distance') + $repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->state->kilometer}}@else{{$repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->state->kilometer}}@endif">
                                                 <i class="fa fa-pencil"></i></a></td>
                                     </tr>
                                 @endforeach
@@ -280,6 +280,9 @@
             $depart = $('#depart'),
             $arrive = $('#arrive'),
             $table = $('#approvalTable'),
+            $filter = $('.filter'),
+            $view = $('#view'),
+            $type = $('#type'),
             $distance = $('#distance');
 
         $(function () {
@@ -292,34 +295,7 @@
                 }
             });
             $repair.on('click', function () {
-                $spinner.show();
-                var id = $(this).attr('id'),
-                    active = '',
-                    collapse = '';
-                $car.html($(this).attr('data-car'));
-                $matriculation.html($(this).attr('data-matriculation'));
-                $ot.html($(this).attr('data-ot'));
-                $depart.val($(this).attr('data-kilometer'));
-                $form.attr('action', 'home/' + id);
-                $.get('home/' + id, function (data) {
-                    $descriptions.empty();
-                    $.each(data, function (index, modelObj) {
-                        if (index === 0) {
-                            active = 'in'
-                        }else {
-                            collapse = 'collapsed';
-                            active = ''
-                        }
-                        $descriptions.append('<div class="panel panel-info"><div class="panel-heading">' +
-                            '<a class="accordion-toggle '+collapse+' capitalize" data-toggle="collapse" data-parent="#accordionDescriptions" href="#detail' + index + '">' +
-                            '' + modelObj.title + ' <small class="pull-right text-muted"><i class="fa fa-clock-o"></i> ' +
-                            '' + modelObj.created_at + '</small></a></div>' +
-                            '<div id="detail' + index + '" class="panel-collapse collapse ' + active + '" style="height: auto;">' +
-                            '<div class="panel-body text-sm">' + modelObj.description + '</div> </div></div>');
-                    });
-                    $spinner.hide();
-                    $modal.modal('show');
-                });
+                validate($(this))
             });
             $valid.on('click', function () {
                 var id = $(this).val();
@@ -374,7 +350,7 @@
                         $file.removeClass('btn-default disabled');
                         toastr[status](msg, "<span class='uppercase font-bold'>" + data.reference + "</span>!");
                         toastr.options.preventDuplicates = true;
-                        $('#repair' + data.id).remove();
+                        $('#approval' + data.id).remove();
                         $submit.button('reset');
                         $modal.modal('hide')
                     },
@@ -400,6 +376,51 @@
                     }
                 });
             });
+            $filter.on('click', function () {
+                $spinner.show();
+                var id = $(this).attr('id');
+                if (id === '1'){
+                    $type.attr('name', 'repair')
+                }else if(id === '2'){
+                    $type.attr('name', 'revision')
+                }else {
+                    $type.attr('name', 'visit')
+                }
+                $.get('home/'+id+'/edit', function (data) {
+                    $view.html(data);
+                    $spinner.hide();
+                })
+            })
         });
+        function validate(obj) {
+            $spinner.show();
+            var id = $(obj).attr('id'),
+                active = '',
+                collapse = '';
+            $car.html($(obj).attr('data-car'));
+            $matriculation.html($(obj).attr('data-matriculation'));
+            $ot.html($(obj).attr('data-ot'));
+            $depart.val($(obj).attr('data-kilometer'));
+            $form.attr('action', 'home/' + id);
+            $.get('home/' + id, function (data) {
+                $descriptions.empty();
+                $.each(data, function (index, modelObj) {
+                    if (index === 0) {
+                        active = 'in'
+                    }else {
+                        collapse = 'collapsed';
+                        active = ''
+                    }
+                    $descriptions.append('<div class="panel panel-info"><div class="panel-heading">' +
+                        '<a class="accordion-toggle '+collapse+' capitalize" data-toggle="collapse" data-parent="#accordionDescriptions" href="#detail' + index + '">' +
+                        '' + modelObj.title + ' <small class="pull-right text-muted"><i class="fa fa-clock-o"></i> ' +
+                        '' + modelObj.created_at + '</small></a></div>' +
+                        '<div id="detail' + index + '" class="panel-collapse collapse ' + active + '" style="height: auto;">' +
+                        '<div class="panel-body text-sm">' + modelObj.description + '</div> </div></div>');
+                });
+                $spinner.hide();
+                $modal.modal('show');
+            });
+        }
     </script>
 @endsection
