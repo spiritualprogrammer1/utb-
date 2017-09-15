@@ -18,6 +18,16 @@ class Diagnostic extends Model
         return $this->hasMany(Diagnostic_employee::class);
     }
 
+    public function service_description()
+    {
+        return $this->hasMany(Service_description::class);
+    }
+
+    public function service_employee()
+    {
+        return $this->hasMany(Service_employee::class);
+    }
+
     public function demand()
     {
         return $this->hasMany(Demand::class);
@@ -28,20 +38,17 @@ class Diagnostic extends Model
         return $this->hasMany(Repair::class);
     }
 
-    function before_work()
+    function work()
     {
-        return $this->hasOne(Before_work::class);
-    }
-
-    function after_work()
-    {
-        return $this->hasMany(After_work::class);
+        return $this->hasMany(Work::class);
     }
 
     function approval()
     {
         return $this->hasMany(Approval::class);
     }
+
+
 
     public function visit_technique()
     {
