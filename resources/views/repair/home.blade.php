@@ -360,7 +360,7 @@
                     status = "success";
                     msg = "LA REPARATION EST TERMINEE";
                 }
-                $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
+                $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> traitement en cours...'});
                 $submit.button('loading');
                 $.ajax({
                     url: url,
