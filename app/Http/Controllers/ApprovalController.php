@@ -7,7 +7,7 @@ use App\Demand;
 use App\Diagnostic;
 use App\Demand_piece;
 use App\Repair;
-use App\Repair_description;
+use App\Service_description;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -91,7 +91,7 @@ function descriptions(Request $request, $id, $type)
 {
     //if ($request->ajax()){
     if ($type == 'repair') {
-        $descriptions = Repair_description::where('repair_id', $id)->orderBy('created_at', 'desc')->get();
+        $descriptions = $descriptions = Repair::findOrFail($id)->diagnostic->service_description->sortByDesc('created_at');
         return response()->json($descriptions);
     }
     /*}else{
