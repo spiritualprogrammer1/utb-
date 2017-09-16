@@ -26,7 +26,7 @@
         </header>
         <section class="scrollable wrapper">
             <div class="row">
-                <div class="col-md-3 col-md-push-9">
+                <div class="col-md-2 col-md-push-10">
                     <div class="panel">
                         <div class="panel-heading b-b">Filtre</div>
                         <div class="panel-body">
@@ -34,20 +34,20 @@
                                 <li class="radio i-checks">
                                     <label>
                                         <input type="radio" name="filter" checked value="waiting" class="filter"><i></i>
-                                        Demande en attente
+                                        En attente
                                     </label>
                                 </li>
                                 <li class="radio i-checks">
                                     <label>
                                         <input type="radio" name="filter" value="validated" class="filter"><i></i>
-                                        Demande approvée
+                                        Approvée
                                     </label>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-9 col-md-pull-3">
+                <div class="col-md-10 col-md-pull-2">
                     <div class="row">
                         <div class="panel">
                             <div class="panel-body">
@@ -55,33 +55,33 @@
                                     <table class="table table-striped m-b-none capitalize" id="approvalTable">
                                         <thead>
                                         <tr>
-                                            <th width="5"></th>
-                                            <th width="5"></th>
+                                            <th width="1"></th>
+                                            <th width="1"></th>
+                                            <th>Reference</th>
                                             <th>Reference OT</th>
                                             <th>Immatriculation</th>
-                                            <th>Chassis</th>
                                             <th>Car</th>
                                             <th><i class="fa fa-calendar"></i> Date</th>
                                             <th><i class="fa fa-cog"></i></th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach($diagnostics as $key=>$diagnostic)
-                                            <tr id="approval{{$diagnostic->id}}" class="fadeIn">
+                                        @foreach($demands as $key=>$demand)
+                                            <tr id="approval{{$demand->id}}" class="animated fadeInDown">
                                                 <td>{{$key + 1}}</td>
                                                 <td>
-                                                    <a href="#" id="{{$diagnostic->id}}" class=""><i
+                                                    <a href="#" id="{{$demand->id}}" class=""><i
                                                                 class="fa fa-search-plus text-muted"></i></a>
                                                 </td>
-                                                <td class="uppercase text-danger-dker">{{$diagnostic->process->reference}}</td>
-                                                <td class="uppercase text-primary-dker">{{$diagnostic->process->state->bus->matriculation}}</td>
-                                                <td class="uppercase">{{$diagnostic->process->state->bus->chassis}}</td>
-                                                <td>{{$diagnostic->process->state->bus->model->brand->name." ".$diagnostic->process->state->bus->model->name}}</td>
-                                                <td>{{\Jenssegers\Date\Date::parse($diagnostic->created_at)->format('j M Y')}}</td>
-                                                <td><a href="#" id="{{$diagnostic->id}}" class="waiting"
-                                                       data-car="{{$diagnostic->process->state->bus->model->brand->name." ".$diagnostic->process->state->bus->model->name}}"
-                                                       data-matriculation="{{$diagnostic->process->state->bus->matriculation}}"
-                                                       data-ot="{{$diagnostic->process->reference}}">
+                                                <td class="uppercase text-danger-dker">{{$demand->reference}}</td>
+                                                <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
+                                                <td class="uppercase text-primary-dker">{{$demand->diagnostic->state->bus->matriculation}}</td>
+                                                <td>{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}</td>
+                                                <td>{{\Jenssegers\Date\Date::parse($demand->created_at)->format('j M Y')}}</td>
+                                                <td><a href="#" id="{{$demand->id}}" class="waiting"
+                                                       data-car="{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}"
+                                                       data-matriculation="{{$demand->diagnostic->state->bus->matriculation}}"
+                                                       data-ot="{{$demand->diagnostic->reference}}">
                                                         <i class="fa fa-pencil"></i></a></td>
                                             </tr>
                                         @endforeach
@@ -100,7 +100,6 @@
             </div>
         </section>
     </section>
-
     <div class="modal fade" id="validateModal">
         <div class="modal-dialog">
             <form id="validateForm" class="modal-content">
@@ -183,12 +182,11 @@
             </form><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div>
-
     <table class="table"
            id="pieceAdd">
         <tbody>
         <tr>
-            <td><textarea class="form-control input-sm" name="piece[]" id="piece"
+            <td><textarea class="form-control input-sm capitalize" name="piece[]" id="piece"
                           placeholder="Nom piece + Marque & Model"
                           rows="1"></textarea>
             </td>
@@ -265,7 +263,7 @@
                     type = 'put',
                     url = $(this).attr('action'),
                     status = "success",
-                    msg = "La sortie a été Approuver";
+                    msg = "LA SORTIE A ETE APPROUVER";
                 $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
                 $submit.button('loading');
                 $.ajax({
