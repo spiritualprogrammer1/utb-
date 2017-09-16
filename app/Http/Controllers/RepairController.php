@@ -14,6 +14,7 @@ use App\service_employee;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Jenssegers\Date\Date;
 use Validator;
 
 class RepairController extends Controller
@@ -91,7 +92,7 @@ class RepairController extends Controller
                 }
 
                 return response()->json(['id' => $repair->id, 'matriculation' => $repair->diagnostic->state->bus->matriculation,
-                    'chassis' => $repair->diagnostic->state->bus->chassis, 'date' => $repair->created_at->format('d/m/Y'),
+                    'chassis' => $repair->diagnostic->state->bus->chassis, 'date' => Date::parse($repair->created_at)->format('j M Y'),
                     'bus' => $repair->diagnostic->state->bus->model->brand->name . " " . $repair->diagnostic->state->bus->model->name,
                     'reference' => $repair->diagnostic->state->reference,
                     'count' => $repair->where('state','1')->orWhere('state','2')->orWhere('state','4')->count('id'),
