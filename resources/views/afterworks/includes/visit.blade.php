@@ -19,7 +19,7 @@
             <td class="uppercase text-danger-dker">{{$visit->diagnostic->state->bus->chassis}}</td>
             <td>{{$visit->diagnostic->state->bus->model->brand->name." ".$visit->diagnostic->state->bus->model->name}}</td>
             <td>{{Jenssegers\Date\Date::parse($visit->update_at)->format('j M Y')}}</td>
-            <td><a href="#" id="{{$visit->diagnostic_id}}" class="repair"
+            <td><a href="#" id="{{$visit->id}}" class="repair"
                    data-car="{{$visit->diagnostic->state->bus->model->brand->name." ".$visit->diagnostic->state->bus->model->name}}"
                    data-matriculation="{{$visit->diagnostic->state->bus->matriculation}}"
                    data-ot="{{$visit->diagnostic->state->reference}}"
