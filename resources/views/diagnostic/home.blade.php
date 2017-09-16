@@ -83,7 +83,7 @@
                                                                                                                value="{{$state->id}}"
                                                                                                                data-trigger="change"
                                                                                                                data-required="true"
-                                                                                                               data-error-message ="Choissisez un Ordre de Travail, SVP">
+                                                                                                               data-error-message="Choissisez un Ordre de Travail, SVP">
                                                                                                         <i></i>
                                                                                                     </label>
                                                                                                 </div>
@@ -187,7 +187,8 @@
                                                             <div class="checkbox i-checks">
                                                                 <label>
                                                                     <input type="checkbox" data-trigger="change"
-                                                                           data-required="true" name="accept" data-error-message ="Accepter pour continuer"><i></i>
+                                                                           data-required="true" name="accept"
+                                                                           data-error-message="Accepter pour continuer"><i></i>
                                                                     Accepter et continuer
                                                                 </label>
                                                             </div>
@@ -221,7 +222,7 @@
                                                                                             name="tester"
                                                                                             data-trigger="change"
                                                                                             data-required="true"
-                                                                                            data-error-message ="Choissisez le technicien ayant effectuer l'essai">
+                                                                                            data-error-message="Choissisez le technicien ayant effectuer l'essai">
                                                                                         <option></option>
                                                                                         @foreach($technicians as $key=>$technician)
                                                                                             <option class="capitalize"
@@ -256,7 +257,7 @@
                                                                                                    data-trigger="change"
                                                                                                    data-required="true"
                                                                                                    readonly
-                                                                                                   data-error-message ="La Distance est obligatoire">
+                                                                                                   data-error-message="La Distance est obligatoire">
                                                                                             <span class="input-group-btn">
                                                                                                  <button class="btn btn-default btn-sm"
                                                                                                          type="button">km</button>
@@ -285,7 +286,7 @@
                                                                                                    class="form-control input-sm before_works capitalize"
                                                                                                    data-trigger="change"
                                                                                                    data-required="true"
-                                                                                                   data-error-message ="Saissisez le Lieu de l'essai">
+                                                                                                   data-error-message="Saissisez le Lieu de l'essai">
                                                                                         </td>
                                                                                     </tr>
                                                                                     </tbody>
@@ -300,7 +301,7 @@
                                                                                       data-trigger="change"
                                                                                       data-required="true"
                                                                                       minlength="6"
-                                                                                      data-error-message ="Saissisez les Remarques effectuées pendand l'essai"
+                                                                                      data-error-message="Saissisez les Remarques effectuées pendand l'essai"
                                                                                       data-length="[6,30]"></textarea>
                                                                         </div>
                                                                     </div>
@@ -368,7 +369,7 @@
                                                                                                                         id="technician"
                                                                                                                         data-trigger="change"
                                                                                                                         data-required="true"
-                                                                                                                        data-error-message ="Choissisez le Technician du Diagnostic"
+                                                                                                                        data-error-message="Choissisez le Technician du Diagnostic"
                                                                                                                         required>
                                                                                                                     <option></option>
                                                                                                                     @foreach($technicians as $key=>$technician)
@@ -382,7 +383,7 @@
                                                                                                                        name="title[]"
                                                                                                                        minlength="3"
                                                                                                                        placeholder="Intitulé du diagnostic"
-                                                                                                                       data-error-message ="Saissisez l'Intitulé ou Sujet du Diagnostic"
+                                                                                                                       data-error-message="Saissisez l'Intitulé ou Sujet du Diagnostic"
                                                                                                                        required
                                                                                                                        id="title">
                                                                                                             </div>
@@ -396,7 +397,7 @@
                                                                                                   style="overflow: scroll;"
                                                                                                   data-length="6"
                                                                                                   rows="2"
-                                                                                                  data-error-message ="Saissisez les Details du diagnostic"
+                                                                                                  data-error-message="Saissisez les Details du diagnostic"
                                                                                                   placeholder="Detail du diagnostic"></textarea>
                                                                                                     </div>
                                                                                                 </section>
@@ -519,7 +520,8 @@
             $test = $('#test'),
             $piece_add = $('#piece_add'),
             $diagnostic_add = $('#diagnostic_add'),
-        $spinner = $('#spinner');
+            $chosen = $('.chosen-select'),
+            $spinner = $('#spinner');
         $(function () {
             $table.dataTable({
                 "sPaginationType": "full_numbers",
@@ -544,6 +546,7 @@
                     data: formData,
                     success: function (data) {
                         $form.trigger('reset');
+                        $chosen.trigger('chosen:updated');
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
                         $file.removeClass('btn-default disabled');
