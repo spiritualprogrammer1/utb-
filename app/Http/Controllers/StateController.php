@@ -63,8 +63,8 @@ class StateController extends Controller
                 ], 422);
             } else {
                 $state = State::create([
-                    'ids' => Carbon::now()->timestamp,
-                    'reference' => "OT-".Carbon::now()->timestamp,
+                    'ids' => uniqid(),
+                    'reference' => "OT-".uniqid(),
                     'bus_id' => $request->bus,
                     'incident' => $request->incident,
                     'remark' => $request->remark,
