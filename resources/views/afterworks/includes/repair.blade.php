@@ -12,7 +12,7 @@
     </thead>
     <tbody>
     @foreach($repairs as $key=>$repair)
-        <tr id="repair{{$repair->id}}"  class="animated fadeInRight">
+        <tr id="approval{{$repair->id}}"  class="animated fadeInRight">
             <td>{{$key + 1}}</td>
             <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
             <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
