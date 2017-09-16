@@ -160,7 +160,7 @@ class CreateRepairTable extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::create('visits', function (Blueprint $table) {
+        Schema::create('visit_techniques', function (Blueprint $table) {
             $table->increments('id');
             $table->string('ids')->unique();
             $table->integer('diagnostic_id')->unsigned();
