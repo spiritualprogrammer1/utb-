@@ -27,13 +27,15 @@
                             <a href="#subNav" data-toggle="class:hide" class="btn btn-sm btn-default active"><i
                                         class="fa fa-caret-right text fa-lg"></i><i
                                         class="fa fa-caret-left text-active fa-lg"></i></a>
+                            <span class="h4 font-thin m-l-sm m-t-sm" id="title">
+                                <i class="fa fa-wrench"></i> REPARATION
+                            </span>
                             <div class="btn-group m-l-md">
                                 <a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""
                                    title="Fiche d'etat...">
                                     <i class="fa fa-file-pdf-o"></i>
                                 </a>
                             </div>
-
                         </div>
                         <div class="col-sm-4 m-b-xs">
                             <div class="input-group">
@@ -283,6 +285,7 @@
             $filter = $('.filter'),
             $view = $('#view'),
             $type = $('#type'),
+            $title = $('#title'),
             $distance = $('#distance');
 
         $(function () {
@@ -324,7 +327,6 @@
                 } else {
                     $distance.val(result)
                 }
-
             });
             $form.on('submit', function (e) {
                 e.preventDefault();
@@ -380,11 +382,14 @@
                 $spinner.show();
                 var id = $(this).attr('id');
                 if (id === '1'){
-                    $type.attr('name', 'repair')
+                    $type.attr('name', 'repair');
+                    $title.html('<i class="fa fa-wrench"></i> REPARATION')
                 }else if(id === '2'){
-                    $type.attr('name', 'revision')
+                    $type.attr('name', 'revision');
+                    $title.html('<i class="i i-gauge"></i> REVISION')
                 }else {
-                    $type.attr('name', 'visit')
+                    $type.attr('name', 'visit');
+                    $title.html('<i class="i i-params"></i> VISIT')
                 }
                 $.get('home/'+id+'/edit', function (data) {
                     $view.html(data);
