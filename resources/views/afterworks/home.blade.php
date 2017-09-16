@@ -59,12 +59,12 @@
                                     <th>Chassis</th>
                                     <th>Car</th>
                                     <th>Date</th>
-                                    <th width="5"></th>
+                                    <th width="1"></th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($repairs as $key=>$repair)
-                                    <tr id="approval{{$repair->id}}">
+                                    <tr id="approval{{$repair->id}}" class="animated fadeInDown">
                                         <td>{{$key + 1}}</td>
                                         <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
                                         <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
