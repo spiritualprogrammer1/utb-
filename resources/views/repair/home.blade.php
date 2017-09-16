@@ -16,7 +16,7 @@
                                             id="diagnostic{{$diagnostic->id}}"
                                             data-bus="{{$diagnostic->state->bus->model->brand->name." ".$diagnostic->state->bus->model->brand->name}}"
                                             data-matriculation="{{$diagnostic->state->bus->matriculation}}">
-                                        {{$diagnostic->state->reference}}</option>
+                                        {{strtoupper($diagnostic->state->reference)}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -123,7 +123,7 @@
                                 <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Reference OT</th>
+                                    <th>Ordre de Travail</th>
                                     <th>Immatriculation</th>
                                     <th>Chassis</th>
                                     <th>Car</th>
@@ -264,6 +264,7 @@
             $submit = $('#submit'),
             $ot_reference = $('#ot_reference'),
             $spinner = $('#spinner'),
+            $chosen = $('.chosen-select'),
             $finish = $('#finish');
         $(function () {
             $table.dataTable({
@@ -289,6 +290,7 @@
                     data: formData,
                     success: function (data) {
                         $form_create.trigger('reset');
+                        $chosen.trigger('chosen:updated');
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
                         $file.removeClass('btn-default disabled');
