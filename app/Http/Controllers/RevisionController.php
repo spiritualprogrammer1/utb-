@@ -12,6 +12,7 @@ use App\Service_employee;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Jenssegers\Date\Date;
 use Validator;
 
 class RevisionController extends Controller
@@ -86,9 +87,8 @@ class RevisionController extends Controller
                         'title' => $request->title[$i],
                     ]);
                 }
-
                 return response()->json(['id' => $revision->id, 'matriculation' => $revision->diagnostic->state->bus->matriculation,
-                    'chassis' => $revision->diagnostic->state->bus->chassis, 'date' => $revision->created_at->format('d/m/Y'),
+                    'chassis' => $revision->diagnostic->state->bus->chassis, 'date' => Date::parse($revision->created_at)->format('j M Y'),
                     'bus' => $revision->diagnostic->state->bus->model->brand->name . " " . $revision->diagnostic->state->bus->model->name,
                     'reference' => $revision->diagnostic->state->reference,
                     'count' => $revision->where('state','1')->orWhere('state','2')->orWhere('state','4')->count('id'),
@@ -115,7 +115,6 @@ class RevisionController extends Controller
             return view('errors.500');
         }
     }
-
 
     public function edit($id)
     {
@@ -196,12 +195,6 @@ class RevisionController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //
