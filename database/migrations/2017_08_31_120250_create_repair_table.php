@@ -15,7 +15,7 @@ class CreateRepairTable extends Migration
     {
         Schema::create('states', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->integer('bus_id')->unsigned();
             $table->text('incident')->unique();
             $table->text('remarque');
@@ -37,7 +37,7 @@ class CreateRepairTable extends Migration
 
         Schema::create('field_states', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->integer('state_id')->unsigned();
             $table->text('field_id')->unique();
             $table->integer('site_id')->unsigned();
@@ -59,7 +59,7 @@ class CreateRepairTable extends Migration
 
         Schema::create('diagnostics', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->string('reference')->unique();
             $table->integer('state_id');
             $table->enum('active', ['0', '1', '2']);
@@ -80,7 +80,7 @@ class CreateRepairTable extends Migration
 
         Schema::create('works', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->enum('state',['1','0','4']);
             $table->integer('distance');
             $table->string('place');
@@ -106,7 +106,7 @@ class CreateRepairTable extends Migration
 
         Schema::create('diagnostic_employees', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->integer('diagnostic_id');
             $table->integer('employee_id');
             $table->string('title');
@@ -122,8 +122,48 @@ class CreateRepairTable extends Migration
 
         Schema::create('repairs', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->integer('diagnostic_id');
+            //0 = finish, 1 = begin, 2 = demand, 3 = demand accepted, 4 = repair return, 5 = output
+            $table->enum('state', ['0', '1', '2', '3', '4','5']);
+            $table->integer('site_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->timestamps();
+
+            $table->foreign('diagnostic_id')->references('id')->on('diagnostics')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('site_id')->references('id')->on('sites')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+        });
+
+        Schema::create('revisions', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('ids')->unique();
+            $table->integer('diagnostic_id')->unsigned();
+            //0 = finish, 1 = begin, 2 = demand, 3 = demand accepted, 4 = repair return, 5 = output
+            $table->enum('state', ['0', '1', '2', '3', '4','5']);
+            $table->integer('site_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->timestamps();
+
+            $table->foreign('diagnostic_id')->references('id')->on('diagnostics')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('site_id')->references('id')->on('sites')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+        });
+
+        Schema::create('visits', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('ids')->unique();
+            $table->integer('diagnostic_id')->unsigned();
             //0 = finish, 1 = begin, 2 = demand, 3 = demand accepted, 4 = repair return, 5 = output
             $table->enum('state', ['0', '1', '2', '3', '4','5']);
             $table->integer('site_id')->unsigned();
@@ -142,7 +182,7 @@ class CreateRepairTable extends Migration
 
         Schema::create('service_descriptions', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->string('title');
             $table->text('description');
             $table->integer('diagnostic_id');
@@ -154,7 +194,7 @@ class CreateRepairTable extends Migration
 
         Schema::create('service_employees', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->integer('diagnostic_id')->unsigned();
             $table->integer('employee_id')->unsigned();
             $table->timestamps();
@@ -168,7 +208,7 @@ class CreateRepairTable extends Migration
 
         Schema::create('approvals', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ids')->unique();
+            $table->string('ids')->unique();
             $table->text('remark')->nullable();
             $table->integer('diagnostic_id')->unsigned();
             $table->integer('user_id')->unsigned();
