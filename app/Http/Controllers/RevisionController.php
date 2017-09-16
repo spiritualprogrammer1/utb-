@@ -67,7 +67,7 @@ class RevisionController extends Controller
             } else {
                 $diagnostic = Diagnostic::findOrFail($request->diagnostic)->update(['active' => '0']);
                 $revision = Revision::create([
-                    'ids' => Carbon::now()->timestamp,
+                    'ids' => uniqid(),
                     'diagnostic_id' => $request->diagnostic,
                     'state' => '1',
                     'site_id' => Auth::user()->id,
@@ -103,7 +103,7 @@ class RevisionController extends Controller
     {
         if ($request->ajax()) {
             if ($id == "0") {
-                $diagnostics = Diagnostic::where('type', '2')->where('active', '1')
+                $diagnostics = Diagnostic::with('state')->where('type', '2')->where('active', '1')
                     ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
                 return response()->json($diagnostics);
             } else {
@@ -172,8 +172,8 @@ class RevisionController extends Controller
                 }
                 if ($request->has('piece')) {
                     $demand = Demand::create([
-                        'ids' => Carbon::now()->timestamp,
-                        'reference' => 'dmd-' . Carbon::now()->timestamp,
+                        'ids' => uniqid(),
+                        'reference' => 'dmd-' . uniqid(),
                         'diagnostic_id' => $diagnostic,
                     ]);
                     for ($i = 0; $i < count($request->piece); $i++) {
