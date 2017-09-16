@@ -7,7 +7,7 @@
         <th>Chassis</th>
         <th>Car</th>
         <th>Date</th>
-        <th width="5"></th>
+        <th width="1"></th>
     </tr>
     </thead>
     <tbody>
@@ -19,7 +19,7 @@
             <td class="uppercase text-danger-dker">{{$revision->diagnostic->state->bus->chassis}}</td>
             <td>{{$revision->diagnostic->state->bus->model->brand->name." ".$revision->diagnostic->state->bus->model->name}}</td>
             <td>{{Jenssegers\Date\Date::parse($revision->update_at)->format('j M Y')}}</td>
-            <td><a href="#" id="{{$revision->diagnostic_id}}" onclick="validate(this)"
+            <td><a href="#" id="{{$revision->id}}" onclick="validate(this)"
                    data-car="{{$revision->diagnostic->state->bus->model->brand->name." ".$revision->diagnostic->state->bus->model->name}}"
                    data-matriculation="{{$revision->diagnostic->state->bus->matriculation}}"
                    data-ot="{{$revision->diagnostic->state->reference}}"
