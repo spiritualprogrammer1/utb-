@@ -186,7 +186,7 @@
             $filter.on('click', function () {
                 $spinner.show();
                 var id = $(this).val();
-                $.get(id, function (data) {
+                $.get('home/'+id, function (data) {
                     $view.html(data);
                     $spinner.hide()
                 })
