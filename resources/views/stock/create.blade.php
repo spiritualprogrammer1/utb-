@@ -2,9 +2,9 @@
 @extends('layouts.master')
 @section('content')
     <section class="hbox stretch">
-        <aside class="aside-xl bg-light dker b-r" id="subNav">
-            <section>
-                <form method="post" id="stockForm" role="form" class="panel b-a bg-light lter">
+        <aside class="aside-xl bg-white lter b-r" id="subNav">
+            <section class="scrollable ">
+                <form method="post" id="stockForm" class="">
                     {{csrf_field()}}
                     <input name="stock_id" type="hidden" id="stock_id">
                     <div class="panel-body panel-danger">
@@ -12,7 +12,7 @@
                             <div class="has-success form-group-sm col-md-7">
                                 <label class="control-label">REFERENCE DU STOCK</label>
                                 <input type="text" name="reference" id="reference" min="3"
-                                       class="form-control input-sm text-danger-dk"
+                                       class="form-control input-sm text-danger-dk uppercase"
                                        placeholder="Reference du stock" required>
                             </div>
                             <div class="form-group-sm col-md-5">
@@ -20,15 +20,13 @@
                                 <select class="chosen-select input-sm form-control"
                                         data-placeholder="CHOISISEZ UN TYPE..." id="type" name="type">
                                     <option></option>
-                                    @forelse($types as $key => $type)
+                                    @foreach($types as $key => $type)
                                         <option value="{{$type->id}}" class="uppercase">{{$type->name}}</option>
-                                    @empty
-                                        <option>AUCUN TYPE DISPONIBLE</option>
-                                    @endforelse
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
-                        <div class="row m-t-md">
+                        <div class="row m-t-sm m-b-sm">
                             <div class="form-group-sm  col-sm-6">
                                 <label>Marque de Piece</label>
                                 <select class="chosen-select input-sm form-control"
@@ -83,12 +81,10 @@
                                 <select class="chosen-select input-sm form-control" id="ray"
                                         data-placeholder="CHOISISEZ UN RAYON DE RANGEMENT...">
                                     <option></option>
-                                    @forelse($rays as $key => $ray)
+                                    @foreach($rays as $key => $ray)
                                         <option value="{{$ray->id}}"
                                                 class="uppercase">{{$ray->name}}</option>
-                                    @empty
-                                        <option>AUCUN RAYON DISPONIBLE</option>
-                                    @endforelse
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="form-group-sm col-sm-4">
@@ -121,17 +117,15 @@
                                 <select class="chosen-select input-sm form-control" id="delivery" name="stock_delivery"
                                         data-placeholder="CHOISISEZ UNE REFERENCE DE BON...">
                                     <option></option>
-                                    @forelse($deliveries as $key => $delivery)
+                                    @foreach($deliveries as $key => $delivery)
                                         <option value="{{$delivery->ids}}"
                                                 class="uppercase">{{$delivery->number}}</option>
-                                    @empty
-                                        <option disabled>AUCUNE REFERENCE DISPONIBLE</option>
-                                    @endforelse
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="form-group-sm col-sm-6">
                                 <label>Fournisseur</label>
-                                <input class="form-control input-sm text-center uppercase text-danger-dk" readonly
+                                <input class="form-control input-sm text-center uppercase text-danger-dk delivery-info" readonly
                                        id="supplier">
                             </div>
                             <div class="form-group-sm col-sm-6 m-t-md">
@@ -140,9 +134,9 @@
                                     <i class="fa fa-floppy-o"></i> enregistrer
                                 </button>
                             </div>
-                            <div class="form-group-sm col-sm-6 ">
+                            <div class="form-group-sm col-sm-6 m-b-xl">
                                 <label>Référence Commande</label>
-                                <input class="form-control input-sm text-center uppercase text-danger-dk" readonly
+                                <input class="form-control input-sm text-center uppercase text-danger-dk delivery-info" readonly
                                        id="order">
                             </div>
                         </div>
@@ -160,7 +154,7 @@
                                 <i class="fa fa-caret-right text fa-lg"></i>
                                 <i class="fa fa-caret-left text-active fa-lg"></i>
                             </a>
-                            <h4><i class="i i-stack"></i> GESTION DE STOCK</h4>
+                            <h4><i class="i i-stack"></i> NOUVEAU STOCK</h4>
                         </div>
                         <div class="btn-group pull-right" data-toggle="buttons">
                             <a href="#" class="btn btn-sm btn-bg btn-rounded btn-default"
@@ -178,9 +172,8 @@
                         </div>
                     </div>
                 </header>
-                <section class="scrollable wrapper w-f">
-                    <section class="panel panel-default" id="view">
-                        <div class="table-responsive">
+                <section class="scrollable bg-light dk wrapper">
+                        <div class="panel panel-default table-responsive">
                             <table class="table datatable table-responsive table-striped m-b-none capitalize"
                                    id="stockTable">
                                 <thead>
@@ -191,28 +184,28 @@
                                     <th>Sous Famille</th>
                                     <th>Qté</th>
                                     <th><i class="i i-calendar"></i> Date</th>
-                                    <th><i class="i i-cog2"></i></th>
+                                    <th width="1"><i class="i i-cog2"></i></th>
                                 </tr>
                                 </thead>
                                 <tbody id="stockRow">
                                 @foreach($stocks as $key => $stock)
                                     <tr id="stock{{$stock->id}}">
-                                        <td style="text-transform: uppercase">{{$stock->reference}}</td>
+                                        <td class="uppercase text-danger-dker">{{$stock->reference}}</td>
                                         <td>{{$stock->type->name}}</td>
                                         <td>{{$stock->sub_category->category->name}}</td>
                                         <td>{{$stock->sub_category->name}}</td>
-                                        <td>{{number_format($stock->quantity)}}</td>
-                                        <td>{{$stock->created_at->format('d/m/Y')}}</td>
+                                        <td class="text-success-dk font-bold">{{number_format($stock->quantity)}}</td>
+                                        <td>{{Jenssegers\Date\Date::parse($stock->created_at)->format('j M Y')}}</td>
                                         <td>
-                                            <a href="#" id="{{$stock->id}}" onclick="stockEdit(this)"><i
-                                                        class="fa fa-pencil"></i></a>
+                                            <a href="#" id="{{$stock->id}}">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
                             </table>
                         </div>
-                    </section>
                 </section>
                 <div class="cssload-container m-t-n-lg none">
                     <div class="cssload-progress cssload-float cssload-shadow m-t-n-lg">
