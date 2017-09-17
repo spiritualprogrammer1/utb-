@@ -112,7 +112,7 @@
                             </div>
                             <h4 style="" class="text-center m-t-n-xl font-thin m-l-lg text-dark-dker">APPROBATION DES
                                 TRAVAUX DE
-                                <span class="font-bold uppercase">Réparation</span></h4>
+                                <span class="font-bold uppercase title">Réparation</span></h4>
                         </div>
                     </section>
                 </div>
@@ -286,6 +286,7 @@
             $view = $('#view'),
             $type = $('#type'),
             $title = $('#title'),
+            $titles = $('.title'),
             $chosen = $('.chosen-select'),
             $distance = $('#distance');
 
@@ -385,16 +386,19 @@
                 var id = $(this).attr('id');
                 if (id === '1'){
                     $type.attr('name', 'repair');
+                    $titles.html('Réparation');
                     $title.fadeOut('slow', function () {
                         $(this).html('<i class="fa fa-wrench"></i> REPARATION');
                     }).fadeIn("slow");
                 }else if(id === '2'){
                     $type.attr('name', 'revision');
+                    $titles.html('Revision');
                     $title.fadeOut('slow', function () {
                         $(this).html('<i class="i i-gauge"></i> REVISION');
                     }).fadeIn("slow");
                 }else {
                     $type.attr('name', 'visit');
+                    $titles.html('Visite Technique');
                     $title.fadeOut('slow', function () {
                         $(this).html('<i class="i i-params"></i> VISITE TECHNIQUE');
                     }).fadeIn("slow");
