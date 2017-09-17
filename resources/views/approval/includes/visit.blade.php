@@ -23,7 +23,7 @@
             <td class="uppercase text-primary-dker">{{$visit->diagnostic->state->bus->matriculation}}</td>
             <td>{{$visit->diagnostic->state->bus->model->brand->name." ".$visit->diagnostic->state->bus->model->name}}</td>
             <td>{{\Jenssegers\Date\Date::parse($visit->updated_at)->format('j M Y')}}</td>
-            <td><a href="#" id="{{$visit->id}}" data-type="visit" class="approval"
+            <td><a href="#" id="{{$visit->id}}" data-type="visit" onclick="approval(this)"
                    data-car="{{$visit->diagnostic->state->bus->model->brand->name." ".$visit->diagnostic->state->bus->model->name}}"
                    data-matriculation="{{$visit->diagnostic->state->bus->matriculation}}"
                    data-ot="{{$visit->diagnostic->state->reference}}" data-diagnostic="{{$visit->diagnostic->id}}">
