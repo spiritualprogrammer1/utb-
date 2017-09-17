@@ -16,7 +16,7 @@
                                             id="diagnostic{{$diagnostic->id}}"
                                             data-bus="{{$diagnostic->state->bus->model->brand->name." ".$diagnostic->state->bus->model->brand->name}}"
                                             data-matriculation="{{$diagnostic->state->bus->matriculation}}">
-                                        {{$diagnostic->state->reference}}</option>
+                                        {{strtoupper($diagnostic->state->reference)}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -123,7 +123,7 @@
                                 <thead>
                                 <tr>
                                     <th></th>
-                                    <th>Reference OT</th>
+                                    <th>Ordre de Travail</th>
                                     <th>Immatriculation</th>
                                     <th>Chassis</th>
                                     <th>Car</th>
@@ -183,7 +183,7 @@
                                 <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car"></a>
                             </div>
                             <h4 style="" class="text-center m-t-n-xl font-thin m-l-lg text-dark-dker">TRAVAUX DE
-                                <span class="font-bold">REPARATION</span></h4>
+                                <span class="font-bold">REVISION</span></h4>
                         </div>
                     </section>
                 </div>
@@ -264,6 +264,7 @@
             $submit = $('#submit'),
             $ot_reference = $('#ot_reference'),
             $spinner = $('#spinner'),
+            $chosen = $('.chosen-select'),
             $finish = $('#finish');
         $(function () {
             $table.dataTable({
@@ -289,6 +290,7 @@
                     data: formData,
                     success: function (data) {
                         $form_create.trigger('reset');
+                        $chosen.trigger('chosen:updated');
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
                         $file.removeClass('btn-default disabled');
@@ -355,10 +357,10 @@
                     type = 'put',
                     url = $(this).attr('action'),
                     status = "info",
-                    msg = "LA REPARATION A ETE MIS A JOUR";
+                    msg = "LA REVISION A ETE MIS A JOUR";
                 if ($finish.is(":checked")) {
                     status = "success";
-                    msg = "LA REPARATION EST TERMINEE";
+                    msg = "LA REVISION EST TERMINEE";
                 }
                 $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> traitement en cours...'});
                 $submit.button('loading');
