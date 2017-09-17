@@ -29,8 +29,8 @@
             @endif
             <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
             <td class="uppercase text-danger-dker">{{$demand->reference}}</td>
-            <td>{{number_format($demand->demand_piece->sum('quantity'))}}</td>
-            <td>{{number_format($demand->demand_piece->sum('delivered'))}}</td>
+            <td class="text-success-dk text-center font-bold">{{number_format($demand->demand_piece->sum('quantity'))}}</td>
+            <td class="text-success-dk text-center font-bold">{{number_format($demand->demand_piece->sum('delivered'))}}</td>
             <td>{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}</td>
             @if($id == "demand")
                 <td>{{Jenssegers\Date\Date::parse($demand->created_at)->format('j M Y')}}</td>
