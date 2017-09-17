@@ -385,13 +385,19 @@
                 var id = $(this).attr('id');
                 if (id === '1'){
                     $type.attr('name', 'repair');
-                    $title.html('<i class="fa fa-wrench"></i> REPARATION')
+                    $title.fadeOut('slow', function () {
+                        $(this).html('<i class="fa fa-wrench"></i> REPARATION');
+                    }).fadeIn("slow");
                 }else if(id === '2'){
                     $type.attr('name', 'revision');
-                    $title.html('<i class="i i-gauge"></i> REVISION')
+                    $title.fadeOut('slow', function () {
+                        $(this).html('<i class="i i-gauge"></i> REVISION');
+                    }).fadeIn("slow");
                 }else {
                     $type.attr('name', 'visit');
-                    $title.html('<i class="i i-params"></i> VISITE TECHNIQUE')
+                    $title.fadeOut('slow', function () {
+                        $(this).html('<i class="i i-params"></i> VISITE TECHNIQUE');
+                    }).fadeIn("slow");
                 }
                 $.get('home/'+id+'/edit', function (data) {
                     $view.html(data);
