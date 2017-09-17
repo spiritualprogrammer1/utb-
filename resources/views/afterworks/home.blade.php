@@ -286,6 +286,7 @@
             $view = $('#view'),
             $type = $('#type'),
             $title = $('#title'),
+            $chosen = $('.chosen-select'),
             $distance = $('#distance');
 
         $(function () {
@@ -347,6 +348,7 @@
                     data: formData,
                     success: function (data) {
                         $form.trigger('reset');
+                        $chosen.trigger('chosen:updated');
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
                         $file.removeClass('btn-default disabled');
@@ -389,7 +391,7 @@
                     $title.html('<i class="i i-gauge"></i> REVISION')
                 }else {
                     $type.attr('name', 'visit');
-                    $title.html('<i class="i i-params"></i> VISIT')
+                    $title.html('<i class="i i-params"></i> VISITE TECHNIQUE')
                 }
                 $.get('home/'+id+'/edit', function (data) {
                     $view.html(data);
