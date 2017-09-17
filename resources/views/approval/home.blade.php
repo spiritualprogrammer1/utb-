@@ -109,11 +109,8 @@
         <div class="modal-dialog">
             <form id="validateForm" class="modal-content">
                 {{csrf_field()}}
-                <input id="diagnostic_id" name="diagnostic" type="hidden">
                 <input id="id" name="id" type="hidden">
-                <input id="repair" name="repair" type="hidden" value="1">
-                <input id="revision" name="revision" type="hidden">
-                <input id="visit" name="visit" type="hidden">
+                <input id="type" name="repair" type="hidden" value="1">
                 <div class="modal-header">
                     <section class="panel panel-info m-b-n-sm">
                         <div class="panel-body">
@@ -171,6 +168,7 @@
             $reference = $('#reference'),
             $spinner = $('#spinner'),
             $id = $('#id'),
+            $type = $('#type'),
             $diagnostic = $('#diagnostic_id'),
             $accordion = $('#accordionDetail');
 
@@ -186,6 +184,13 @@
             $filter.on('click', function () {
                 $spinner.show();
                 var id = $(this).val();
+                if (id === 'repair'){
+                    $type.attr('name', 'repair');
+                }else if(id === 'revision'){
+                    $type.attr('name', 'revision');
+                }else {
+                    $type.attr('name', 'visit');
+                }
                 $.get('home/'+id, function (data) {
                     $view.html(data);
                     $spinner.hide()
@@ -201,7 +206,7 @@
                     url = 'home',
                     status = "success",
                     msg = "LA SORTIE A ETE APPROUVER";
-                $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
+                $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> traitement en cours...'});
                 $submit.button('loading');
                 $.ajax({
                     url: url,
