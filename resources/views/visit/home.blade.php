@@ -183,7 +183,7 @@
                                 <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car"></a>
                             </div>
                             <h4 style="" class="text-center m-t-n-xl font-thin m-l-lg text-dark-dker">TRAVAUX DE
-                                <span class="font-bold">REPARATION</span></h4>
+                                <span class="font-bold">VISITE TECHNIQUE</span></h4>
                         </div>
                     </section>
                 </div>
@@ -357,10 +357,10 @@
                     type = 'put',
                     url = $(this).attr('action'),
                     status = "info",
-                    msg = "LA REPARATION A ETE MIS A JOUR";
+                    msg = "LA VISITE A ETE MIS A JOUR";
                 if ($finish.is(":checked")) {
                     status = "success";
-                    msg = "LA REPARATION EST TERMINEE";
+                    msg = "LA VISITE EST TERMINEE";
                 }
                 $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> traitement en cours...'});
                 $submit.button('loading');
