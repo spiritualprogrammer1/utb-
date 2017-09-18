@@ -1,23 +1,14 @@
 @section('title') Sorties de pieces @endsection
-@section('styles')
-    <style>
-        @media print {
-            .row {
-                display: none;
-            }
-        }
-    </style>
-@endsection
 @extends('layouts.master')
 @section('content')
     <section class="vbox">
-        <header class="header bg-light lt b-b b-light">
+        <header class="header bg-light lter b-b b-light">
             <p class="h4 font-thin pull-left m-r m-b-sm"><i class="i i-stack"></i> SORTIE DE PIECES</p>
             <a class="btn btn-sm btn-default btn-rounded btn-icon disabled pull-left m-r-xl" id="file" data-value=""
                title="Fiche d'etat...">
                 <i class="fa fa-file-pdf-o"></i>
             </a>
-            <form id="searchForm" class="col-md-4 m-t-sm m-l-xl has-success none">
+            <form id="searchForm" class="col-md-4 m-t-sm m-l-xl none">
                 {{csrf_field()}}
                 <input name="delivered" type="hidden" value="1">
                 <div class="col-md-6">
@@ -50,26 +41,26 @@
         </header>
         <section class="scrollable wrapper">
             <div class="row">
-                <div class="col-md-3 col-md-push-9">
+                <div class="col-md-2 col-md-push-10">
                     <div class="panel">
                         <div class="panel-heading b-b">Filtre</div>
                         <div class="panel-body">
                             <ul class="list-unstyled">
                                 <li class="radio i-checks">
                                     <label>
-                                        <input type="radio" name="filter" value="demand" checked class="filter"><i></i> Demande en attente
+                                        <input type="radio" name="filter" value="demand" checked class="filter"><i></i> En attente
                                     </label>
                                 </li>
                                 <li class="radio i-checks">
                                     <label>
-                                        <input type="radio" name="filter" value="delivered" class="filter"><i></i> Sortie de pièces effectuées
+                                        <input type="radio" name="filter" value="delivered" class="filter"><i></i> Effectuées
                                     </label>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-9 col-md-pull-3">
+                <div class="col-md-10 col-md-pull-2">
                     <div class="row row-sm">
                         <section class="panel">
                             <div class="panel-heading b-b">Liste des demande de pieces</div>
@@ -92,7 +83,7 @@
                                             <tr id="output{{$demand->id}}">
                                                 <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
                                                 <td class="uppercase text-danger-dker">{{$demand->reference}}</td>
-                                                <td>{{number_format($demand->demand_piece->sum('quantity'))}}</td>
+                                                <td class="text-success-dk text-center">{{number_format($demand->demand_piece->sum('quantity'))}}</td>
                                                 <td>{{number_format($demand->demand_piece->sum('delivered'))}}</td>
                                                 <td>{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}</td>
                                                 <td>{{Jenssegers\Date\Date::parse($demand->created_at)->format('j M Y')}}</td>
@@ -231,7 +222,6 @@
                         toastr[status](msg, "<span class='uppercase'>"+ data.demand +"</span>");
                         toastr.options.preventDuplicates = true;
                         var row = '<tr id="output' + data.id + '" class="alert alert-info text-danger font-bold">' +
-                            '<td>' + data.key + '</td>' +
                             '<td class="uppercase">' + data.reference + '</td>' +
                             '<td class="uppercase">' + data.demand + '</td>' +
                             '<td>' + data.quantity + '</td>' +
@@ -292,9 +282,9 @@
                 $.get('home/' + id, function (data) {
                     $view.html(data);
                     if (id === "demand"){
-                        $search.hide()
+                        $search.fadeOut("slow");
                     }else {
-                        $search.show()
+                        $search.fadeIn("slow");
                     }
                     $spinner.hide();
                 })
