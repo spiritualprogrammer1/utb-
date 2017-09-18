@@ -79,7 +79,7 @@ class StockController extends Controller
 
     public function store(Request $request)
     {
-        if ($request->ajax()) {
+        //if ($request->ajax()) {
             if ($request->has("delivery")) {
                 $messages = array(
                     'number.required' => "La Référence de Bon est obligatoire",
@@ -156,6 +156,7 @@ class StockController extends Controller
                     ]);
 
                     $demand = Demand::findOrFail($request->demand)->update(['state' => '2']);
+                    $diagnostic = Demand::findOrFail($request->demand)->diagnostic->update(['active' => '2']);
 
                     for ($i = 0; $i < $count = count($request->reference); $i++) {
                         $demand_piece = Demand_piece::findOrFail($request->piece[$i]);
@@ -196,7 +197,7 @@ class StockController extends Controller
                         'bus' => $demand->diagnostic->state->bus->model->brand->name . " " . $demand->diagnostic->state->bus->model->name,
                         'reference' => $demand->diagnostic->state->reference, 'quantity' => number_format($demand->demand_piece->sum('quantity')),
                         'delivered' => number_format($demand->demand_piece->sum('delivered')), 'demand' => $demand->reference,
-                        'date'=>$demand->updated_at->format('d/m/Y'),'key'=>$request->key]);
+                        'date'=>$demand->updated_at->format('d/m/Y')]);
                 }
             } elseif ($request->has("input")) {
                 $messages = array(
@@ -366,19 +367,17 @@ class StockController extends Controller
                         'sub_category_id' => $request->sub_category,
                         'type_id' => $request->type,
                         'quantity' => $request->quantity,
-                        'price' => $request->price,
-                        'total' => $request->total,
                         'block_id' => $request->block
                     ]);
                     return response()->json(['id' => $stock->id, 'reference' => $stock->reference,
                         'type' => $stock->type->name, 'family' => $stock->sub_category->category->name,
                         'sub' => $stock->sub_category->name, 'quantity' => $stock->quantity,
-                        'date' => $stock->created_at->format('d/m/Y')]);
+                        'date' => Date::parse($stock->created_at)->format('j M Y')]);
                 }
             }
-        } else {
+        /*} else {
             return view('errors.500');
-        }
+        }*/
     }
 
     public function movement(Request $request, $id, $type)
@@ -387,8 +386,7 @@ class StockController extends Controller
             if ($type == "output") {
                 //$demand = Demand::findOrFail($id);
                 $movements = Movement_stock::where('demand_id', $id)->orderBy('created_at','desc')->get();
-                $items = Item_stock::where('movement_stock_id', $id)->get();
-                return view('stock.partials.output', ['items' => $items, 'movements' => $movements]);
+                return view('stock.partials.output', ['movements' => $movements]);
             } elseif ($type == "back") {
                 $movement = Movement_stock::findOrFail($id);
                 $items = Item_stock::where('movement_stock_id', $id)->get();
@@ -548,212 +546,16 @@ class StockController extends Controller
         return view('stock.listing', ['stocks' => $stocks]);
     }
 
-
-    function supplieStock()
-    {
-        $supplier_id = Input::get('id');
-        $stocks = Stock::where('supplier_id', '=', $supplier_id)->get();
-        return Response::json(['id' => $stocks->id, 'reference' => $stocks->reference, 'type' => $stocks->type->name, 'category' => $stocks->category->name, 'sub' => $stocks->sub_category->name, 'supplier' => $stocks->supplier->name, 'created_at' => $stocks->created_at]);
-    }
-
-
-    public function stockUpdate(Request $request)
-    {
-        if ($request->ajax()) {
-            $validator = Validator::make($request->all(), [
-                'supplier' => 'bail|required|min:1|max:255|',
-                'model' => 'bail|required|min:1|max:255|',
-                'sub_category' => 'bail|required|min:1|max:255|',
-                'quantity' => 'bail|required|min:1|max:255|',
-                'block' => 'bail|required|min:1|max:255|',
-                /*'price' => 'bail|required|min:3|max:255|',
-                'total' => 'bail|required|min:3|max:255|',*/
-            ]);
-
-            if ($validator->fails()) {
-                $errors = $validator->errors();
-                $errors = json_decode($errors);
-
-                return response()->json([
-                    'success' => false,
-                    'message' => $errors
-                ], 422);
-            } else {
-                $stock = Stock::find($request->stock_id);
-                $stock->supplier_id = $request->supplier;
-                $stock->model_id = $request->model;
-                $stock->sub_category_id = $request->sub_category;
-                $stock->type_id = $request->type;
-                $stock->guaranty = $request->guaranty;
-                $stock->quantity = $request->quantity;
-                $stock->price = $request->price;
-                $stock->transport = $request->transport;
-                $stock->annex = $request->annex;
-                $stock->tva_rate = $request->ttva;
-                $stock->total = $request->total;
-                $stock->tva = $request->tva;
-                $stock->block_id = $request->block;
-                $stock->save();
-
-                return response()->json(['id' => $stock->id, 'reference' => $stock->reference, 'type' => $stock->type->name, 'sub_category' => $stock->sub_category->name, 'quantity' => $stock->quantity, 'date' => $stock->created_at->format('d/m/Y')]);
-            }
-        }
-    }
-
-
-    public function adjust(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'quantity' => 'bail|required|min:1|max:255|',
-            'id' => 'bail|required|min:1|max:255|',
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $errors = json_decode($errors);
-
-            return response()->json([
-                'success' => false,
-                'message' => $errors
-            ], 422);
-        } else {
-            $old = Stock::findOrFail($request->id);
-
-            $stock = Stock::where('id', $request->id)
-                ->update(['quantity' => $old->quantity + $request->quantity]);
-
-            $new = Stock::findOrFail($request->id);
-            $in = Inventory::create([
-                'stock_id' => $request->id,
-                'quantity' => $request->quantity,
-                'old_quantity' => $old->quantity,
-            ]);
-            return response()->json(['id' => $request->id, 'reference' => $new->reference, 'type' => $new->type->name, 'category' => $new->sub_category->category->name,
-                'sub_category' => $new->sub_category->name, 'quantity' => $new->quantity, 'ray' => $new->block->shelf->ray->name,
-                'shelf' => $new->block->shelf->name, 'block' => $new->block->name, 'supplier' => $new->supplier->name, 'date' => $new->updated_at->format('d/m/Y')]);
-        }
-    }
-
     public function edit(Request $request, $id)
     {
 
     }
-
 
     public function update(Request $request, $id)
     {
 
     }
 
-    public function in(Request $request)
-    {
-        //if ($request->ajax()) {
-        $validator = Validator::make($request->all(), [
-            'supplier' => 'bail|required|min:1|max:255|',
-            'quantity' => 'bail|required|min:1|max:255|',
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $errors = json_decode($errors);
-
-            return response()->json([
-                'success' => false,
-                'message' => $errors
-            ], 422);
-        } else {
-            $old = Stock::findOrFail($request->id);
-
-            $stock = Stock::where('id', $request->id)
-                ->update(['quantity' => $old->quantity + $request->quantity]);
-
-            if ($request->has('tva')) {
-                $tva = $request->tva;
-            } else {
-                $tva = '0';
-            }
-            $in = Item_stock::create([
-                'supplier_id' => $request->supplier,
-                'stock_id' => $request->id,
-                'quantity' => $request->quantity,
-                'unit_price' => $request->price,
-                'transport' => $request->transport,
-                'annex' => $request->annex,
-                'tva_rate' => $request->ttva,
-                'total' => $request->total,
-                'tva' => $tva,
-                'stock_old' => $old->quantity,
-                'type' => 0,
-            ]);
-
-            return response()->json(['id' => $in->stock_id, 'reference' => $in->stock->reference, 'type' => $in->stock->type->name, 'category' => $in->stock->sub_category->category->name,
-                'sub_category' => $in->stock->sub_category->name, 'quantity' => $in->stock->quantity]);
-        }
-        //}
-    }
-
-    public function out(Request $request)
-    {
-
-        //if ($request->ajax()) {
-        $validator = Validator::make($request->all(), [
-            'quantity' => 'bail|required|min:1|max:255|',
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $errors = json_decode($errors);
-
-            return response()->json([
-                'success' => false,
-                'message' => $errors
-            ], 422);
-        } else {
-            $old = Stock::findOrFail($request->id);
-
-
-            $stock = Stock::where('id', $request->id)
-                ->update(['quantity' => $old->quantity - $request->quantity]);
-
-            $out = Item_stock::create([
-                'stock_id' => $request->id,
-                'quantity' => $request->quantity,
-                'stock_old' => $old->quantity,
-                'type' => 1,
-            ]);
-
-            return response()->json(['id' => $out->stock_id, 'reference' => $out->stock->reference, 'type' => $out->stock->type->name, 'category' => $out->stock->sub_category->category->name,
-                'sub_category' => $out->stock->sub_category->name, 'quantity' => $out->stock->quantity]);
-        }
-        //}
-    }
-
-
-    /**
-     * DELIVERY FUNCTIONS
-     **/
-
-
-    public function preview(Request $request, $id)
-    {
-        if ($request->ajax()) {
-            $url = asset('assets/uploads/delivery');
-            $image = Delivery::select('image')->where('ids', $id)->get();
-            $preview = $url . "/" . $image[0]->image;
-            return response()->json($preview);
-        } else {
-            return view('errors.500');
-        }
-    }
-
-    /*** END ***/
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //
