@@ -14,9 +14,9 @@
                                 @foreach($diagnostics as $diagnostic)
                                     <option value="{{$diagnostic->id}}" name="diagnostic"
                                             id="diagnostic{{$diagnostic->id}}"
-                                            data-bus="{{$diagnostic->state->bus->model->brand->name." ".$diagnostic->state->bus->model->brand->name}}"
-                                            data-matriculation="{{$diagnostic->state->bus->matriculation}}">
-                                        {{strtoupper($diagnostic->state->reference)}}</option>
+                                            data-bus="{{$diagnostic->statee->bus->model->brand->name." ".$diagnostic->statee->bus->model->brand->name}}"
+                                            data-matriculation="{{$diagnostic->statee->bus->matriculation}}">
+                                        {{strtoupper($diagnostic->statee->reference)}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -97,7 +97,7 @@
                         <i class="fa fa-plus text"></i>
                         <i class="fa fa-minus text-active"></i>
                     </a>
-                    <a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""
+                    <a class="btn btn-sm btn-default disabled btn-rounded btn-icon" id="file" data-value=""
                        title="Fiche d'etat...">
                         <i class="fa fa-file-pdf-o"></i>
                     </a>
@@ -136,15 +136,15 @@
                                 @foreach($visits as $key=>$visit)
                                     <tr id="visit{{$visit->id}}">
                                         <td>{{$key + 1}}</td>
-                                        <td class="uppercase text-danger-dker">{{$visit->diagnostic->state->reference}}</td>
-                                        <td class="uppercase text-danger-dker">{{$visit->diagnostic->state->bus->matriculation}}</td>
-                                        <td class="uppercase text-danger-dker">{{$visit->diagnostic->state->bus->chassis}}</td>
-                                        <td>{{$visit->diagnostic->state->bus->model->brand->name." ".$visit->diagnostic->state->bus->model->name}}</td>
+                                        <td class="uppercase text-danger-dker">{{$visit->diagnostic->statee->reference}}</td>
+                                        <td class="uppercase text-danger-dker">{{$visit->diagnostic->statee->bus->matriculation}}</td>
+                                        <td class="uppercase text-danger-dker">{{$visit->diagnostic->statee->bus->chassis}}</td>
+                                        <td>{{$visit->diagnostic->statee->bus->model->brand->name." ".$visit->diagnostic->statee->bus->model->name}}</td>
                                         <td>{{\Jenssegers\Date\Date::parse($visit->updated_at)->format('j M Y')}}</td>
                                         <td><a href="#" id="{{$visit->id}}" class="visit"
-                                               data-car="{{$visit->diagnostic->state->bus->model->brand->name." ".$visit->diagnostic->state->bus->model->name}}"
-                                               data-matriculation="{{$visit->diagnostic->state->bus->matriculation}}"
-                                               data-ot="{{$visit->diagnostic->state->reference}}">
+                                               data-car="{{$visit->diagnostic->statee->bus->model->brand->name." ".$visit->diagnostic->statee->bus->model->name}}"
+                                               data-matriculation="{{$visit->diagnostic->statee->bus->matriculation}}"
+                                               data-ot="{{$visit->diagnostic->statee->reference}}">
                                                 <i class="fa fa-pencil"></i></a></td>
                                         <td class="text-lowercase">@if($visit->state == 4)
                                                 <span class="badge bg-danger">retour {{$visit->diagnostic->work->where('state','4')->count()}}</span>
@@ -242,6 +242,12 @@
         </tr>
         </tbody>
     </table>
+    <div class="modal fade" id="visitModal">
+        <div class="modal-dialog modal-lfg" style="width: 700px;">
+            <div class="modal-content" id="file_content">
+            </div>
+        </div><!-- /.modal-dialog -->
+    </div>
 @endsection
 @section('scripts')
     <script>
@@ -249,6 +255,8 @@
             $form_create = $('#createForm'),
             $form = $('#validateForm'),
             $file = $('#file'),
+                $visitModal=$('#visitModal'),
+                $file_content=$('#file_content'),
             $submit_create = $('#submit_create'),
             $diagnostic = $('#diagnostic'),
             $visit_row = $('#visitRow'),
@@ -281,7 +289,7 @@
                     type = 'post',
                     url = 'home',
                     status = "success",
-                    msg = "La Reception a bien été enregistrer";
+                    msg = "La Visite a bien été enregistrer";
                 $submit_create.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> traitement en cours...'});
                 $submit_create.button('loading');
                 $.ajax({
@@ -290,6 +298,7 @@
                     data: formData,
                     success: function (data) {
                         $form_create.trigger('reset');
+                        score();
                         $chosen.trigger('chosen:updated');
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
@@ -332,7 +341,17 @@
                         }
                     }
                 });
-            });
+            })
+            
+            function score()
+            {
+
+                $.get('score',function (data) {
+                    $('#count_visitattente').html(data.count_attentvist);
+                    $('#count_visitoncours').html(data.count_visitatcours);
+                })
+            }
+
             $diagnostic_add.on('click', function () {
                 var $table = $('#reference_table tbody');
                 $table.append($('#reference_table tbody tr:last').clone());
@@ -377,6 +396,7 @@
                         toastr.options.preventDuplicates = true;
                         if (data.finish === '1') {
                             $('#visit' + data.id).remove();
+                            score1();
                         } else {
                             $('#visit' + data.id).addClass('alert alert-info text-danger-dk font-bold');
                         }
@@ -405,6 +425,27 @@
                     }
                 });
             });
+
+            $file.on('click',function () {
+                $spinner.show();
+                var id = $(this).attr('data-value') ;
+                $.get('filesvisit/' + id, function (data) {
+                    $file_content.html(data);
+                    $visitModal.modal('show')
+                    $spinner.hide();
+                })
+            })
+
+
+            function score1()
+            {
+
+                $.get('scoree',function (data) {
+                    $('#testVisit').html(data.testVist);
+                    $('#count_visitoncours').html(data.count_visitcour);
+                })
+            }
+
             $finish.on('click', function () {
                 var check;
                 check = $finish.is(":checked");

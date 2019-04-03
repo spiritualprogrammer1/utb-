@@ -19,14 +19,14 @@
                     <i class="fa fa-search-plus text-muted"></i>
                 </a>
             </td>
-            <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
-            <td class="uppercase text-primary-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
-            <td>{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}</td>
+            <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->reference}}</td>
+            <td class="uppercase text-primary-dker">{{$repair->diagnostic->statee->bus->matriculation}}</td>
+            <td>{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}</td>
             <td>{{\Jenssegers\Date\Date::parse($repair->updated_at)->format('j M Y')}}</td>
             <td><a href="#" id="{{$repair->id}}" data-type="repair" class="approval"
-                   data-car="{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}"
-                   data-matriculation="{{$repair->diagnostic->state->bus->matriculation}}"
-                   data-ot="{{$repair->diagnostic->state->reference}}" data-diagnostic="{{$repair->diagnostic->id}}">
+                   data-car="{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}"
+                   data-matriculation="{{$repair->diagnostic->statee->bus->matriculation}}"
+                   data-ot="{{$repair->diagnostic->statee->reference}}" data-diagnostic="{{$repair->diagnostic->id}}">
                     <i class="fa fa-pencil"></i></a></td>
         </tr>
     @endforeach

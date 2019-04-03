@@ -21,16 +21,86 @@ class VisitController extends Controller
         $this->middleware('auth');
     }
 
+    public function filesvisit(Request $request,$id)
+    {
+        $visit=Visit_technique::findOrFail($id);
+        $bus_id= $visit->diagnostic->statee->bus_id;
+
+        $deniervist=Visit_technique::join('diagnostics','diagnostics.id','=','visit_techniques.diagnostic_id')
+            ->join('works','works.diagnostic_id','=','diagnostics.id')
+            ->join('states','states.id','=','diagnostics.state_id')
+            ->join('buses','buses.id','=','states.bus_id')
+            ->select('visit_techniques.created_at as date','states.kilometer as kilometer')
+            ->where('buses.id',$bus_id)
+            ->where('works.type','2')
+            ->where('visit_techniques.state','5')
+            ->orderBy('visit_techniques.id','desc')
+            ->take(3)
+            ->get();
+        return view('visit.file.visitfile',compact('deniervist','visit'));
+    }
+
     public function index()
     {
-        $technicians = Employee::where('post_id', '1')->get();
-        $diagnostics = Diagnostic::where('type', '3')->where('active', '1')
-            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
-        $active = '';
-        if ($diagnostics->count() == '0') {
-            $active = '0';
+        $site_id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+
+            //    $technicians = Employee::where('post_id', '1')->where('site_id',$site_id)->get();
+                $technicians = Employee::where('post_id', '1')->get();
+
+
+//        $diagnostics = Diagnostic::where('type', '3')->where('active', '1')
+//            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                $diagnostics = Diagnostic::whereHas('statee',function ($query){
+                    $site_id=Auth::user()->employee->site_id;
+                    $query->where('site_id',$site_id);
+
+                })->whereBetween('active', ['1','2'])->where('type', '3')->orderBy('updated_at', 'desc')->get();
+                $active = '';
+                if ($diagnostics->count() == '0') {
+                    $active = '0';
+                }
+                $visits = Visit_technique::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
+
+
+            }
+            else{
+
+                $technicians = Employee::where('post_id', '1')->get();
+//        $diagnostics = Diagnostic::where('type', '3')->where('active', '1')
+//            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                $diagnostics = Diagnostic::whereBetween('active', ['1','2'])->where('type', '3')->orderBy('updated_at', 'desc')->get();
+                $active = '';
+                if ($diagnostics->count() == '0') {
+                    $active = '0';
+                }
+                $visits = Visit_technique::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
+
+            }
         }
-        $visits = Visit_technique::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
+        else{
+
+        //    $technicians = Employee::where('post_id', '1')->where('site_id',$site_id)->get();
+            $technicians = Employee::where('post_id', '1')->where('site_id',$site_id)->get();
+
+//        $diagnostics = Diagnostic::where('type', '3')->where('active', '1')
+//            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+            $diagnostics = Diagnostic::whereHas('statee',function ($query){
+                $site_id=Auth::user()->employee->site_id;
+                $query->where('site_id',$site_id);
+
+            })->whereBetween('active', ['1','2'])->where('type', '3')->orderBy('updated_at', 'desc')->get();
+            $active = '';
+            if ($diagnostics->count() == '0') {
+                $active = '0';
+            }
+            $visits = Visit_technique::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
+
+
+        }
+
+
         return view('visit.home', ['diagnostics' => $diagnostics, 'technicians' => $technicians,
             'visits' => $visits, 'active' => $active]);
     }
@@ -86,10 +156,10 @@ class VisitController extends Controller
                     'title' => $request->title[$i],
                 ]);
             }
-            return response()->json(['id' => $visit->id, 'matriculation' => $visit->diagnostic->state->bus->matriculation,
-                'chassis' => $visit->diagnostic->state->bus->chassis, 'date' => Date::parse($visit->created_at)->format('j M Y'),
-                'bus' => $visit->diagnostic->state->bus->model->brand->name . " " . $visit->diagnostic->state->bus->model->name,
-                'reference' => $visit->diagnostic->state->reference,
+            return response()->json(['id' => $visit->id, 'matriculation' => $visit->diagnostic->statee->bus->matriculation,
+                'chassis' => $visit->diagnostic->statee->bus->chassis, 'date' => Date::parse($visit->created_at)->format('j M Y'),
+                'bus' => $visit->diagnostic->statee->bus->model->brand->name . " " . $visit->diagnostic->statee->bus->model->name,
+                'reference' => $visit->diagnostic->statee->reference,
                 'count' => $visit->where('state','1')->orWhere('state','2')->orWhere('state','4')->count('id'),
                 'diagnostic' => $request->diagnostic]);
         }
@@ -102,12 +172,55 @@ class VisitController extends Controller
     {
         if ($request->ajax()) {
             if ($id == "0") {
-                $diagnostics = Diagnostic::with('state')->where('type', '3')->where('active', '1')
-                    ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                $site_id=Auth::user()->employee->site_id;
+                if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                    if (Auth::user()->employee->action_site == 2) {
+                        $diagnostics = Diagnostic::whereHas('statee',function ($q){
+                            $site_id=Auth::user()->employee->site_id;
+                            $q->where('site_id',$site_id);
+
+                        })->with('state')->where('type', '3')->where('active', '1')
+                            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                    }
+                    else{
+                        $diagnostics = Diagnostic::with('state')->where('type', '3')->where('active', '1')
+                            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+
+
+                    }
+                }
+                else{
+                    $diagnostics = Diagnostic::whereHas('statee',function ($q){
+                        $site_id=Auth::user()->employee->site_id;
+                        $q->where('site_id',$site_id);
+
+                    })->with('state')->where('type', '3')->where('active', '1')
+                        ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                }
+
                 return response()->json($diagnostics);
             } else {
                 $visit = Visit_technique::findOrFail($id);
-                $employees = Employee::where('post_id', '1')->get();
+
+                $site_id=Auth::user()->employee->site_id;
+                if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                    if (Auth::user()->employee->action_site == 2) {
+                    //    $employees = Employee::where('post_id', '1')->where('site_id',$site_id)->get();
+
+                        $employees = Employee::where('post_id', '1')->get();
+
+                    }
+                    else{
+                        $employees = Employee::where('post_id', '1')->get();
+                    }
+                    }
+                    else{
+                      //  $employees = Employee::where('post_id', '1')->where('site_id',$site_id)->get();
+
+                        $employees = Employee::where('post_id', '1')->get();
+
+                    }
+
                 return view('visit.partials.visit', ['visit' => $visit, 'employees' => $employees]);
             }
         } else {
@@ -193,7 +306,64 @@ class VisitController extends Controller
             return view('errors.500');
         }
     }
+public function score()
+{
 
+    $site_id=Auth::user()->employee->site_id;
+    if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+        if (Auth::user()->employee->action_site == 2) {
+            $count_attentvist= Diagnostic::whereHas('statee',function ($q){
+                $site_id=Auth::user()->employee->site_id;
+                $q->where('site_id',$site_id);
+
+            })->whereBetween('active', ['1','2'])->where('type', '3')->count();
+            $count_visitatcours=Visit_technique::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->count();
+
+        }
+        else{
+            $count_attentvist= Diagnostic::whereBetween('active', ['1','2'])->where('type', '3')->count();
+            $count_visitatcours=Visit_technique::where('state', '1')->orWhere('state', '2')->count();
+
+        }
+    }else{
+        $count_attentvist= Diagnostic::whereHas('statee',function ($q){
+            $site_id=Auth::user()->employee->site_id;
+            $q->where('site_id',$site_id);
+
+        })->whereBetween('active', ['1','2'])->where('type', '3')->count();
+        $count_visitatcours=Visit_technique::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->count();
+
+    }
+
+
+
+    return response()->json(['count_attentvist'=>$count_attentvist,'count_visitatcours'=>$count_visitatcours]);
+}
+
+public function scoree()
+{
+    $site_id=Auth::user()->employee->site_id;
+    if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+        if (Auth::user()->employee->action_site == 2) {
+            $testVist=Visit_technique::where('site_id',$site_id)->where('state', '3')->count();
+            $count_visitcour=Visit_technique::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->count();
+        }
+        else{
+            $testVist=Visit_technique::where('state', '3')->count();
+            $count_visitcour=Visit_technique::where('state', '1')->orWhere('state', '2')->count();
+
+        }
+    }
+    else{
+        $testVist=Visit_technique::where('site_id',$site_id)->where('state', '3')->count();
+        $count_visitcour=Visit_technique::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->count();
+
+    }
+
+
+    return response()->json(['testVist'=>$testVist,'count_visitcour'=>$count_visitcour]);
+
+}
     public function destroy($id)
     {
         //

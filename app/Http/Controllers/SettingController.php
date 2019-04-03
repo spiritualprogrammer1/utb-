@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use App\Block;
 use App\Brand;
 use App\Category;
+use App\Entreprise;
 use App\Model;
 use App\Models;
+use App\Post;
 use App\Ray;
+use App\Role;
+use App\Service;
 use App\Shelve;
+use App\Site;
 use App\Sub_category;
 use App\Type;
 use Validator;
@@ -33,7 +38,296 @@ class SettingController extends Controller
         $types = Type::all();
         return view('setting.vehicle', compact('brands', 'models', 'categories', 'subs', 'types'));
     }
+    public function service()
+    {
 
+        $service=Service::all();
+        $services=Service::all();
+        $postes=Post::all();
+
+        return view('setting.service',compact('service','postes','services'));
+    }
+    public function serviceCreate(Request $request)
+    {
+        if ($request->ajax()) {
+            $validator = Validator::make($request->all(), [
+                'name' => 'bail|required|min:3|max:255|unique:services',
+                'display_name'=>'bail|required|min:3|max:255'
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $errors = json_decode($errors);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $errors
+                ], 422);
+            } else {
+                $service = Service::create([
+                    'name' => htmlspecialchars(strtolower($request->name)),
+                    'display_name'=>htmlspecialchars(strtolower($request->display_name))
+                ]);
+                return response()->json(['id' => $service->id, 'name' => $service->display_name, 'date' => $service->created_at->format('d/m/Y H:i:s')]);
+            }
+        }
+    }
+    public function serviceUpdated(Request $request)
+    {
+        if ($request->ajax()) {
+            $validator = Validator::make($request->all(), [
+                'name' => 'bail|required|min:1|max:255',
+                'display_name'=>'bail|required'
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $errors =  json_decode($errors);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $errors
+                ], 422);
+            } else {
+                $service = Service::find($request->service_id);
+                $service->name = htmlspecialchars(strtolower($request->name));
+                $service->display_name = htmlspecialchars(strtolower($request->display_name));
+                $service->save();
+                return Response(['id'=>$service->id, 'name'=>$service->name, 'date' => $service->created_at->format('d/m/Y H:i:s')]);
+            }
+        }
+    }
+    public function createPoste(Request $request)
+    {
+        if($request->ajax())
+        {
+            $validator = Validator::make($request->all(),[
+                'name'=>'bail|required',
+                'service'=>'bail|required'
+            ],
+                [
+                    'name.required'=>'le libelle est obligatoire',
+                    'service_id.required'=>'le champs service est obligatoire'
+                ]);
+            if($validator->fails())
+            {
+                $errors = $validator->errors();
+                $errors= json_decode($errors);
+
+                return response()->json([
+                    'success'=> false,
+                    'message'=> $errors
+                ],422);
+
+            }
+            else{
+
+                $postes = Post::create([
+                    'name'=>strtolower($request->name),
+                    'service_id'=>$request->service,
+
+                ]);
+                $roles = Role::create([
+                    'name'=>strtolower($request->name),
+                    'display_name'=>strtolower($request->name),
+                    'description'=>strtolower($request->name),
+                ]);
+
+
+                return response()->json(['service'=>$postes->service->name,'id'=>$postes->id,'name'=>$postes->name,'date'=>$postes->created_at->format('d/m/Y H:i:s')]);
+            }
+
+        }
+
+    }
+    public function UpdatePoste(Request $request)
+    {
+        if($request->ajax())
+        {
+            $validator= Validator::make($request->all(),[
+                'name'=>'bail|required'
+            ]);
+
+            if($validator->fails())
+            {
+                $errors = $validator->errors();
+                $errors= json_decode($errors);
+
+                return response()->json([
+                    'success'=> false,
+                    'message'=> $errors
+                ],422);
+            }
+            else {
+
+                $postes = Post::find($request->poste_id);
+                $postes->name = $request->name;
+                $postes->service_id= $request->service;
+                $postes->save();
+
+                return response()->json(['id'=>$postes->id,'name'=>$postes->name,'service'=>$postes->service->name,'date'=>$postes->created_at->format('d/m/Y H:i:s')]);
+
+            }
+        }
+
+    }
+    /*******data entreprise**********/
+    public function getEntreprise(Request $request)
+    {
+        $entreprise=Entreprise::all();
+        $entreprisecount=Entreprise::count();
+        return view('setting.entreprise',compact('entreprise','entreprisecount'));
+    }
+    public function postEntreprise(Request $request)
+    {
+        if($request->ajax())
+        {
+            $rules=array( 'name'=>'bail|required|min:3',
+                'display_name'=>'bail|required|min:4',
+                'picture'=>'bail|required',
+                  'footer'=>'bail|required');
+            $messages = array(
+                'name.required'=>'le libelle est obligatoire',
+                'display_name.required'=>'la description est obligatoire',
+                'picture.required'=>'choisir un logo'
+            );
+
+            $validator = Validator::make($request->all(),$rules,$messages);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $errors = json_decode($errors);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $errors
+                ], 422);
+            } else {
+
+                if($request->hasFile('picture')) {
+                    $image = $request['picture'];
+
+                    $input['imagename'] = time().'.'. $image->getClientOriginalExtension();
+                    $destinationPath = public_path('/picture_employe');
+                    $image->move($destinationPath, $input['imagename']);
+                }
+
+                $entreprise = Entreprise::create([
+                    'name'=> $request->name,
+                    'display_name'=> $request->display_name,
+                    'picture'=>$input['imagename'],
+                    'footer'=>$request->footer
+
+                ]);
+                $entreprisecount=Entreprise::count();
+                return response()->json(['entreprisecount'=>$entreprisecount,'date'=>$entreprise->created_at->format('d/m/Y H:i:s'),'id'=>$entreprise->id,'name'=>$entreprise->name,'display_name'=>$entreprise->display_name]);
+
+            }
+        }
+    }
+
+    public function updateEntreprise(Request $request)
+    {
+        if($request->ajax())
+        {
+            $rules=array( 'name'=>'bail|required|min:3',
+                'display_name'=>'bail|required|min:4',
+            );
+            $messages = array(
+                'name.required'=>'le libelle est obligatoire',
+                'display_name.required'=>'la description est obligatoire',
+
+            );
+
+            $validator = Validator::make($request->all(),$rules,$messages);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $errors = json_decode($errors);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $errors
+                ], 422);
+            } else {
+
+                if($request->hasFile('picture')) {
+                    $image = $request['picture'];
+
+                    $input['imagename'] = time().'.'. $image->getClientOriginalExtension();
+                    $destinationPath = public_path('/picture_employe');
+                    $image->move($destinationPath, $input['imagename']);
+                }
+
+
+                $entreprise=Entreprise::find($request->entreprise_id);
+                $entreprise->name=$request->name;
+                $entreprise->display_name=$request->display_name;
+                $entreprise->footer=$request->footer;
+                $entreprise->picture=$input['imagename'];
+                $entreprise->save();
+
+                return response()->json(['date'=>$entreprise->created_at->format('d/m/Y H:i:s'),'id'=>$entreprise->id,'name'=>$entreprise->name,'display_name'=>$entreprise->display_name]);
+
+            }
+        }
+    }
+    public function site()
+    {
+        $site = Site::all()->sortByDesc("created_at");
+        return view('setting.site',compact('site'));
+    }
+    public function siteCreate(Request $request)
+    {
+
+        if ($request->ajax()) {
+            $validator = Validator::make($request->all(), [
+                'name' => 'bail|required|min:3|max:255|unique:sites',
+                'ville' => 'bail|required|min:3|max:255',
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $errors = json_decode($errors);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $errors
+                ], 422);
+            } else {
+                $site = Site::create([
+                    'name' => htmlspecialchars(strtolower($request->name)),
+                    'ville'=>htmlspecialchars(strtolower($request->ville))
+                ]);
+                return response()->json(['id' => $site->id, 'ville'=>$site->ville,'name' => $site->name, 'date' => $site->created_at->format('d/m/Y H:i:s')]);
+            }
+        }
+
+
+    }
+
+    public function siteUpdate(Request $request)
+    {
+
+        if ($request->ajax()) {
+            $validator = Validator::make($request->all(), [
+                'name' => 'bail|required|min:3|max:255',
+                'ville' => 'bail|required|min:1|max:255',
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $errors =  json_decode($errors);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $errors
+                ], 422);
+            } else {
+                $site = Site::find($request->site_id);
+                $site->id = $request->site_id;
+                $site->name = strtolower($request->name);
+                $site->ville = strtolower($request->ville);
+                $site->save();
+                return Response(['id'=>$site->id, 'name'=>$site->name, 'date' => $site->created_at->format('d/m/Y H:i:s'), 'ville'=>$site->ville]);
+            }
+        }
+
+    }
     public function vehicle_store(Request $request){
         if ($request->ajax()) {
             if ($request->has("brand")) {

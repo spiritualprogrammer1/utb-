@@ -78,13 +78,17 @@
                                 <tbody id="vehicleRow">
                                 @foreach($buses as $key=>$bus)
                                     <tr id="bus{{$bus->id}}" class="animated fadeIn">
-                                        <td>{{$bus->designation}}</td>
+                                        <td>{{$bus->id}}</td>
                                         <td class="text-danger-dk uppercase">{{$bus->matriculation}}</td>
                                         <td class="text-danger-dk uppercase">{{$bus->chassis}}</td>
                                         <td>{{$bus->model->brand->name}}</td>
                                         <td>{{$bus->model->name}}</td>
-                                        <td>{{\Jenssegers\Date\Date::parse($bus->assurance->date)->format('j M Y')}}</td>
-                                        <td>{{\Jenssegers\Date\Date::parse($bus->visit->date)->format('j M Y')}}</td>
+                                        <?php $assurance=App\Assurance::where('bus_id',$bus->id)->orderBy('id','DESC')->first();
+                                           $visite=App\Visit::where('bus_id',$bus->id)->orderBy('id','DESC')->first();
+                                        ?>
+                                        <td>{{\Jenssegers\Date\Date::parse($assurance['date'])->format('j M Y')}}</td>
+                                        <td>{{\Jenssegers\Date\Date::parse($visite['date'])->format('j M Y')}}</td>
+
                                     </tr>
                                 @endforeach
                                 </tbody>

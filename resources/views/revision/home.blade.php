@@ -14,9 +14,9 @@
                                 @foreach($diagnostics as $diagnostic)
                                     <option value="{{$diagnostic->id}}" name="diagnostic"
                                             id="diagnostic{{$diagnostic->id}}"
-                                            data-bus="{{$diagnostic->state->bus->model->brand->name." ".$diagnostic->state->bus->model->brand->name}}"
-                                            data-matriculation="{{$diagnostic->state->bus->matriculation}}">
-                                        {{strtoupper($diagnostic->state->reference)}}</option>
+                                            data-bus="{{$diagnostic->statee->bus->model->brand->name." ".$diagnostic->statee->bus->model->brand->name}}"
+                                            data-matriculation="{{$diagnostic->statee->bus->matriculation}}">
+                                        {{strtoupper($diagnostic->statee->reference)}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -97,7 +97,7 @@
                         <i class="fa fa-plus text"></i>
                         <i class="fa fa-minus text-active"></i>
                     </a>
-                    <a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""
+                    <a class="btn btn-sm btn-default disabled  btn-rounded btn-icon" id="file" data-value=""
                        title="Fiche d'etat...">
                         <i class="fa fa-file-pdf-o"></i>
                     </a>
@@ -136,15 +136,15 @@
                                 @foreach($revisions as $key=>$revision)
                                     <tr id="revision{{$revision->id}}">
                                         <td>{{$key + 1}}</td>
-                                        <td class="uppercase text-danger-dker">{{$revision->diagnostic->state->reference}}</td>
-                                        <td class="uppercase text-danger-dker">{{$revision->diagnostic->state->bus->matriculation}}</td>
-                                        <td class="uppercase text-danger-dker">{{$revision->diagnostic->state->bus->chassis}}</td>
-                                        <td>{{$revision->diagnostic->state->bus->model->brand->name." ".$revision->diagnostic->state->bus->model->name}}</td>
+                                        <td class="uppercase text-danger-dker">{{$revision->diagnostic->statee->reference}}</td>
+                                        <td class="uppercase text-danger-dker">{{$revision->diagnostic->statee->bus->matriculation}}</td>
+                                        <td class="uppercase text-danger-dker">{{$revision->diagnostic->statee->bus->chassis}}</td>
+                                        <td>{{$revision->diagnostic->statee->bus->model->brand->name." ".$revision->diagnostic->statee->bus->model->name}}</td>
                                         <td>{{\Jenssegers\Date\Date::parse($revision->updated_at)->format('j M Y')}}</td>
                                         <td><a href="#" id="{{$revision->id}}" class="revision"
-                                               data-car="{{$revision->diagnostic->state->bus->model->brand->name." ".$revision->diagnostic->state->bus->model->name}}"
-                                               data-matriculation="{{$revision->diagnostic->state->bus->matriculation}}"
-                                               data-ot="{{$revision->diagnostic->state->reference}}">
+                                               data-car="{{$revision->diagnostic->statee->bus->model->brand->name." ".$revision->diagnostic->statee->bus->model->name}}"
+                                               data-matriculation="{{$revision->diagnostic->statee->bus->matriculation}}"
+                                               data-ot="{{$revision->diagnostic->statee->reference}}">
                                                 <i class="fa fa-pencil"></i></a></td>
                                         <td class="text-lowercase">@if($revision->state == 4)
                                                 <span class="badge bg-danger">retour {{$revision->diagnostic->work->where('state','4')->count()}}</span>
@@ -242,6 +242,12 @@
         </tr>
         </tbody>
     </table>
+    <div class="modal fade" id="revisionModal">
+        <div class="modal-dialog modal-lfg" style="width: 700px;">
+            <div class="modal-content" id="file_content">
+            </div>
+        </div><!-- /.modal-dialog -->
+    </div>
 @endsection
 @section('scripts')
     <script>
@@ -253,10 +259,13 @@
             $diagnostic = $('#diagnostic'),
             $revision_row = $('#revisionRow'),
             $sub_nav = $('#subNav'),
+                $revisionModal=$('#revisionModal'),
+                $file_content=$('#file_content'),
             $revision_add = $('#revisionAdd'),
             $revision = $('.revision'),
             $car = $('#car'),
             $ot = $('#ot'),
+                $modale=$('#revisionModal'),
             $matriculation = $('#matriculation'),
             $diagnostic_add = $('#diagnostic_add'),
             $modal_validate = $('#validateModal'),
@@ -281,7 +290,7 @@
                     type = 'post',
                     url = 'home',
                     status = "success",
-                    msg = "La Reception a bien été enregistrer";
+                    msg = "La Revision a bien été enregistrer";
                 $submit_create.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> traitement en cours...'});
                 $submit_create.button('loading');
                 $.ajax({
@@ -290,6 +299,7 @@
                     data: formData,
                     success: function (data) {
                         $form_create.trigger('reset');
+                        score();
                         $chosen.trigger('chosen:updated');
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
@@ -333,6 +343,25 @@
                     }
                 });
             });
+            $file.on('click',function () {
+                $spinner.show();
+                var id = $(this).attr('data-value');
+                $.get('filesrevision/' + id, function (data) {
+                    $file_content.html(data);
+                    $modale.modal('show')
+                    $spinner.hide();
+                })
+            })
+
+            function score()
+            {
+                $.get('score',function (data) {
+                    $('#testRevision');
+                    $('#count_revisioncours').html(data.revisioncours);
+                    $('#count_attenterevision').html(data.revisoneattent);
+                })
+            }
+
             $diagnostic_add.on('click', function () {
                 var $table = $('#reference_table tbody');
                 $table.append($('#reference_table tbody tr:last').clone());
@@ -377,6 +406,7 @@
                         toastr.options.preventDuplicates = true;
                         if (data.finish === '1') {
                             $('#revision' + data.id).remove();
+                            score1();
                         } else {
                             $('#revision' + data.id).addClass('alert alert-info text-danger-dk font-bold');
                         }
@@ -405,6 +435,14 @@
                     }
                 });
             });
+            function score1()
+            {
+                $.get('scoree',function (data) {
+                    $('#testRevision').html(data.essaienattenterevision);
+                    $('#count_revisioncours').html(data.revisioncours);
+                })
+            }
+
             $finish.on('click', function () {
                 var check;
                 check = $finish.is(":checked");

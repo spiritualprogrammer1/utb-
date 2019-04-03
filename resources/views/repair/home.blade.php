@@ -14,9 +14,9 @@
                                 @foreach($diagnostics as $diagnostic)
                                     <option value="{{$diagnostic->id}}" name="diagnostic"
                                             id="diagnostic{{$diagnostic->id}}"
-                                            data-bus="{{$diagnostic->state->bus->model->brand->name." ".$diagnostic->state->bus->model->brand->name}}"
-                                            data-matriculation="{{$diagnostic->state->bus->matriculation}}">
-                                        {{strtoupper($diagnostic->state->reference)}}</option>
+                                            data-bus="{{$diagnostic->statee->bus->model->brand->name." ".$diagnostic->statee->bus->model->brand->name}}"
+                                            data-matriculation="{{$diagnostic->statee->bus->matriculation}}">
+                                        {{strtoupper($diagnostic->statee->reference)}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -97,7 +97,7 @@
                         <i class="fa fa-plus text"></i>
                         <i class="fa fa-minus text-active"></i>
                     </a>
-                    <a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""
+                    <a class="btn btn-sm btn-default disabled btn-rounded btn-icon" id="file" data-value=""
                        title="Fiche d'etat...">
                         <i class="fa fa-file-pdf-o"></i>
                     </a>
@@ -136,15 +136,15 @@
                                 @foreach($repairs as $key=>$repair)
                                     <tr id="repair{{$repair->id}}">
                                         <td>{{$key + 1}}</td>
-                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
-                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
-                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->chassis}}</td>
-                                        <td>{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->reference}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->bus->matriculation}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->bus->chassis}}</td>
+                                        <td>{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}</td>
                                         <td>{{\Jenssegers\Date\Date::parse($repair->updated_at)->format('j M Y')}}</td>
                                         <td><a href="#" id="{{$repair->id}}" class="repair"
-                                               data-car="{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}"
-                                               data-matriculation="{{$repair->diagnostic->state->bus->matriculation}}"
-                                               data-ot="{{$repair->diagnostic->state->reference}}">
+                                               data-car="{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}"
+                                               data-matriculation="{{$repair->diagnostic->statee->bus->matriculation}}"
+                                               data-ot="{{$repair->diagnostic->statee->reference}}">
                                                 <i class="fa fa-pencil"></i></a></td>
                                         <td class="text-lowercase">@if($repair->state == 4)
                                                 <span class="badge bg-danger">retour {{$repair->diagnostic->work->where('state','4')->count()}}</span>
@@ -242,6 +242,12 @@
         </tr>
         </tbody>
     </table>
+    <div class="modal fade" id="repairModal">
+        <div class="modal-dialog modal-lfg" style="width: 700px;">
+            <div class="modal-content" id="file_content">
+            </div>
+        </div><!-- /.modal-dialog -->
+    </div>
 @endsection
 @section('scripts')
     <script>
@@ -253,9 +259,12 @@
             $diagnostic = $('#diagnostic'),
             $repair_row = $('#repairRow'),
             $sub_nav = $('#subNav'),
+                $modale = $('#repairModal'),
             $repair_add = $('#repairAdd'),
             $repair = $('.repair'),
             $car = $('#car'),
+
+                $file_content=$('#file_content'),
             $ot = $('#ot'),
             $matriculation = $('#matriculation'),
             $diagnostic_add = $('#diagnostic_add'),
@@ -281,7 +290,7 @@
                     type = 'post',
                     url = 'home',
                     status = "success",
-                    msg = "La Reception a bien été enregistrer";
+                    msg = "La Reparation a bien été enregistrer";
                 $submit_create.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> traitement en cours...'});
                 $submit_create.button('loading');
                 $.ajax({
@@ -290,6 +299,7 @@
                     data: formData,
                     success: function (data) {
                         $form_create.trigger('reset');
+                        score1();
                         $chosen.trigger('chosen:updated');
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
@@ -333,6 +343,25 @@
                     }
                 });
             });
+            function score1()
+            {
+                $.get('score',function (data) {
+                    $('#count_repairattente').html(data.reparationattente);
+                    $('#count_repaircours').html(data.reparationencours);
+                })
+            }
+
+            $file.on('click',function() {
+                $spinner.show();
+                var id = $(this).attr('data-value');
+                $.get('filesrepaire/' + id, function (data) {
+
+                    $file_content.html(data);
+                    $modale.modal('show')
+                    $spinner.hide();
+                })
+            });
+
             $diagnostic_add.on('click', function () {
                 var $table = $('#reference_table tbody');
                 $table.append($('#reference_table tbody tr:last').clone());
@@ -370,13 +399,15 @@
                     data: formData,
                     success: function (data) {
                         $form.trigger('reset');
+                        toastr[status](msg, "<span class='uppercase font-bold'>" + data.reference + "</span>!");
+                        toastr.options.preventDuplicates = true;
+
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
                         $file.removeClass('btn-default disabled');
-                        toastr[status](msg, "<span class='uppercase font-bold'>" + data.reference + "</span>!");
-                        toastr.options.preventDuplicates = true;
                         if (data.finish === '1') {
                             $('#repair' + data.id).remove();
+                            score();
                         } else {
                             $('#repair' + data.id).addClass('alert alert-info text-danger-dk font-bold');
                         }
@@ -405,6 +436,15 @@
                     }
                 });
             });
+
+            function score()
+            {
+                $.get('scoree',function (data) {
+                    $('#testRepair').html(data.essaaprestravauxeepair);
+                    $('#count_repaircours').html(data.reparationencours);
+
+                })
+            }
             $finish.on('click', function () {
                 var check;
                 check = $finish.is(":checked");

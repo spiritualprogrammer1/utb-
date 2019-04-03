@@ -31,8 +31,8 @@
                                 <i class="fa fa-wrench"></i> REPARATION
                             </span>
                             <div class="btn-group m-l-md">
-                                <a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""
-                                   title="Fiche d'etat...">
+                                <a class="btn btn-sm btn-default disabled none btn-rounded btn-icon " id="file" data-value=""
+                                   title="Fiche essai apres travaux...">
                                     <i class="fa fa-file-pdf-o"></i>
                                 </a>
                             </div>
@@ -66,17 +66,20 @@
                                 @foreach($repairs as $key=>$repair)
                                     <tr id="approval{{$repair->id}}" class="animated fadeInDown">
                                         <td>{{$key + 1}}</td>
-                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
-                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
-                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->chassis}}</td>
-                                        <td>{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->reference}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->bus->matriculation}}</td>
+                                        <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->bus->chassis}}</td>
+                                        <td>{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}</td>
                                         <td>{{Jenssegers\Date\Date::parse($repair->update_at)->format('j M Y')}}</td>
-                                        <td><a href="#" id="{{$repair->diagnostic_id}}" class="repair"
-                                               data-car="{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}"
-                                               data-matriculation="{{$repair->diagnostic->state->bus->matriculation}}"
-                                               data-ot="{{$repair->diagnostic->state->reference}}"
-                                               data-kilometer="@if($repair->diagnostic->work->where('state','4')->isNotEmpty()){{$repair->diagnostic->work->where('state','4')->sum('distance') + $repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->state->kilometer}}@else{{$repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->state->kilometer}}@endif">
-                                                <i class="fa fa-pencil"></i></a></td>
+                                        <td><a href="#" id="{{$repair->id}}" class="repair"
+                                               data-car="{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}"
+                                               data-matriculation="{{$repair->diagnostic->statee->bus->matriculation}}"
+                                               data-ot="{{$repair->diagnostic->statee->reference}}"
+                                               data-kilometer="@if($repair->diagnostic->work->where('state','4')->isNotEmpty()){{$repair->diagnostic->work->last()->arrive}}@else{{$repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->statee->kilometer}}@endif">
+                                                <i class="fa fa-pencil"></i></a>
+
+
+                                        </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -264,6 +267,12 @@
             </form><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div>
+    <div class="modal fade" id="fileModal">
+        <div class="modal-dialog modal-lfg" style="width: 700px;">
+            <div class="modal-content" id="file_content">
+            </div>
+        </div><!-- /.modal-dialog -->
+    </div>
 @endsection
 @section('scripts')
     <script>
@@ -278,6 +287,8 @@
             $remark = $('#remark'),
             $file = $('#file'),
             $submit = $('#submit'),
+                $fileModal=$('#fileModal'),
+                $file_content=$('#file_content'),
             $modal = $('#validateModal'),
             $depart = $('#depart'),
             $arrive = $('#arrive'),
@@ -349,11 +360,13 @@
                     data: formData,
                     success: function (data) {
                         $form.trigger('reset');
+                        score();
                         $chosen.trigger('chosen:updated');
-                        $file.attr('data-value', data.id);
+                        $file.attr('data-value', data.work_id);
                         $file.addClass('btn-danger');
-                        $file.removeClass('btn-default disabled');
-                        toastr[status](msg, "<span class='uppercase font-bold'>" + data.reference + "</span>!");
+                        $file.removeClass('btn-default disabled none');
+                        toastr[status](msg);
+                    //    toastr[status](msg, "<span class='uppercase font-bold'>" + data.reference + "</span>!");
                         toastr.options.preventDuplicates = true;
                         $('#approval' + data.id).remove();
                         $submit.button('reset');
@@ -381,6 +394,33 @@
                     }
                 });
             });
+            $file.on('click',function () {
+                $spinner.show();
+                var id = $(this).attr('data-value') ;
+                $.get('filesafertworks/' + id, function (data) {
+                    $file_content.html(data);
+                    $fileModal.modal('show')
+                    $spinner.hide();
+                })
+            })
+
+
+            function score()
+            {
+
+                $.get('score',function (data) {
+                    $('#testVisit').html(data.testVist);
+                    $('#testRevision').html(data.testRevision);
+                    $('#testRepair').html(data.testRepaire);
+                    $('#count_repaircours').html(data.repairencours);
+                    $('#count_revisioncours').html(data.revisionencours)
+                    $('#count_visitoncours').html(data.visitencours);
+                    $('#aftertestvisit').html(data.aftertestvisit);
+                    $('#aftertestrevision').html(data.aftertestrevision);
+                    $('#aftertestrepair').html(data.aftertestrepair);
+                })
+            }
+
             $filter.on('click', function () {
                 $spinner.show();
                 var id = $(this).attr('id');
@@ -390,17 +430,20 @@
                     $title.fadeOut('slow', function () {
                         $(this).html('<i class="fa fa-wrench"></i> REPARATION');
                     }).fadeIn("slow");
+                    $file.addClass('disabled none');
                 }else if(id === '2'){
                     $type.attr('name', 'revision');
                     $titles.html('Revision');
                     $title.fadeOut('slow', function () {
                         $(this).html('<i class="i i-gauge"></i> REVISION');
+                        $file.addClass('disabled none');
                     }).fadeIn("slow");
                 }else {
                     $type.attr('name', 'visit');
                     $titles.html('Visite Technique');
                     $title.fadeOut('slow', function () {
                         $(this).html('<i class="i i-params"></i> VISITE TECHNIQUE');
+                        $file.addClass('disabled none');
                     }).fadeIn("slow");
                 }
                 $.get('home/'+id+'/edit', function (data) {

@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Demand;
 use App\Demand_piece;
+use App\Enginebus;
+use App\Item_stock;
 use App\Service_description;
 use App\Repairdescription;
 use App\Diagnostic;
 use App\Diagnostic_employee;
 use App\Employee;
 use App\Repair;
-use App\service_employee;
+use App\Service_employee;
+use App\State;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,21 +29,125 @@ class RepairController extends Controller
 
     public function index()
     {
-        $technicians = Employee::where('post_id', '1')->get();
-        $diagnostics = Diagnostic::where('type', '1')->where('active', '1')
-            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
-        $active = '';
-        if ($diagnostics->count() == '0') {
-            $active = '0';
+        $site_id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+
+                //$technicians = Employee::where('site_id',$site_id)->where('post_id', '1')->get();
+                $technicians = Employee::where('post_id', '1')->get();
+
+                $diagnostics=Diagnostic::whereHas('statee',function ($query){
+                    $site_id=Auth::user()->employee->site_id;
+                    $query->where('site_id',$site_id);
+
+                })->whereBetween('active', ['1','2'])->where('type','1')->orderBy('updated_at', 'desc')->get();
+                $active = '';
+                if ($diagnostics->count() == '0') {
+                    $active = '0';
+                }
+                $repairs = Repair::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
+
+
+            }
+            else{
+                $technicians = Employee::where('post_id', '1')->get();
+//        $diagnostics = Diagnostic::where('active', '1')
+//            ->orWhere('active','2')->where('type', '1')->orderBy('updated_at', 'desc')->get();
+//        $diagnostics = Diagnostic::whereBetween('active', [1,2])->where('type', '1')->orderBy('updated_at', 'desc')->get();
+                $diagnostics=Diagnostic::whereBetween('active', ['1','2'])->where('type','1')->orderBy('updated_at', 'desc')->get();
+                $active = '';
+                if ($diagnostics->count() == '0') {
+                    $active = '0';
+                }
+                $repairs = Repair::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
+
+
+            }
         }
-        $repairs = Repair::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
-        return view('repair.home', ['diagnostics' => $diagnostics, 'technicians' => $technicians,
+        else{
+          //  $technicians = Employee::where('site_id',$site_id)->where('post_id', '1')->get();
+
+            $technicians = Employee::where('post_id', '1')->get();
+
+            $diagnostics=Diagnostic::whereHas('statee',function ($query){
+             $site_id=Auth::user()->employee->site_id;
+             $query->where('site_id',$site_id);
+
+         })->whereBetween('active', ['1','2'])->where('type','1')->orderBy('updated_at', 'desc')->get();
+            $active = '';
+            if ($diagnostics->count() == '0') {
+                $active = '0';
+            }
+            $repairs = Repair::where('site_id',$site_id)
+                ->where('state', '1')->orWhere('state', '2')
+                ->orWhere('state', '4')
+                ->get();
+
+        }
+
+       return view('repair.home', ['diagnostics' => $diagnostics, 'technicians' => $technicians,
             'repairs' => $repairs, 'active' => $active]);
     }
 
     public function create()
     {
         //
+    }
+
+    public function score()
+    {
+        $site_id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+                $reparationencours=Repair::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $reparationattente=Diagnostic::whereHas('statee',function ($query){
+                    $site_id=Auth::user()->employee->site_id;
+                    $query->where('site_id',$site_id);
+
+                })->whereBetween('active', ['1','2'])->where('type','1')->count();
+            }
+            else{
+
+                $reparationencours=Repair::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $reparationattente=Diagnostic::whereBetween('active', ['1','2'])->where('type','1')->count();
+            }
+        }
+        else{
+
+            $reparationencours=Repair::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+            $reparationattente=Diagnostic::whereHas('statee',function ($query){
+                $site_id=Auth::user()->employee->site_id;
+                $query->where('site_id',$site_id);
+
+            })->whereBetween('active', ['1','2'])->where('type','1')->count();
+        }
+
+        return response()->json(['reparationencours'=>$reparationencours,'reparationattente'=>$reparationattente]);
+    }
+
+    public function scoree()
+    {
+
+        $site_id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+                $reparationencours=Repair::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $essaaprestravauxeepair=Repair::where('site_id',$site_id)->where('state', '3')->count();
+
+            }
+            else{
+
+                $reparationencours=Repair::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $essaaprestravauxeepair=Repair::where('state', '3')->count();
+
+            }
+        }
+        else{
+            $reparationencours=Repair::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+            $essaaprestravauxeepair=Repair::where('site_id',$site_id)->where('state', '3')->count();
+        }
+
+        return response()->json(['reparationencours'=>$reparationencours,'essaaprestravauxeepair'=>$essaaprestravauxeepair]);
     }
 
     public function store(Request $request)
@@ -82,6 +189,7 @@ class RepairController extends Controller
                         'diagnostic_id' => $request->diagnostic,
                         'employee_id' => $request->technician[$i],
                     ]);
+
                 }
                 for ($i = 0; $i < count($request->title); $i++) {
                     $description = Service_description::create([
@@ -91,14 +199,27 @@ class RepairController extends Controller
                     ]);
                 }
 
-                return response()->json(['id' => $repair->id, 'matriculation' => $repair->diagnostic->state->bus->matriculation,
-                    'chassis' => $repair->diagnostic->state->bus->chassis, 'date' => Date::parse($repair->created_at)->format('j M Y'),
-                    'bus' => $repair->diagnostic->state->bus->model->brand->name . " " . $repair->diagnostic->state->bus->model->name,
-                    'reference' => $repair->diagnostic->state->reference,
+                /*****enregistrer le moteur****/
+//                $engineBus=Enginebus::create([
+//                    'item_stock_id'=>$request->item_stock_id,
+//                       'state_id'=>$diagnostic->statee->id,
+//                       'kilometer'=>$request->new_kilometer,
+//                       'bus_id'=>$diagnostic->statee->bus_id,
+//
+//                ]);
+
+
+
+                return response()->json(['id' => $repair->id, 'matriculation' => $repair->diagnostic->statee->bus->matriculation,
+                    'chassis' => $repair->diagnostic->statee->bus->chassis, 'date' => Date::parse($repair->created_at)->format('j M Y'),
+                    'bus' => $repair->diagnostic->statee->bus->model->brand->name . " " . $repair->diagnostic->statee->bus->model->name,
+                    'reference' => $repair->diagnostic->statee->reference,
                     'count' => $repair->where('state','1')->orWhere('state','2')->orWhere('state','4')->count('id'),
                     'diagnostic' => $request->diagnostic]);
             }
-        } else {
+        }
+
+        else {
             return view('errors.500');
         }
     }
@@ -107,13 +228,89 @@ class RepairController extends Controller
     {
         if ($request->ajax()) {
             if ($id == "0") {
-                $diagnostics = Diagnostic::where('type', '1')->where('active', '1')
-                    ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+
+
+                $site_id=Auth::user()->employee->site_id;
+                if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                    if (Auth::user()->employee->action_site == 2) {
+                        $diagnostics = Diagnostic::whereHas('statee',function ($query){
+                            $site_id=Auth::user()->employee->site_id;
+                            $query->where('site_id',$site_id);
+
+                        })->where('type', '1')->where('active', '1')
+                            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                    }
+                    else{
+
+                        $diagnostics = Diagnostic::where('type', '1')->where('active', '1')
+                            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                    }
+                }
+                else{
+
+                    $diagnostics = Diagnostic::whereHas('statee',function ($query){
+                        $site_id=Auth::user()->employee->site_id;
+                        $query->where('site_id',$site_id);
+
+                    })->where('type', '1')->where('active', '1')
+                        ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+
+                }
+
+
                 return response()->json($diagnostics);
             } else {
                 $repair = Repair::findOrFail($id);
                 $employees = Employee::where('post_id', '1')->get();
-                return view('repair.partials.repair', ['repair' => $repair, 'employees' => $employees]);
+
+                $state_id=$repair->diagnostic->statee->id;
+
+
+                /*************recuperation de pneu*****/
+
+                $k=0;
+                $engine_tire=array();
+                $item_stock_tire=Item_stock::whereHas('stock',function ($query){
+                    $query->where('stock_type',2);
+
+                })->where('state_id',$state_id)->get();
+
+             foreach ($item_stock_tire as $item_stock_tir)
+             {
+                 $engine_tire[$k]=Enginebus::where('item_stock_id',$item_stock_tir->id)->where('state',2)->get();
+                 $k++;
+             }
+
+
+                  /***************instance state***************/
+                  $states = State::findOrFail($state_id);
+
+                /***recuperation du moteur si il existe**/
+
+                $item_stock=Item_stock::whereHas('stock',function ($query){
+                    $query->where('stock_type',1);
+
+                })->where('state_id',$state_id)->first();
+                if(isset($item_stock->id) and !empty($item_stock->id))
+                {
+                    $engine=Enginebus::where('item_stock_id',$item_stock->id)->first();
+                    /*********si le moteur existe state_kilometer =1******/
+                    $states->state_kilometer=1;
+                    $states->save();
+
+                }
+                else{
+                    $engine="";
+                }
+                /*****recuperation des pneus***/
+                $item_tire_stock = Item_stock::whereHas('stock',function ($query){
+                    $query->where('stock_type',2);
+
+                })->where('state_id',$state_id)->get();
+
+
+
+                return view('repair.partials.repair', ['engine_tire'=>$engine_tire,'item_tire_stock'=>$item_tire_stock,'repair' => $repair, 'employees' => $employees,'item_stock'=>$item_stock,'engine'=>$engine]);
             }
         } else {
             return view('errors.500');
@@ -123,12 +320,35 @@ class RepairController extends Controller
     public function edit(Request $request, $id)
     {
         if ($request->ajax()) {
-            $demands = Demand::where('diagnostic_id', $id)->get();
-            foreach ($demands as $demand) {
-                $pieces [] = Demand_piece::where('demand_id', $demand->id)->get();
+
+
+            $site_id=Auth::user()->employee->site_id;
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $demands = Demand::where('diagnostic_id', $id)->get();
+                    foreach ($demands as $demand) {
+                        $pieces [] = Demand_piece::where('demand_id', $demand->id)->get();
+                    }
+                }
+                else{
+                    $demands = Demand::where('diagnostic_id', $id)->get();
+                    foreach ($demands as $demand) {
+                        $pieces [] = Demand_piece::where('demand_id', $demand->id)->get();
+                    }
+
+                }
             }
+            else{
+                $demands = Demand::where('diagnostic_id', $id)->get();
+                foreach ($demands as $demand) {
+                    $pieces [] = Demand_piece::where('demand_id', $demand->id)->get();
+                }
+            }
+
             return response()->json($pieces);
-        } else {
+        }
+
+        else {
             return view('errors.500');
         }
     }
@@ -162,7 +382,73 @@ class RepairController extends Controller
                     'message' => $errors
                 ], 422);
             } else {
+
+
+
+
                 $diagnostic = Repair::findOrFail($id)->diagnostic_id;
+                $diagnosti= Repair::findOrFail($id)->diagnostic;
+                $repair =Repair::findOrFail($id);
+
+
+
+                /*******state =2 pour les pneus et level pour le niveau*******************/
+                /********recuperation des pneux ******/
+                    /********level=1 pour la creation*********/
+
+                    if($request->engine_tire_idd==1)
+                    {
+                        for($i=0;$i<count($request->engine_tire_id);$i++)
+                        {
+                            $engineBus_tire[$i]=Enginebus::findOrFail($request->engine_tire_idd[$i]);
+                            $engineBus_tire[$i]->kilometer=$request->new_kilometer_tire[$i];
+                            $engineBus_tire[$i]->save();
+
+                        }
+
+                    }
+                    else
+                    {
+                        for($i=0;$i<count($request->item_stock_tire_id);$i++)
+                        {
+
+
+                            $engineBus=Enginebus::create([
+                                'item_stock_id'=>$request->item_stock_tire_id[$i],
+                                'state_id'=>$repair->diagnostic->statee->id,
+                                'kilometer'=>$request->new_kilometer_tire[$i],
+                                'bus_id'=>$repair->diagnostic->statee->bus->id,
+                                'state'=>2,
+                                'level'=>1,
+                            ]);
+
+                        }
+                    }
+
+
+                /*****enregistrer le moteur****/
+                /*******state=1 pour les moteurs et level pour ne niveau******/
+
+                if($request->level_engine==1)
+                {
+                    $engineBus=Enginebus::where('state_id',$diagnosti->statee->id)->first();
+
+                    $engineBus->kilometer=$request->new_kilometer;
+                    $engineBus->save();
+                }
+                else{
+                    $engineBus=Enginebus::create([
+                        'item_stock_id'=>$request->item_stock_id,
+                        'state_id'=>$repair->diagnostic->statee->id,
+                        'kilometer'=>$request->new_kilometer,
+                        'bus_id'=>$repair->diagnostic->statee->bus_id,
+                        'state'=>1,
+                        'level'=>1,
+
+                    ]);
+                }
+
+
                 for ($i = 0; $i < count($request->technician); $i++) {
                     $technicians = service_employee::where('employee_id', $request->technician[$i])->get();
                     //if ($technicians) {
@@ -202,7 +488,8 @@ class RepairController extends Controller
                 }
                 return response()->json(['id' => $id, 'reference' => $request->reference, 'finish' => $finish]);
             }
-        } else {
+       }
+ else {
             return view('errors.500');
         }
     }
@@ -217,7 +504,24 @@ class RepairController extends Controller
         }
     }
 
-    public
+    public function filesrepaire(Request $request,$id)
+    {
+        $repair=Repair::findOrFail($id);
+        $bus_id= $repair->diagnostic->statee->bus_id;
+
+        $denierrepair=Repair::join('diagnostics','diagnostics.id','=','repairs.diagnostic_id')
+            ->join('works','works.diagnostic_id','=','diagnostics.id')
+            ->join('states','states.id','=','diagnostics.state_id')
+            ->join('buses','buses.id','=','states.bus_id')
+            ->select('repairs.created_at as date','states.kilometer as kilometer')
+            ->where('buses.id',$bus_id)
+            ->where('works.type','2')
+            ->where('repairs.state','5')
+            ->orderBy('repairs.id','desc')
+            ->take(3)
+            ->get();
+        return view('repair.file.repairfile',compact('denierrepair','repair'));
+    }
     function destroy($id)
     {
         //

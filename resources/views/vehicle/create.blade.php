@@ -54,6 +54,28 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="row m-t-md">
+                            <div class="form-group-sm col-sm-10">
+                                <label class="control-label text-info">Societe</label>
+                                <select class="chosen-select form-control input-sm uppercase col-md-6" name="societe"
+                                        id="societe" data-placeholder="Choissisez une societe">
+                                    <option></option>
+
+                                    <option value="AHT" name="societe"
+                                           >
+                                        AHT
+                                    </option>
+                                    <option value="UTB" name="societe"
+                                            >
+                                        UTB
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
                         <div class="form-group m-t-md">
                             <label class="control-label">P.M.C *</label>
                             <input type="text" name="first_circulation" id="first_circulation"
@@ -168,6 +190,7 @@
             $input = $('.input'),
             $spinner = $('.cssload-container'),
             $designation = $('#designation');
+        $societe=$('#societe');
         $(function () {
             $table.dataTable({
                 "sPaginationType": "full_numbers",
@@ -203,6 +226,7 @@
                     data: formData,
                     success: function (data) {
                         toastr[status](msg, "<span class='uppercase'>" + data.matriculation + "</span>!");
+                        score()
                         toastr.options.preventDuplicates = true;
                         var row = '<tr id="vehicle' + data.id + '" class="alert alert-danger bg-light dker text-primary-dk animated fadeInDown">' +
                             '<td class="uppercase">' + data.matriculation + '</td>' +
@@ -261,6 +285,7 @@
                 $designation.val(data.designation);
                 $matriculation.val(data.matriculation);
                 $chassis.val(data.chassis);
+                $societe.val(data.societe);
                 //$circulation.val(data.circulation);
                 models(data.brand);
                 $brand.val(data.brand);
@@ -285,6 +310,28 @@
                 }
             })
         }
+
+        function score()
+        {
+
+            $.ajax({
+                url: '../score',
+                type: 'get',
+                success: function (data) {
+                    $('#totalbus').html(data.totalbus);
+                    $('#totalvisitexip').html(data.totalvisitexip)
+                    $('#totassurance').html(data.totassurance);
+                },
+            });
+
+
+//            $.get('../score',function (data) {
+//                $('#totalbus').html(data.totalbus);
+//                $('#count_visitoncours').html(data.count_visitatcours);
+//            })
+        }
+
+
         function refresh() {
             $form.trigger('reset');
             $models.empty();

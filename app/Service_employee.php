@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service_employee extends Model
 {
+    use \Venturecraft\Revisionable\RevisionableTrait;
+    protected $revisionCreationsEnabled = true;
+    protected $revisionCleanup = true;
+    protected $historyLimit =50;
     protected $fillable = ['ids', 'diagnostic_id', 'employee_id'];
 
     public function employee()

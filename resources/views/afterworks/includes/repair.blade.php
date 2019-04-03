@@ -14,16 +14,16 @@
     @foreach($repairs as $key=>$repair)
         <tr id="approval{{$repair->id}}"  class="animated fadeInDown">
             <td>{{$key + 1}}</td>
-            <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
-            <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
-            <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->bus->chassis}}</td>
-            <td>{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}</td>
+            <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->reference}}</td>
+            <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->bus->matriculation}}</td>
+            <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->bus->chassis}}</td>
+            <td>{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}</td>
             <td>{{Jenssegers\Date\Date::parse($repair->update_at)->format('j M Y')}}</td>
             <td><a href="#" id="{{$repair->id}}" onclick="validate(this)"
-                   data-car="{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}"
-                   data-matriculation="{{$repair->diagnostic->state->bus->matriculation}}"
-                   data-ot="{{$repair->diagnostic->state->reference}}"
-                   data-kilometer="@if($repair->diagnostic->work->where('state','4')->isNotEmpty()){{$repair->diagnostic->work->where('state','4')->sum('distance') + $repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->state->kilometer}}@else{{$repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->state->kilometer}}@endif">
+                   data-car="{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}"
+                   data-matriculation="{{$repair->diagnostic->statee->bus->matriculation}}"
+                   data-ot="{{$repair->diagnostic->statee->reference}}"
+                   data-kilometer="@if($repair->diagnostic->work->where('state','4')->isNotEmpty()){{$repair->diagnostic->work->where('state','4')->sum('distance') + $repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->statee->kilometer}}@else{{$repair->diagnostic->work->where('state','1')->first()->distance + $repair->diagnostic->statee->kilometer}}@endif">
                     <i class="fa fa-pencil"></i></a></td>
         </tr>
     @endforeach

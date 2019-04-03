@@ -13,7 +13,7 @@ class RoleTableSeeder extends Seeder
      */
     public function run()
     {
-        $super = new Role();
+       /* $super = new Role();
         $super->name = 'super-admin';
         $super->type = 'super_admin';
         $super->display_name = 'super administrateur';
@@ -25,7 +25,7 @@ class RoleTableSeeder extends Seeder
         $super->type = 'admin';
         $admin->display_name = 'Administrateur';
         $admin->description = 'l\'utilisateur est juste autorisé à tout observer';
-        $admin->save();
+        $admin->save();*/
 
         /*********************
          **** STOCK ROLES ****
@@ -40,7 +40,7 @@ class RoleTableSeeder extends Seeder
             [
                 'name' => 'edit',
                 'type' => 'stock',
-                'display_name' => "modifier",
+                'display_name' => "modification",
                 'description' => "L\'utilisateur est habilité à modifier les stock existant"
             ],
             [
@@ -64,7 +64,7 @@ class RoleTableSeeder extends Seeder
             [
                 'name' => 'list_stck',
                 'type' => 'stock',
-                'display_name' => 'liste',
+                'display_name' => 'liste de stock',
                 'description' => "L\'utilisateur est habilité à voir la liste de stock"
             ],
             [
@@ -82,19 +82,19 @@ class RoleTableSeeder extends Seeder
             [
                 'name' => 'add_supplier',
                 'type' => 'supplier',
-                'display_name' => 'nouveau',
+                'display_name' => 'nouveau fournisseur',
                 'description' => "L\'utilisateur est habilité à enregistrer des fournisseur"
             ],
             [
                 'name' => 'edit_supplier',
                 'type' => 'supplier',
-                'display_name' => 'modifier',
+                'display_name' => 'modification fournisseur',
                 'description' => "L\'utilisateur est habilité à modifier les fournisseur"
             ],
             [
                 'name' => 'info_supplier',
                 'type' => 'supplier',
-                'display_name' => 'informations',
+                'display_name' => 'informations fournisseur',
                 'description' =>"L\'utilisateur est habilité à consulter les informations sur les fournisseurs"
             ],
         ];
@@ -103,7 +103,6 @@ class RoleTableSeeder extends Seeder
         }
         /***** END ****/
 
-
         /*********************
          **** BUS ROLES ****
          **********************/
@@ -111,19 +110,19 @@ class RoleTableSeeder extends Seeder
             [
                 'name' => 'new_bus',
                 'type' => 'bus',
-                'display_name' => 'enregistrer',
+                'display_name' => 'enregistrement',
                 'description' => "L\'utilisateur est habilité à enregistrer de nouveaux car"
             ],
             [
                 'name' => 'edit_bus',
                 'type' => 'bus',
-                'display_name' => "modifier",
+                'display_name' => "modification",
                 'description' => "L\'utilisateur est habilité à modifier les car existant"
             ],
             [
                 'name' => 'list_bus',
                 'type' => 'bus',
-                'display_name' => 'liste',
+                'display_name' => 'liste des cars',
                 'description' => "L\'utilisateur est habilité à consulter la liste des cars"
             ],
             [
@@ -140,7 +139,7 @@ class RoleTableSeeder extends Seeder
             ],
         ];
         foreach ($buses as $key => $bus) {
-            Role::create($bus);
+            Permission::create($bus);
         }
         /***** END ****/
 
@@ -164,24 +163,24 @@ class RoleTableSeeder extends Seeder
             [
                 'name' => 'authorization_repair',
                 'type' => 'approval',
-                'display_name' => 'sortie du car apres une réparation',
+                'display_name' => 'sortie de car apres une réparation',
                 'description' => "L\'utilisateur est habilité à donner l'autorisation de sortie des cars du garage, aprés une réparation"
             ],
             [
                 'name' => 'authorization_revision',
                 'type' => 'approval',
-                'display_name' => 'sortie du car apres une revision',
+                'display_name' => 'sortie de car apres une revision',
                 'description' => "L\'utilisateur est habilité à donner l'autorisation de sortie des cars du garage, aprés une revision"
             ],
             [
                 'name' => 'authorization_visit',
                 'type' => 'approval',
-                'display_name' => 'sortie du car apres une visite technique',
+                'display_name' => 'sortie de car apres une visite technique',
                 'description' => "L\'utilisateur est habilité à donner l'autorisation de sortie des cars du garage, aprés une visite technique"
             ],
         ];
         foreach ($approvals as $key => $approval) {
-            Role::create($approval);
+            Permission::create($approval);
         }
         /***** END ****/
 
@@ -209,7 +208,7 @@ class RoleTableSeeder extends Seeder
             ],
         ];
         foreach ($afterWorks as $key => $afterWork) {
-            Role::create($afterWork);
+            Permission::create($afterWork);
         }
         /***** END ****/
 

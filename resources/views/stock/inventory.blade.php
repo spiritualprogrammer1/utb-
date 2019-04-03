@@ -56,7 +56,7 @@
                                     </td>
                                     <td>
                                         <input class="form-control input-sm" name="quantity[]" id="quantity_inventory"
-                                               type="number" placeholder="0" data-id="0" onkeyup="calcul($(this))"
+                                               type="number" placeholder="0" data-id="0"  onkeyup="calcul($(this))"
                                                required>
                                         <input id="quantity_count0" type="hidden" value="0">
                                         <p class="form-control-static text-center">
@@ -215,7 +215,7 @@
                         e.preventDefault();
                         var formData = $(this).serialize();
                         var type = 'post';
-                        var url = 'stock';
+                        var url = '{{route('home.store')}}';
                         status = "success";
                         var msg = "L'Inventaire a bien été effectuer";
                         $submit_inventory.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});

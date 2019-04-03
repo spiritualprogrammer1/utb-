@@ -86,6 +86,15 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="row acquisition">
+                            <div class="form-group form-group-sm col-sm-6">
+                                <label class="control-label">Prix Unitaire</label>
+                                <input type="text" name="price[]" id="price" min="3" maxlength="9" value="0"
+                                       class="form-control input-sm input_numeric" placeholder="0"
+                                       required>
+                            </div>
+                        </div>
+
                     </div>
                 </form>
             </section>
@@ -145,6 +154,7 @@
                                     <th>Reference</th>
                                     <th>Bon livraison</th>
                                     <th>Qté Entrée</th>
+                                    <th>Prix unitaire</th>
                                     <th><i class="i i-calendar"></i> Date</th>
                                 </tr>
                                 </thead>
@@ -159,6 +169,8 @@
                                         <td class="uppercase">{{$movement->reference}}</td>
                                         <td class="uppercase">{{$movement->delivery->number}}</td>
                                         <td>{{$movement->item_stock->sum('quantity')}}</td>
+
+                                        <td>{{$movement->item_stock->sum('prix_unitaire')}}</td>
                                         <td>{{\Jenssegers\Date\Date::parse($movement->created_at)->format('j M Y')}}</td>
                                     </tr>
                                 @endforeach
@@ -236,7 +248,7 @@
                         e.preventDefault();
                         var formData = $(this).serialize();
                         var type = 'post';
-                        var url = 'stock';
+                        var url = 'home';
                         status = "success";
                         var msg = "L'Entrer bien été valider";
                         $submit_input.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
@@ -254,6 +266,7 @@
                                     '<td class="uppercase">' + data.reference + '</td>' +
                                     '<td class="uppercase">' + data.delivery + '</td>' +
                                     '<td>' + data.quantity + '</td>' +
+                                     '<td>' + data.price + '</td>' +
                                     '<td>' + data.date + '</td><tr>';
                                 $row.before(row);
                                 $submit_input.button('reset');

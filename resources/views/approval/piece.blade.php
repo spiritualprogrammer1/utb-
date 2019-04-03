@@ -5,10 +5,10 @@
         <header class="header bg-light lt b-b b-light">
             <p class="h4 font-thin pull-left m-r m-b-sm"><i class="fa fa-gavel"></i> APPROBATION DE SORTIE DES PIECES
             </p>
-            <a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""
-               title="Fiche d'etat...">
-                <i class="fa fa-file-pdf-o"></i>
-            </a>
+            {{--<a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""--}}
+               {{-->--}}
+                {{--<i class="fa fa-file-pdf-o"></i>--}}
+            {{--</a>--}}
             <div class="btn-group pull-right" data-toggle="buttons">
                 <a href="#" class="btn btn-sm btn-bg btn-default btn-rounded"
                    onclick="$('#approvalTable').tableExport({type:'xlsx',escape:'false'});">
@@ -56,7 +56,7 @@
                                         <thead>
                                         <tr>
                                             <th width="1"></th>
-                                            <th width="1"></th>
+                                            {{--<th width="1"></th>--}}
                                             <th>Reference</th>
                                             <th>Reference OT</th>
                                             <th>Immatriculation</th>
@@ -69,18 +69,18 @@
                                         @foreach($demands as $key=>$demand)
                                             <tr id="approval{{$demand->id}}" class="animated fadeInDown">
                                                 <td>{{$key + 1}}</td>
-                                                <td>
-                                                    <a href="#" id="{{$demand->id}}" class=""><i
-                                                                class="fa fa-search-plus text-muted"></i></a>
-                                                </td>
+                                                {{--<td>--}}
+                                                    {{--<a href="#" id="{{$demand->id}}" class=""><i--}}
+                                                                {{--class="fa fa-search-plus text-muted"></i></a>--}}
+                                                {{--</td>--}}
                                                 <td class="uppercase text-danger-dker">{{$demand->reference}}</td>
-                                                <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
-                                                <td class="uppercase text-primary-dker">{{$demand->diagnostic->state->bus->matriculation}}</td>
-                                                <td>{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}</td>
+                                                <td class="uppercase text-danger-dker">{{$demand->diagnostic->statee->reference}}</td>
+                                                <td class="uppercase text-primary-dker">{{$demand->diagnostic->statee->bus->matriculation}}</td>
+                                                <td>{{$demand->diagnostic->statee->bus->model->brand->name." ".$demand->diagnostic->statee->bus->model->name}}</td>
                                                 <td>{{\Jenssegers\Date\Date::parse($demand->created_at)->format('j M Y')}}</td>
                                                 <td><a href="#" id="{{$demand->id}}" class="waiting"
-                                                       data-car="{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}"
-                                                       data-matriculation="{{$demand->diagnostic->state->bus->matriculation}}"
+                                                       data-car="{{$demand->diagnostic->statee->bus->model->brand->name." ".$demand->diagnostic->statee->bus->model->name}}"
+                                                       data-matriculation="{{$demand->diagnostic->statee->bus->matriculation}}"
                                                        data-ot="{{$demand->diagnostic->reference}}">
                                                         <i class="fa fa-pencil"></i></a></td>
                                             </tr>
@@ -214,8 +214,10 @@
             $ot = $('#ot'),
             $matriculation = $('#matriculation'),
             $piece_add = $('#piece_add'),
+                $approvalpiece=$('#approvalpiece'),
             $form = $('#validateForm'),
             $submit = $('#submit'),
+                $pieceenattente=$('#pieceenattente')
             $file = $('#file'),
             $reference = $('#reference'),
             $spinner = $('#spinner');
@@ -263,7 +265,7 @@
                     type = 'put',
                     url = $(this).attr('action'),
                     status = "success",
-                    msg = "LA SORTIE A ETE APPROUVER";
+                    msg = "DEMANDE DE PIECES  APPROUVEE";
                 $submit.button({loadingText: '<i class="fa fa-spinner fa-spin"></i> en cours...'});
                 $submit.button('loading');
                 $.ajax({
@@ -274,6 +276,7 @@
                         $form.trigger('reset');
                         $file.attr('data-value', data.id);
                         $file.addClass('btn-danger');
+                        score();
                         $file.removeClass('btn-default disabled');
                         toastr[status](msg, "<span class='uppercase'>" + data.reference + "</span>!");
                         toastr.options.preventDuplicates = true;
@@ -324,6 +327,15 @@
                 });
                 $modal_validate.modal('show');
                 $spinner.hide()
+            })
+        }
+
+        function score()
+        {
+            $.get('../score',function(data){
+
+                $approvalpiece.html(data.demande);
+                $pieceenattente.html(data.pieceenattente);
             })
         }
     </script>

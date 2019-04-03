@@ -2,7 +2,7 @@
     <thead>
     <tr>
         <th width="1"></th>
-        <th width="1"></th>
+        {{--<th width="1"></th>--}}
         <th>Reference</th>
         <th>Reference OT</th>
         <th>Immatriculation</th>
@@ -19,23 +19,23 @@
     @foreach($demands as $key=>$demand)
         <tr id="approval{{$demand->id}}" class="animated fadeInLeft">
             <td>{{$key + 1}}</td>
-            <td>
-                <a href="#" id="{{$demand->id}}" class=""><i
-                            class="fa fa-search-plus text-muted"></i></a>
-            </td>
-            <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
-            <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
-            <td class="uppercase text-primary-dker">{{$demand->diagnostic->state->bus->matriculation}}</td>
-            <td class="uppercase">{{$demand->diagnostic->state->bus->chassis}}</td>
-            <td>{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}</td>
+            {{--<td>--}}
+                {{--<a href="#" id="{{$demand->id}}" class=""><i--}}
+                            {{--class="fa fa-search-plus text-muted"></i></a>--}}
+            {{--</td>--}}
+            <td class="uppercase text-danger-dker">{{$demand->diagnostic->reference}}</td>
+            <td class="uppercase text-danger-dker">{{$demand->diagnostic->statee->reference}}</td>
+            <td class="uppercase text-primary-dker">{{$demand->diagnostic->statee->bus->matriculation}}</td>
+            <td class="uppercase">{{$demand->diagnostic->statee->bus->chassis}}</td>
+            <td>{{$demand->diagnostic->statee->bus->model->brand->name." ".$demand->diagnostic->statee->bus->model->name}}</td>
             @if($id == "validated")
                 <td>{{\Jenssegers\Date\Date::parse($demand->diagnostic->updated_at)->format('j M Y')}}</td>
             @else
                 <td>{{\Jenssegers\Date\Date::parse($demand->created_at)->format('j M Y')}}</td>
                 <td><a href="#" id="{{$demand->id}}" onclick="waiting(this)"
-                       data-car="{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}"
-                       data-matriculation="{{$demand->diagnostic->state->bus->matriculation}}"
-                       data-ot="{{$demand->diagnostic->state->reference}}">
+                       data-car="{{$demand->diagnostic->statee->bus->model->brand->name." ".$demand->diagnostic->statee->bus->model->name}}"
+                       data-matriculation="{{$demand->diagnostic->statee->bus->matriculation}}"
+                       data-ot="{{$demand->diagnostic->statee->reference}}">
                         <i class="fa fa-pencil"></i></a></td>
             @endif
         </tr>

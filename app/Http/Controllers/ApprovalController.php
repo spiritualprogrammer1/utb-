@@ -6,6 +6,7 @@ use App\Approval;
 use App\Demand;
 use App\Diagnostic;
 use App\Demand_piece;
+use App\Release;
 use App\Repair;
 use App\Revision;
 use App\Service_description;
@@ -13,6 +14,7 @@ use App\Visit_technique;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 use Validator;
 
 class ApprovalController extends Controller
@@ -24,13 +26,51 @@ class ApprovalController extends Controller
 
     public function index()
     {
-        $repairs = Repair::where('state', '5')->orderBy('updated_at', 'desc')->get();
+
+        $id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+                $repairs = Repair::where('state', '5')->where('site_id',$id)->orderBy('updated_at', 'desc')->get();
+            }
+            else{
+                $repairs = Repair::where('state', '5')->orderBy('updated_at', 'desc')->get();
+            }
+        }
+        else{
+
+            $repairs = Repair::where('state', '5')->where('site_id',$id)->orderBy('updated_at', 'desc')->get();
+        }
+
+
         return view('approval.home', ['repairs' => $repairs]);
     }
 
     public function create()
     {
-        $demands = Demand::where('state', '0')->orderBy('created_at', 'desc')->get();
+        $id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+
+                $demands = Demand::whereHas('diagnostic',function($query){
+                    $query->whereHas('statee',function ($q){
+                        $id=Auth::user()->employee->site_id;
+                        $q->where('site_id',$id);
+                    });
+                })->where('state', '0')->orderBy('created_at', 'desc')->get();
+
+            }
+            else{
+                $demands = Demand::where('state', '0')->orderBy('created_at', 'desc')->get();
+            }
+        }
+        else{
+            $demands = Demand::whereHas('diagnostic',function($query){
+                $query->whereHas('statee',function ($q){
+                    $id=Auth::user()->employee->site_id;
+                    $q->where('site_id',$id);
+                });
+            })->where('state', '0')->orderBy('created_at', 'desc')->get();
+        }
         return view('approval.piece', ['demands' => $demands]);
     }
 
@@ -71,7 +111,7 @@ class ApprovalController extends Controller
                     'site_id' => Auth::user()->id,
                 ]);
             }
-            return response()->json(['id' => $request->id, 'reference' => $approval->diagnostic->state->reference]);
+            return response()->json(['id' => $request->id, 'approval_id'=>$approval->id,'reference' => $approval->diagnostic->statee->reference,'approval_id'=>$approval->id]);
         } else {
             return view('errors.500');
         }
@@ -82,19 +122,102 @@ class ApprovalController extends Controller
     function show(Request $request, $id)
     {
         if ($id == "waiting") {
-            $demands = Demand::where('state', '0')->orderBy('created_at', 'desc')->get();
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $demands = Demand::whereHas('diagnostic',function($query){
+                        $query->whereHas('statee',function ($q){
+                            $id=Auth::user()->employee->site_id;
+                            $q->where('site_id',$id);
+                        });
+                    })->where('state', '0')->orderBy('created_at', 'desc')->get();
+                }
+                else{
+                    $demands = Demand::where('state', '0')->orderBy('created_at', 'desc')->get();
+                }
+            }
+            else{
+                $demands = Demand::whereHas('diagnostic',function($query){
+                    $query->whereHas('statee',function ($q){
+                        $id=Auth::user()->employee->site_id;
+                        $q->where('site_id',$id);
+                    });
+                })->where('state', '0')->orderBy('created_at', 'desc')->get();
+            }
             return view('approval.includes.piece', ['demands' => $demands])->with(['id' => $id]);
         } elseif ($id == "validated") {
-            $demands = Demand::where('state', '1')->orWhere('state', '2')->orWhere('state', '3')->orderBy('created_at', 'desc')->get();
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $demands = Demand::whereHas('diagnostic',function($query){
+                        $query->whereHas('statee',function ($q){
+                            $id=Auth::user()->employee->site_id;
+                            $q->where('site_id',$id);
+                        });
+                    })->where('state', '1')->orWhere('state', '2')->orWhere('state', '3')->orderBy('created_at', 'desc')->get();
+
+                }
+                else{
+                    $demands = Demand::where('state', '1')->orWhere('state', '2')->orWhere('state', '3')->orderBy('created_at', 'desc')->get();
+
+                }
+            }
+            else{
+                $demands = Demand::whereHas('diagnostic',function($query){
+                    $query->whereHas('statee',function ($q){
+                        $id=Auth::user()->employee->site_id;
+                        $q->where('site_id',$id);
+                    });
+
+                })->where('state', '1')->orWhere('state', '2')->orWhere('state', '3')->orderBy('created_at', 'desc')->get();
+
+            }
             return view('approval.includes.piece', ['demands' => $demands])->with(['id' => $id]);
         } elseif ($id == "revision") {
-            $revisions = Revision::where('state', '5')->orderBy('updated_at', 'desc')->get();
+            $site_id=Auth::user()->employee->site_id;
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $revisions = Revision::where('state', '5')->where('site_id',$site_id)->orderBy('updated_at', 'desc')->get();
+                }
+                else{
+                    $revisions = Revision::where('state', '5')->orderBy('updated_at', 'desc')->get();
+
+
+                }
+            }
+            else{
+                $revisions = Revision::where('state', '5')->where('site_id',$site_id)->orderBy('updated_at', 'desc')->get();
+
+            }
             return view('approval.includes.revision', ['revisions' => $revisions]);
         } elseif ($id == "repair") {
-            $repairs = Repair::where('state', '5')->orderBy('updated_at', 'desc')->get();
+            $site_id=Auth::user()->employee->site_id;
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $repairs = Repair::where('state', '5')->where('site_id',$site_id)->orderBy('updated_at', 'desc')->get();
+                }
+                else{
+                    $repairs = Repair::where('state', '5')->orderBy('updated_at', 'desc')->get();
+                }
+            }
+            else{
+                $repairs = Repair::where('state', '5')->where('site_id',$site_id)->orderBy('updated_at', 'desc')->get();
+            }
+
             return view('approval.includes.repair', ['repairs' => $repairs]);
         } elseif ($id == "visit") {
-            $visits = Visit_technique::where('state', '5')->orderBy('updated_at', 'desc')->get();
+
+            $site_id=Auth::user()->employee->site_id;
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $visits = Visit_technique::where('state', '5')->where('site_id',$site_id)->orderBy('updated_at', 'desc')->get();
+                }
+                else{
+                    $visits = Visit_technique::where('state', '5')->orderBy('updated_at', 'desc')->get();
+
+                }
+            }
+            else{
+                $visits = Visit_technique::where('state', '5')->where('site_id',$site_id)->orderBy('updated_at', 'desc')->get();
+            }
             return view('approval.includes.visit', ['visits' => $visits]);
         } else {
             $pieces = Demand_piece::where('demand_id', $id)->get();
@@ -120,8 +243,7 @@ class ApprovalController extends Controller
         }
     }
 
-    public
-    function edit($id)
+    public function edit($id)
     {
         //
     }
@@ -168,13 +290,68 @@ class ApprovalController extends Controller
 
     }
 
+    public function filesapprovalhome(Request $request,$id)
+    {
+
+        $releases = Approval::findOrFail($request->id);
+
+
+        return view('approval.file.fileapprovalpresta',compact('releases'));
+
+    }
+
     /**
      * Remove the specified resource from storage.
      *
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public
+    public function score()
+    {
+        $site_id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+                $demande=Demand::whereHas('diagnostic',function ($query){
+                    $query->whereHas('statee',function ($q){
+                        $site_id=Auth::user()->employee->site_id;
+                        $q->where('site_id',$site_id);
+                    });
+
+                })->where('state', '0')->count();
+                $pieceenattente = Demand::whereHas('diagnostic',function ($query){
+                    $query->whereHas('statee',function ($q){
+                        $site_id=Auth::user()->employee->site_id;
+                        $q->where('site_id',$site_id);
+                    });
+                })->where('state', '1')->orWhere('state', '2')->count();
+
+            }
+            else{
+
+                $demande=Demand::where('state', '0')->count();
+                $pieceenattente = Demand::where('state', '1')->orWhere('state', '2')->count();
+
+
+            }
+        }
+        else{
+
+            $demande=Demand::whereHas('diagnostic',function ($query){
+                $query->whereHas('statee',function ($q){
+                    $site_id=Auth::user()->employee->site_id;
+                    $q->where('site_id',$site_id);
+                });
+
+            })->where('state', '0')->count();
+            $pieceenattente = Demand::whereHas('diagnostic',function ($query){
+                $query->whereHas('statee',function ($q){
+                    $site_id=Auth::user()->employee->site_id;
+                    $q->where('site_id',$site_id);
+                });
+            })->where('state', '1')->orWhere('state', '2')->count();
+        }
+        return response()->json(['demande' => $demande,'pieceenattente' => $pieceenattente]);
+    }
     function destroy($id)
     {
         //

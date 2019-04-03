@@ -24,16 +24,75 @@ class RevisionController extends Controller
 
     public function index()
     {
-        $technicians = Employee::where('post_id', '1')->get();
-        $diagnostics = Diagnostic::where('type', '2')->where('active', '1')
-            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
-        $active = '';
-        if ($diagnostics->count() == '0') {
-            $active = '0';
+        $site_id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+              //  $technicians = Employee::where('site_id',$site_id)->where('post_id', '1')->get();
+
+                $technicians = Employee::where('post_id', '1')->get();
+//        $diagnostics = Diagnostic::where('active', '1')
+//            ->orWhere('active','2')->where('type', '2')->orderBy('updated_at', 'desc')->get();
+                $diagnostics=Diagnostic::whereHas('statee',function ($query){
+                    $site_id=Auth::user()->employee->site_id;
+                    $query->where('site_id',$site_id);
+
+                })->whereBetween('active', ['1','2'])->where('type','2')->orderBy('updated_at', 'desc')->get();
+                $active = '';
+                if ($diagnostics->count() == '0') {
+                    $active = '0';
+                }
+                $revisions = Revision::where('site_id',$site_id)
+                    ->where('state', '1')
+                    ->orWhere('state', '2')
+                    ->orWhere('state', '4')->get();
+            }
+            else{
+                $technicians = Employee::where('post_id', '1')->get();
+//        $diagnostics = Diagnostic::where('active', '1')
+//            ->orWhere('active','2')->where('type', '2')->orderBy('updated_at', 'desc')->get();
+                $diagnostics=Diagnostic::whereBetween('active', ['1','2'])->where('type','2')->orderBy('updated_at', 'desc')->get();
+                $active = '';
+                if ($diagnostics->count() == '0') {
+                    $active = '0';
+                }
+                $revisions = Revision::where('state', '1')
+                    ->orWhere('state', '2')
+                    ->orWhere('state', '4')
+                    ->get();
+
+            }
         }
-        $revisions = Revision::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->get();
+        else{
+          //  $technicians = Employee::where('site_id',$site_id)->where('post_id', '1')->get();
+
+            $technicians = Employee::where('post_id', '1')->get();
+//        $diagnostics = Diagnostic::where('active', '1')
+//            ->orWhere('active','2')->where('type', '2')->orderBy('updated_at', 'desc')->get();
+            $diagnostics=Diagnostic::whereHas('statee',function ($query){
+                $site_id=Auth::user()->employee->site_id;
+                $query->where('site_id',$site_id);
+
+            })->whereBetween('active', ['1','2'])->where('type','2')->orderBy('updated_at', 'desc')->get();
+            $active = '';
+            if ($diagnostics->count() == '0') {
+                $active = '0';
+            }
+
+            $revisions = Revision::where('site_id',$site_id)
+                ->where('state', '1')
+                ->orWhere('state', '2')
+                ->orWhere('state', '4')
+                ->get();
+
+
+        }
+
+
+
+//        return view('revision.home',compact('diagnostics','technicians','revisions','active'));
         return view('revision.home', ['diagnostics' => $diagnostics, 'technicians' => $technicians,
             'revisions' => $revisions, 'active' => $active]);
+
     }
 
     public function create()
@@ -87,10 +146,10 @@ class RevisionController extends Controller
                         'title' => $request->title[$i],
                     ]);
                 }
-                return response()->json(['id' => $revision->id, 'matriculation' => $revision->diagnostic->state->bus->matriculation,
-                    'chassis' => $revision->diagnostic->state->bus->chassis, 'date' => Date::parse($revision->created_at)->format('j M Y'),
-                    'bus' => $revision->diagnostic->state->bus->model->brand->name . " " . $revision->diagnostic->state->bus->model->name,
-                    'reference' => $revision->diagnostic->state->reference,
+                return response()->json(['id' => $revision->id, 'matriculation' => $revision->diagnostic->statee->bus->matriculation,
+                    'chassis' => $revision->diagnostic->statee->bus->chassis, 'date' => Date::parse($revision->created_at)->format('j M Y'),
+                    'bus' => $revision->diagnostic->statee->bus->model->brand->name . " " . $revision->diagnostic->statee->bus->model->name,
+                    'reference' => $revision->diagnostic->statee->reference,
                     'count' => $revision->where('state','1')->orWhere('state','2')->orWhere('state','4')->count('id'),
                     'diagnostic' => $request->diagnostic]);
             }
@@ -103,12 +162,53 @@ class RevisionController extends Controller
     {
         if ($request->ajax()) {
             if ($id == "0") {
-                $diagnostics = Diagnostic::with('state')->where('type', '2')->where('active', '1')
-                    ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+
+                $site_id=Auth::user()->employee->site_id;
+                if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                    if (Auth::user()->employee->action_site == 2) {
+                        $diagnostics = Diagnostic::whereHas('statee',function ($query){
+                            $site_id=Auth::user()->employee->site_id;
+                            $query->where('site_id',$site_id);
+
+                        })->with('state')->where('type', '2')->where('active', '1')
+                            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                    }
+                    else{
+                        $diagnostics = Diagnostic::with('state')->where('type', '2')->where('active', '1')
+                            ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+                    }
+                }
+                else{
+                    $diagnostics = Diagnostic::whereHas('statee',function ($query){
+                        $site_id=Auth::user()->employee->site_id;
+                        $query->where('site_id',$site_id);
+
+                    })->with('state')->where('type', '2')->where('active', '1')
+                        ->orWhere('active','2')->orderBy('updated_at', 'desc')->get();
+
+                }
+
                 return response()->json($diagnostics);
             } else {
                 $revision = Revision::findOrFail($id);
-                $employees = Employee::where('post_id', '1')->get();
+                $site_id=Auth::user()->employee->site_id;
+                if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                    if (Auth::user()->employee->action_site == 2) {
+                        $employees = Employee::where('post_id', '1')->where('site_id',$site_id)->get();
+
+                        $employees = Employee::where('post_id', '1')->get();
+
+                    }
+                    else{
+                        $employees = Employee::where('post_id', '1')->get();
+                    }
+                }
+                else{
+                  //  $employees = Employee::where('post_id', '1')->where('site_id',$site_id)->get();
+
+                    $employees = Employee::where('post_id', '1')->get();
+
+                }
                 return view('revision.partials.revision', ['revision' => $revision, 'employees' => $employees]);
             }
         } else {
@@ -193,6 +293,56 @@ class RevisionController extends Controller
         } else {
             return view('errors.500');
         }
+    }
+
+    public function filesrevision(Request $request,$id)
+    {
+        $revision=Revision::findOrFail($id);
+        $bus_id= $revision->diagnostic->statee->bus_id;
+
+        $denierrevision=Revision::join('diagnostics','diagnostics.id','=','revisionns.diagnostic_id')
+            ->join('works','works.diagnostic_id','=','diagnostics.id')
+            ->join('states','states.id','=','diagnostics.state_id')
+            ->join('buses','buses.id','=','states.bus_id')
+            ->select('revisionns.created_at as date','states.kilometer as kilometer')
+            ->where('buses.id',$bus_id)
+            ->where('works.type','2')
+            ->where('revisionns.state','5')
+            ->orderBy('revisionns.id','desc')
+            ->take(3)
+            ->get();
+        return view('revision.file.revisionfile',compact('denierrevision','revision'));
+    }
+
+    public function score()
+    {
+        $revisioncours=Revision::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+        $revisoneattent=Diagnostic::whereBetween('active', ['1','2'])->where('type','2')->count();
+        return response()->json(['revisioncours'=>$revisioncours,'revisoneattent'=>$revisoneattent]);
+
+    }
+
+    public function scoree()
+    {
+        $site_id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+                $revisioncours=Revision::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $essaienattenterevision=Revision::where('site_id',$site_id)->where('state', '3')->count();
+            }
+            else{
+                $revisioncours=Revision::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $essaienattenterevision=Revision::where('state', '3')->count();
+            }
+        }
+        else{
+            $revisioncours=Revision::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+            $essaienattenterevision=Revision::where('site_id',$site_id)->where('state', '3')->count();
+        }
+
+
+        return response()->json(['revisioncours'=>$revisioncours,'essaienattenterevision'=>$essaienattenterevision]);
+
     }
 
     public function destroy($id)

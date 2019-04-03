@@ -6,10 +6,24 @@
     <section class="vbox bg-white" id="page">
         <header class="header bg-light lt b-b b-light">
             <p class="h4 font-thin pull-left m-r m-b-sm"><i class="fa fa-bug"></i> DIAGNOSTIQUE DU CAR</p>
-            <a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""
-               title="Fiche d'etat...">
-                <i class="fa fa-file-pdf-o"></i>
+            {{--<a class="btn btn-sm btn-default disabled none btn-rounded btn-icon " id="file" data-value=""--}}
+               {{--title="Fiche d'etat...">--}}
+                {{--<img src="{{asset('img/pdf.png')}}" width="25">--}}
+                {{--<i class="fa fa-file-pdf-o"></i>--}}
+            {{--</a>--}}
+            <a class="btn btn-sm btn-default disabled none  btn-rounded btn-icon " id="filep" data-value=""
+               title="Fiche de diagnostic...">
+                <img src="{{asset('img/pdf.png')}}" width="25">
+                {{--<i class="fa fa-file-pdf-o"></i>--}}
             </a>
+
+            <a class="btn btn-sm btn-default  none  btn-rounded btn-icon " id="filework" data-value=""
+               title="Fiche essaie avant travaux...">
+                <img src="{{asset('img/pdf1.jpg')}}" width="25">
+                {{--<i class="fa fa-file-pdf-o"></i>--}}
+            </a>
+            <img src="{{asset('assets/images/Spinner.gif')}}" width="50" class="m-t-sm none"
+                 id="file_load">
         </header>
         <section class="scrollable wrapper bg-light dker">
             <section class="scrollable padder">
@@ -58,8 +72,7 @@
                                                                                         <th>Marque</th>
                                                                                         <th>Modele</th>
                                                                                         <th>Date</th>
-                                                                                        <th><i class="i i-check"></i>
-                                                                                        </th>
+                                                                                        <th><i class="i i-check"></i></th>
                                                                                     </tr>
                                                                                     </thead>
                                                                                     <tbody>
@@ -75,7 +88,7 @@
                                                                                             <td>{{$state->created_at->format('d/m/Y')}}</td>
                                                                                             <td width="10">
                                                                                                 <div class="radio i-checks">
-                                                                                                    <label class="m-t-n-xl"
+                                                                                                    <label class="m-t-n"
                                                                                                            style="width: 5px; height: 50px">
                                                                                                         <input type="radio"
                                                                                                                name="state"
@@ -114,15 +127,38 @@
                                                     <div class="tab-pane" id="step2">
                                                         <div class="col-md-10">
                                                             <div class="row">
+
                                                                 <section class="panel panel-info m-t-n-md">
                                                                     <header class="panel-heading font-bold">
                                                                         <h3 class="panel-title">Incidents & Remarques
-                                                                            eventuels du car</h3>
+                                                                            eventuelles </h3>
                                                                     </header>
                                                                     <div class="panel-body  panel">
                                                                         <div class="row">
-                                                                            <div class="col-md-8">
+                                                                            <div class="col-md-6">
                                                                                 <div class="row">
+                                                                                    <section class="panel panel-info">
+                                                                                        <div class="panel-body">
+                                                                                            <a href="#"
+                                                                                               class="thumb pull-right m-l m-t-xs avatar">
+                                                                                                <img src="{{asset('assets/images/Car_Repair_icon.png')}}">
+                                                                                                <i class="on md b-white bottom"></i>
+                                                                                            </a>
+                                                                                            <div class="clear">
+                                                                                                <a href="#"
+                                                                                                   class="text-info font-bold">
+                                                                                                    @
+                                                                                                    <span class="uppercase text-danger matriculation"></span></a>
+                                                                                                <small class="block text-primary capitalize font-bold">
+                                                                                                    <span class="vehicle"></span>
+                                                                                                </small>
+                                                                                                <a href="#"
+                                                                                                   class="btn btn-xs btn-success m-t-xs">
+                                                                                                    <span class="reference uppercase ot"></span>
+                                                                                                </a>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </section>
                                                                                     <section
                                                                                             class="panel panel-warning">
                                                                                         <header class="panel-heading">
@@ -145,30 +181,9 @@
                                                                                     </section>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col-md-4">
+                                                                            <div class="col-md-6" id="vehicle_history">
                                                                                 <div class="row">
-                                                                                    <section class="panel panel-info">
-                                                                                        <div class="panel-body">
-                                                                                            <a href="#"
-                                                                                               class="thumb pull-right m-l m-t-xs avatar">
-                                                                                                <img src="http://segar-ciera.dev/assets/images/Car_Repair_icon.png">
-                                                                                                <i class="on md b-white bottom"></i>
-                                                                                            </a>
-                                                                                            <div class="clear">
-                                                                                                <a href="#"
-                                                                                                   class="text-info font-bold">
-                                                                                                    @
-                                                                                                    <span class="uppercase text-danger matriculation"></span></a>
-                                                                                                <small class="block text-primary capitalize font-bold">
-                                                                                                    <span class="vehicle"></span>
-                                                                                                </small>
-                                                                                                <a href="#"
-                                                                                                   class="btn btn-xs btn-success m-t-xs">
-                                                                                                    <span class="reference uppercase ot"></span>
-                                                                                                </a>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </section>
+
 
                                                                                 </div>
                                                                             </div>
@@ -220,15 +235,17 @@
                                                                                     <select class="chosen-select form-control input-sm before_works"
                                                                                             data-placeholder="Choissisez un technicien"
                                                                                             name="tester"
+                                                                                            id="tester"
                                                                                             data-trigger="change"
-                                                                                            data-required="true"
-                                                                                            data-error-message="Choissisez le technicien ayant effectuer l'essai">
+
+                                                                                            >
                                                                                         <option></option>
                                                                                         @foreach($technicians as $key=>$technician)
                                                                                             <option class="capitalize"
                                                                                                     value="{{$technician->id}}">{{$technician->username}}</option>
                                                                                         @endforeach
                                                                                     </select>
+
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-md-8">
@@ -285,7 +302,8 @@
                                                                                                    name="place"
                                                                                                    class="form-control input-sm before_works capitalize"
                                                                                                    data-trigger="change"
-                                                                                                   data-required="true"
+                                                                                                   data-required="true",
+                                                                                                   id="lieu"
                                                                                                    data-error-message="Saissisez le Lieu de l'essai">
                                                                                         </td>
                                                                                     </tr>
@@ -298,6 +316,7 @@
                                                                             <textarea rows="8"
                                                                                       class="form-control input-sm text-area before_works"
                                                                                       name="description"
+                                                                                      id="descrip"
                                                                                       data-trigger="change"
                                                                                       data-required="true"
                                                                                       minlength="6"
@@ -309,16 +328,9 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-md-2 m-b-lg">
-                                                            <!--<div class="form-group">
-                                                                <label class="control-label text-danger-dker">Test avant travaux?</label>
-                                                                <div class="m-l-md">
-                                                                    <label class="switch">
-                                                                        <input type="checkbox" checked value="1" name="test" id="test">
-                                                                        <span></span>
-                                                                    </label>
-                                                                </div>
+                                                            <div class="col-sm-2">
+                                                                <a class="btn btn-danger" data_id="" id="befor_test" onclick="savetest(this)">SAUVEGARDER</a>
                                                             </div>
-                                                        </div>-->
                                                         </div>
                                                         <ul class="pager wizard m-b-sm">
                                                             <li class="previous first" style="display:none;"><a
@@ -337,11 +349,11 @@
                                                                     <header class="panel-heading font-bold">
                                                                         <h3 class="panel-title">Detection des
                                                                             pannes
-                                                                            <button class="btn btn-sm btn-info uppercase m-l-lg"
+                                                                            <a class="btn btn-sm btn-info uppercase m-l-lg"
                                                                                     id="diagnostic_add">
                                                                                 <i class="fa fa-plus-square"></i>
                                                                                 Ajouter un diagnostique
-                                                                            </button>
+                                                                            </a>
                                                                             <a href="#"
                                                                                class="btn btn-sm btn-info pull-right uppercase"
                                                                                id="piece_add">
@@ -401,6 +413,11 @@
                                                                                                   placeholder="Detail du diagnostic"></textarea>
                                                                                                     </div>
                                                                                                 </section>
+                                                                                                <a href="#piece_row"
+                                                                                                   data-dismiss="alert"
+                                                                                                   class="btn btn-default btn-xs pull-right">
+                                                                                                    <i class="fa fa-trash-o text-danger-dker"></i>
+                                                                                                </a>
                                                                                             </td>
                                                                                         </tr>
                                                                                         </tbody>
@@ -481,8 +498,7 @@
                        id="piece"
                        placeholder="Nom piece + Marque & Model"
                        rows="2" required></textarea>
-            </td>
-            <td>
+
                 <input class="form-control input-sm"
                        name="quantity[]"
                        id="quantity"
@@ -493,10 +509,19 @@
                    class="btn btn-default btn-xs pull-right">
                     <i class="fa fa-trash-o text-danger-dker"></i>
                 </a>
+
             </td>
+
+
         </tr>
         </tbody>
     </table>
+    <div class="modal fade" id="diagnosModal">
+        <div class="modal-dialog modal-lfg" style="width: 700px;">
+            <div class="modal-content" id="file_content">
+            </div>
+        </div><!-- /.modal-dialog -->
+    </div>
 @endsection
 @section('scripts')
     <script src="{{asset('assets/js/parsley/parsley.min.js')}}"></script>
@@ -507,13 +532,21 @@
             $form = $('#wizardform'),
             $first = $('.first'),
             $file = $('#file'),
+                $filep=$('#filep'),
             $submit = $('#submit'),
+                $modale = $('#diagnosModal'),
+                $file_content=$('#file_content'),
             $remark = $('#remark'),
+                $file_load=$('#file_load'),
             $incident = $('#incident'),
+                $filework=$('#filework'),
             $matriculation = $('.matriculation'),
             $vehicle = $('.vehicle'),
             $ot = $('.ot'),
+                $vehicle_history=$('#vehicle_history'),
             $state = $('.state'),
+              $count_diagnostique=$('#count_diagnostique'),
+                $approvalpiece=$('#approvalpiece'),
             $depart = $('#depart'),
             $arrive = $('#arrive'),
             $distance = $('#distance'),
@@ -522,6 +555,49 @@
             $diagnostic_add = $('#diagnostic_add'),
             $chosen = $('.chosen-select'),
             $spinner = $('#spinner');
+//         $file.hide();
+//        $filework.hide();
+
+
+        function savetest(obj) {
+          var state_id = $('#befor_test').val();
+
+            var  arrive=$arrive.val(),
+                leaving=$('#depart').val(),
+                distance=$('#distance').val(),
+                lieu=$('#lieu').val(),
+                tester=$('#tester').val(),
+                descrip=$('#descrip').val(),
+                arrive=$('#arrive').val();
+
+            if(leaving==" " || distance==" " || lieu==" " || descrip=="" || arrive=="")
+            {
+                toastr["warning"]('Veuillez entré les données svp!')
+            }
+            else{
+                $.get('savetest/' + state_id +'/' +leaving +'/'+ distance+'/'+ lieu +'/'+tester +'/'+descrip +'/'+arrive, function (data) {
+
+                    toastr["success"]('essaie enregistré')
+//               $('#befor_test').prop(disabled, true);
+                    $arrive.val(" ");
+                    $('#depart').val(" ");
+                    $('#distance').val(" ");
+                    $('#lieu').val(" ");
+//               $('#tester').val("")
+                    $('#descrip').val(" ")
+                    $('#arrive').val("")
+                 //   $view_work.html(data);
+                    $filework.attr({"id": data.before_test});
+                    $filework.attr({"data-value": data.before_test});
+                    $filework.show()
+                });
+
+            }
+
+
+        }
+
+
         $(function () {
             $table.dataTable({
                 "sPaginationType": "full_numbers",
@@ -531,6 +607,13 @@
                     "url": "../assets/js/datatables/French.json"
                 }
             });
+
+
+
+
+
+
+
             $form.on('submit', function (e) {
                 e.preventDefault();
                 var formData = $(this).serialize(),
@@ -547,14 +630,20 @@
                     success: function (data) {
                         $form.trigger('reset');
                         $chosen.trigger('chosen:updated');
-                        $file.attr('data-value', data.id);
-                        $file.addClass('btn-danger');
-                        $file.removeClass('btn-default disabled');
+                        $filep.attr('data-value', data.diagnostic_id);
+                        $filep.removeClass('btn-default disabled none');
+                        $filep.addClass('btn-danger');
+                        $filep.removeClass('btn-default disabled none');
+
+                        $filework.attr('data-value',data.work_id);
+                        $filework.addClass('btn-warning');
+                        $filework.removeClass('btn-default disabled none');
                         $('#state' + data.id).remove();
                         toastr[status](msg, "<span class='uppercase'>" + data.matriculation + "</span>!");
                         toastr.options.preventDuplicates = true;
                         $submit.button('reset');
                         $first.click();
+                        score();
                     },
                     error: function (jqXhr) {
                         if (jqXhr.status === 401)
@@ -578,18 +667,90 @@
                     }
                 });
             });
+
+
+
+
+
+
+            $filep.on('click', function () {
+                $file_load.removeClass('none')
+                var id = $(this).attr('data-value');
+                $.get('filesdiagnostique/' + id, function (data) {
+                    $file_content.html(data);
+                    $modale.modal('show')
+                    $file_load.hide();
+                })
+            });
+
+            $filework.on('click',function () {
+                $file_load.removeClass('none')
+
+                var id = $(this).attr('data-value');
+                $.get('filesworks/' + id, function (data) {
+                    $file_content.html(data);
+                    $modale.modal('show')
+                     $file_load.hide()
+                })
+
+            })
+
+
+
+
+
             $state.on('click', function () {
                 $spinner.show();
                 var id = $(this).val();
+                $('#befor_test').val(id);
                 $.get('home/' + id, function (data) {
                     $incident.html(data.incident);
                     $remark.html(data.remark);
                     $matriculation.html(data.matriculation);
                     $vehicle.html(data.bus);
                     $ot.html(data.ot);
+
+                    $('#depart').val(data.depart)
+                    $('#depart').prop('readonly', true);
+                    $('#distance').val(data.distance),
+                        $('#distance').prop('readonly', true);
+
+                        $('#lieu').val(data.place),
+                        $('#lieu').prop('readonly', true);
+                        $('#tester').val(data.employee),
+                        $('#tester').prop('readonly', true);
+                    $('#tester').trigger("chosen:updated");
+                        $('#descrip').val(data.description),
+                            $('#descrip').prop('readonly', true);
+                       $('#arrive').val(data.arrive);
+                    $('#arrive').prop('readonly',true);
+
+                    if(data.employee == undefined)
+                    {
+
+                        $('#befor_test').show();
+                        $('#arrive').prop('readonly',false);
+                        $('#descrip').prop('readonly', false);
+                        $('#lieu').prop('readonly', false);
+                        $('#depart').prop('readonly', false);
+                        $('#tester').prop('readonly', false);
+                        $('#distance').prop('readonly', false);
+
+                    }
+                    else{
+                        $('#befor_test').hide();
+                    }
+
+
                     $depart.val(data.depart);
+                    $.get('bus_history/' + data.bus_id, function (data) {
+                        $vehicle_history.html(data);
+
+                    });
                     $spinner.hide();
                 })
+
+
             });
             $arrive.on('change', function () {
                 var depart = $depart.val(),
@@ -644,6 +805,15 @@
                 $('#title' + count).val('');
                 $('#diagnostic' + count).val('');
             });
+
+
+            function score()
+            {
+                $.get('score',function(data){
+                    $count_diagnostique.html(data.diagnostic_count);
+                    $approvalpiece.html(data.demans);
+                })
+            }
         });
     </script>
 @endsection

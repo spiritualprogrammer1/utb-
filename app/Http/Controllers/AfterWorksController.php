@@ -25,8 +25,29 @@ class AfterWorksController extends Controller
 
     public function index()
     {
-        $technicians = Employee::where('post_id', '1')->get();
-        $repairs = Repair::where('state', '3')->get();
+        $id=Auth::user()->employee->site_id;
+
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+             //   $technicians = Employee::where('post_id', '1')->where('site_id',$id)->get();
+
+                $technicians = Employee::where('post_id', '1')->get();
+                $repairs = Repair::where('state', '3')->where('site_id',$id)->get();
+
+            }
+            else{
+                $technicians = Employee::where('post_id', '1')->get();
+                $repairs = Repair::where('state', '3')->get();
+            }
+        }
+        else{
+           // $technicians = Employee::where('post_id', '1')->where('site_id',$id)->get();
+
+            $technicians = Employee::where('post_id', '1')->get();
+
+            $repairs = Repair::where('state', '3')->where('site_id',$id)->get();
+
+        }
         return view('afterworks.home', ['repairs' => $repairs, 'technicians' => $technicians]);
     }
 
@@ -53,16 +74,112 @@ class AfterWorksController extends Controller
 
     public function edit($id)
     {
+        $site_id=Auth::user()->employee->site_id;
         if ($id == 1) {
-            $repairs = Repair::where('state', '3')->get();
+
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $repairs = Repair::where('state', '3')->where('site_id',$site_id)->get();
+
+                }
+                else{
+                    $repairs = Repair::where('state', '3')->get();
+
+                }
+            }
+            else
+            {
+                $repairs = Repair::where('state', '3')->where('site_id',$site_id)->get();
+
+            }
+
             return view('afterworks.includes.repair', ['repairs' => $repairs]);
         } elseif ($id == 2) {
-            $revisions = Revision::where('state', '3')->get();
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $revisions = Revision::where('state', '3')->where('site_id',$site_id)->get();
+                }
+                else{
+                    $revisions = Revision::where('state', '3')->get();
+                }
+            }
+            else{
+                $revisions = Revision::where('state', '3')->where('site_id',$site_id)->get();
+
+            }
+
+
             return view('afterworks.includes.revision', ['revisions' => $revisions]);
         } else {
-            $visits = Visit_technique::where('state', '3')->get();
+
+            if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+                if (Auth::user()->employee->action_site == 2) {
+                    $visits = Visit_technique::where('state', '3')->where('site_id',$site_id)->get();
+
+                }
+                else{
+                    $visits = Visit_technique::where('state', '3')->get();
+
+                }
+
+            }
+            else{
+                $visits = Visit_technique::where('state', '3')->where('site_id',$site_id)->get();
+
+            }
+
             return view('afterworks.includes.visit', ['visits' => $visits]);
         }
+    }
+
+    public function score()
+    {
+        $site_id=Auth::user()->employee->site_id;
+        if(Auth::user()->can(['tableau de bord administration générale','tableau de bord admin'])) {
+            if (Auth::user()->employee->action_site == 2) {
+
+                $testVisit=Visit_technique::where('site_id',$site_id)->where('state', '3')->count();
+                $testRevision=Revision::where('site_id',$site_id)->where('state', '3')->count();
+                $testRepaire=Repair::where('site_id',$site_id)->where('state', '3')->count();
+                $repairencours=Repair::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $revisionencours=Revision::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $visitencours=Visit_technique::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->count();
+                $aftertestvisit=Visit_technique::where('state', '5')->where('site_id',$site_id)->count();
+                $aftertestrevision=Revision::where('state', '5')->where('site_id',$site_id)->count();
+                $aftertestrepair= Repair::where('state', '5')->where('site_id',$site_id)->count();
+
+
+            }
+            else{
+                $testVisit=Visit_technique::where('state', '3')->count();
+                $testRevision=Revision::where('state', '3')->count();
+                $testRepaire=Repair::where('state', '3')->count();
+                $repairencours=Repair::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $revisionencours=Revision::where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+                $visitencours=Visit_technique::where('state', '1')->orWhere('state', '2')->count();
+                $aftertestvisit=Visit_technique::where('state', '5')->count();
+                $aftertestrevision=Revision::where('state', '5')->count();
+                $aftertestrepair= Repair::where('state', '5')->count();
+
+            }
+        }
+        else{
+
+            $testVisit=Visit_technique::where('site_id',$site_id)->where('state', '3')->count();
+            $testRevision=Revision::where('site_id',$site_id)->where('state', '3')->count();
+            $testRepaire=Repair::where('site_id',$site_id)->where('state', '3')->count();
+            $repairencours=Repair::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+            $revisionencours=Revision::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->orWhere('state', '4')->count();
+            $visitencours=Visit_technique::where('site_id',$site_id)->where('state', '1')->orWhere('state', '2')->count();
+            $aftertestvisit=Visit_technique::where('state', '5')->where('site_id',$site_id)->count();
+            $aftertestrevision=Revision::where('state', '5')->where('site_id',$site_id)->count();
+            $aftertestrepair= Repair::where('state', '5')->where('site_id',$site_id)->count();
+
+
+        }
+
+
+        return response()->json(['aftertestrepair'=>$aftertestrepair,'aftertestrevision'=>$aftertestrevision,'aftertestvisit'=>$aftertestvisit,'testVisit'=>$testVisit,'visitencours'=>$visitencours,'revisionencours'=>$revisionencours,'repairencours'=>$repairencours,'testVist'=>$testVisit,'testRevision'=>$testRevision,'testRepaire'=>$testRepaire]);
     }
 
 
@@ -91,7 +208,8 @@ class AfterWorksController extends Controller
                     'success' => false,
                     'message' => $errors
                 ], 422);
-            } else {
+            }
+            else {
                 if ($request->has('repair')) {
                     $diagnostic = Repair::findOrFail($id)->diagnostic_id;
                     $repair = Repair::findOrFail($id)->update(['state' => $request->valid]);
@@ -108,6 +226,7 @@ class AfterWorksController extends Controller
                     'type' => '2',
                     'state' => $request->valid,
                     'distance' => $request->distance,
+                    'arrive'=> $request->arrive,
                     'place' => $request->place,
                     'description' => $request->description,
                     'employee_id' => $request->tester,
@@ -115,11 +234,20 @@ class AfterWorksController extends Controller
                     'user_id' => Auth::user()->id,
                     'site_id' => Auth::user()->id,
                 ]);
-                return response()->json(['id' => $id, 'reference' => $reference]);
+                return response()->json(['id' => $id, 'reference' => $reference,'work_id'=>$works->id]);
             }
-        } else {
-            return view('errors.500');
         }
+// else {
+//            return view('errors.500');
+//        }
+    }
+
+    public function filesafertworks(Request $request,$id)
+    {
+
+        $before_test=Work::where('id',$id)->where('type','2')->get();
+        return view('afterworks.file.fileworksafter',compact('before_test'));
+
     }
 
     public function destroy($id)

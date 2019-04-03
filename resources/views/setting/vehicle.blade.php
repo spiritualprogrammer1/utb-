@@ -11,6 +11,7 @@
                 <ul class="nav nav-tabs m-b-n-xxs">
                     <li class="active"><a href="#brand" data-toggle="tab">MARQUE DES CARS</a></li>
                     <li class=""><a href="#model" class="" data-toggle="tab">MODELE DES CARS</a></li>
+                    {{--<li class=""><a href="#societe" class="" data-toggle="tab">SOCIETE </a></li>--}}
                 </ul>
                 <div class="panel panel-default tab-content">
                     <!----------  Brand tab ------------->
@@ -146,6 +147,66 @@
                             </div>
                         </div>
                     </ul>
+                    <!--------------- End --------------->
+                    <!----------  Societe tab ------------->
+                    {{--<ul class="list-group tab-pane  panel-primary active panel" id="societe">--}}
+                        {{--<div class="col-sm-4">--}}
+                            {{--<aside class="aside-md bg-white b-r" id="aside">--}}
+                                {{--<div class="wrapper">--}}
+                                    {{--<h4 class="m-t-none text-success-dk uppercase">Gestion des SOCIETES</h4>--}}
+                                    {{--<form id="brandForm" method="post" role="form">--}}
+                                        {{--{{csrf_field()}}--}}
+                                        {{--<input type="hidden" name="brand" value="1">--}}
+                                        {{--<input id="societe" type="hidden" name="brand_id">--}}
+                                        {{--<div class="form-group">--}}
+                                            {{--<label>Nom</label>--}}
+                                            {{--<a href="#" id="brand_reset" onclick="brand_reset()"--}}
+                                               {{--style="position: relative"--}}
+                                               {{--class="btn btn-sm btn-icon btn-default btn-rounded pull-right none m-t-n-sm">--}}
+                                                {{--<i class="fa fa-refresh"></i>--}}
+                                            {{--</a>--}}
+                                            {{--<input type="text" name="name" id="brand_name" minlength="3"--}}
+                                                   {{--placeholder="Nom de la societe"--}}
+                                                   {{--class="input-sm form-control" required>--}}
+                                        {{--</div>--}}
+                                        {{--<div class="m-t-lg">--}}
+                                            {{--<button type="submit" value="save" id="societe_submit"--}}
+                                                    {{--class="btn btn-sm btn-success btn-rounded btn-group-justified uppercase">--}}
+                                                {{--<i class="fa fa-floppy-o"></i> enregistrer--}}
+                                            {{--</button>--}}
+                                        {{--</div>--}}
+                                    {{--</form>--}}
+                                {{--</div>--}}
+                            {{--</aside>--}}
+                        {{--</div>--}}
+
+                        {{--<div class="col-sm-8  panel-default panel" style="overflow: scroll; max-height: 80vh">--}}
+                            {{--<div class="table-responsive">--}}
+                                {{--<table class="table table-responsive table-striped m-b-none table_1 capitalize"--}}
+                                       {{--id="brand_table">--}}
+                                    {{--<thead>--}}
+                                    {{--<tr>--}}
+                                        {{--<th>Nom</th>--}}
+                                        {{--<th><i class="i i-calendar"></i> Date</th>--}}
+                                        {{--<th><i class="i i-cog2"></i></th>--}}
+                                    {{--</tr>--}}
+                                    {{--</thead>--}}
+                                    {{--<tbody id="brandRow">--}}
+                                    {{--@foreach($brands as $key=>$brand)--}}
+                                        {{--<tr id="brand{{$brand->id}}">--}}
+                                            {{--<td>{{$brand->name}}</td>--}}
+                                            {{--<td>{{$brand->created_at->format('d/m/Y H:i:s')}}</td>--}}
+                                            {{--<td>--}}
+                                                {{--<a href="#" id="{{$brand->id}}" class="brand-edit"><i--}}
+                                                            {{--class="fa fa-pencil text-success-dk"></i></a>--}}
+                                            {{--</td>--}}
+                                        {{--</tr>--}}
+                                    {{--@endforeach--}}
+                                    {{--</tbody>--}}
+                                {{--</table>--}}
+                            {{--</div>--}}
+                        {{--</div>--}}
+                    {{--</ul>--}}
                     <!--------------- End --------------->
                 </div>
             </div>

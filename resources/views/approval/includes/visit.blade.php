@@ -2,7 +2,7 @@
     <thead>
     <tr>
         <th width="1"></th>
-        <th width="1"></th>
+        {{--<th width="1"></th>--}}
         <th>Reference OT</th>
         <th>Immatriculation</th>
         <th>Car</th>
@@ -14,19 +14,19 @@
     @foreach($visits as $key=>$visit)
         <tr id="approval{{$visit->id}}" class="animated fadeInRight">
             <td>{{$key + 1}}</td>
-            <td>
-                <a href="#" id="{{$visit->id}}" class="">
-                    <i class="fa fa-search-plus text-muted"></i>
-                </a>
-            </td>
-            <td class="uppercase text-danger-dker">{{$visit->diagnostic->state->reference}}</td>
-            <td class="uppercase text-primary-dker">{{$visit->diagnostic->state->bus->matriculation}}</td>
-            <td>{{$visit->diagnostic->state->bus->model->brand->name." ".$visit->diagnostic->state->bus->model->name}}</td>
+            {{--<td>--}}
+                {{--<a href="#" id="{{$visit->id}}" class="">--}}
+                    {{--<i class="fa fa-search-plus text-muted"></i>--}}
+                {{--</a>--}}
+            {{--</td>--}}
+            <td class="uppercase text-danger-dker">{{$visit->diagnostic->statee->reference}}</td>
+            <td class="uppercase text-primary-dker">{{$visit->diagnostic->statee->bus->matriculation}}</td>
+            <td>{{$visit->diagnostic->statee->bus->model->brand->name." ".$visit->diagnostic->statee->bus->model->name}}</td>
             <td>{{\Jenssegers\Date\Date::parse($visit->updated_at)->format('j M Y')}}</td>
             <td><a href="#" id="{{$visit->id}}" data-type="visit" onclick="approval(this)"
-                   data-car="{{$visit->diagnostic->state->bus->model->brand->name." ".$visit->diagnostic->state->bus->model->name}}"
-                   data-matriculation="{{$visit->diagnostic->state->bus->matriculation}}"
-                   data-ot="{{$visit->diagnostic->state->reference}}" data-diagnostic="{{$visit->diagnostic->id}}">
+                   data-car="{{$visit->diagnostic->statee->bus->model->brand->name." ".$visit->diagnostic->statee->bus->model->name}}"
+                   data-matriculation="{{$visit->diagnostic->statee->bus->matriculation}}"
+                   data-ot="{{$visit->diagnostic->statee->reference}}" data-diagnostic="{{$visit->diagnostic->id}}">
                     <i class="fa fa-pencil"></i></a></td>
         </tr>
     @endforeach

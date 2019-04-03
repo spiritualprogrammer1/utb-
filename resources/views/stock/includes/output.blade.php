@@ -27,17 +27,17 @@
                 <td><a href="#" id="{{$demand->id}}" onclick="information(this)">
                         <i class="fa fa-search-plus text-muted"></i></a></td>
             @endif
-            <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
+            <td class="uppercase text-danger-dker">{{$demand->diagnostic->statee->reference}}</td>
             <td class="uppercase text-danger-dker">{{$demand->reference}}</td>
             <td class="text-success-dk text-center font-bold">{{number_format($demand->demand_piece->sum('quantity'))}}</td>
             <td class="text-success-dk text-center font-bold">{{number_format($demand->demand_piece->sum('delivered'))}}</td>
-            <td>{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}</td>
+            <td>{{$demand->diagnostic->statee->bus->model->brand->name." ".$demand->diagnostic->statee->bus->model->name}}</td>
             @if($id == "demand")
                 <td>{{Jenssegers\Date\Date::parse($demand->created_at)->format('j M Y')}}</td>
                 <td><a href="#" id="{{$demand->id}}" onclick="validate(this)"
-                       data-car="{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}"
+                       data-car="{{$demand->diagnostic->statee->bus->model->brand->name." ".$demand->diagnostic->statee->bus->model->name}}"
                        data-demand="{{$demand->reference}}"
-                       data-ot="{{$demand->diagnostic->state->reference}}" data-key="{{$key + 1}}">
+                       data-ot="{{$demand->diagnostic->statee->reference}}" data-key="{{$key + 1}}">
                         <i class="fa fa-pencil"></i></a></td>
             @else
                 <td>{{Jenssegers\Date\Date::parse($demand->updated_at)->format('j M Y')}}</td>

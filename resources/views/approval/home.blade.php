@@ -5,7 +5,7 @@
         <header class="header bg-light lt b-b b-light">
             <p class="h4 font-thin pull-left m-r m-b-sm"><i class="fa fa-gavel"></i> APPROBATION DE SORTIE DU CAR
             </p>
-            <a class="btn btn-sm btn-default btn-rounded btn-icon disabled" id="file" data-value=""
+            <a class="btn btn-sm btn-default disabled btn-rounded btn-icon " id="file" data-value=""
                title="Fiche d'etat...">
                 <i class="fa fa-file-pdf-o"></i>
             </a>
@@ -62,7 +62,7 @@
                                         <thead>
                                         <tr>
                                             <th width="5"></th>
-                                            <th width="5"></th>
+                                            {{--<th width="5"></th>--}}
                                             <th>Reference OT</th>
                                             <th>Immatriculation</th>
                                             <th>Car</th>
@@ -74,19 +74,19 @@
                                         @foreach($repairs as $key=>$repair)
                                             <tr id="approval{{$repair->id}}" class="fadeIn">
                                                 <td>{{$key + 1}}</td>
-                                                <td>
-                                                    <a href="#" id="{{$repair->id}}" class="">
-                                                        <i class="fa fa-search-plus text-muted"></i>
-                                                    </a>
-                                                </td>
-                                                <td class="uppercase text-danger-dker">{{$repair->diagnostic->state->reference}}</td>
-                                                <td class="uppercase text-primary-dker">{{$repair->diagnostic->state->bus->matriculation}}</td>
-                                                <td>{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}</td>
+                                                {{--<td>--}}
+                                                    {{--<a href="#" id="{{$repair->id}}" class="">--}}
+                                                        {{--<i class="fa fa-search-plus text-muted"></i>--}}
+                                                    {{--</a>--}}
+                                                {{--</td>--}}
+                                                <td class="uppercase text-danger-dker">{{$repair->diagnostic->statee->reference}}</td>
+                                                <td class="uppercase text-primary-dker">{{$repair->diagnostic->statee->bus->matriculation}}</td>
+                                                <td>{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}</td>
                                                 <td>{{\Jenssegers\Date\Date::parse($repair->updated_at)->format('j M Y')}}</td>
                                                 <td><a href="#" id="{{$repair->id}}" data-type="repair" class="approval"
-                                                       data-car="{{$repair->diagnostic->state->bus->model->brand->name." ".$repair->diagnostic->state->bus->model->name}}"
-                                                       data-matriculation="{{$repair->diagnostic->state->bus->matriculation}}"
-                                                       data-ot="{{$repair->diagnostic->state->reference}}" data-diagnostic="{{$repair->diagnostic->id}}">
+                                                       data-car="{{$repair->diagnostic->statee->bus->model->brand->name." ".$repair->diagnostic->statee->bus->model->name}}"
+                                                       data-matriculation="{{$repair->diagnostic->statee->bus->matriculation}}"
+                                                       data-ot="{{$repair->diagnostic->statee->reference}}" data-diagnostic="{{$repair->diagnostic->id}}">
                                                         <i class="fa fa-pencil"></i></a></td>
                                             </tr>
                                         @endforeach
@@ -148,6 +148,12 @@
             </form><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div>
+    <div class="modal fade" id="fileModal">
+        <div class="modal-dialog modal-lfg" style="width: 700px;">
+            <div class="modal-content" id="file_content">
+            </div>
+        </div><!-- /.modal-dialog -->
+    </div>
 @endsection
 @section('scripts')
     <script>
@@ -159,8 +165,10 @@
             $table_piece = $('#pieceTable'),
             $piece_row = $('#pieceRow'),
             $car = $('#car'),
+                $fileModal=$('#fileModal'),
             $ot = $('#ot'),
             $matriculation = $('#matriculation'),
+                $file_content=$('#file_content'),
             $piece_add = $('#piece_add'),
             $form = $('#validateForm'),
             $submit = $('#submit'),
@@ -214,7 +222,8 @@
                     data: formData,
                     success: function (data) {
                         $form.trigger('reset');
-                        $file.attr('data-value', data.id);
+                        score();
+                        $file.attr('data-value', data.approval_id);
                         $file.addClass('btn-danger');
                         $file.removeClass('btn-default disabled');
                         toastr[status](msg, "<span class='uppercase'>" + data.reference + "</span>!");
@@ -246,6 +255,34 @@
                 });
             });
         });
+
+        $file.on('click',function () {
+            $spinner.show();
+            var id = $(this).attr('data-value') ;
+            $.get('filesapprovalhome/' + id, function (data) {
+                $file_content.html(data);
+                $fileModal.modal('show')
+                $spinner.hide();
+            })
+        })
+
+
+        function score()
+        {
+
+            $.get('score',function (data) {
+                $('#testVisit').html(data.testVist);
+                $('#testRevision').html(data.testRevision);
+                $('#testRepair').html(data.testRepaire);
+                $('#count_repaircours').html(data.repairencours);
+                $('#count_revisioncours').html(data.revisionencours)
+                $('#count_visitoncours').html(data.visitencours);
+                $('#aftertestvisit').html(data.aftertestvisit);
+                $('#aftertestrevision').html(data.aftertestrevision);
+                $('#aftertestrepair').html(data.aftertestrepair);
+            })
+        }
+
 
         function approval(obj) {
             $spinner.show();

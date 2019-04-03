@@ -1,11 +1,18 @@
 @section('title') Sorties de pieces @endsection
 @extends('layouts.master')
 @section('content')
+
+    <style>
+
+        .custom-select{
+            z-index: absolute ;
+        }
+    </style>
     <section class="vbox">
         <header class="header bg-light lter b-b b-light">
             <p class="h4 font-thin pull-left m-r m-b-sm"><i class="i i-stack"></i> SORTIE DE PIECES</p>
             <a class="btn btn-sm btn-default btn-rounded btn-icon disabled pull-left m-r-xl" id="file" data-value=""
-               title="Fiche d'etat...">
+               title="Fiche stock...">
                 <i class="fa fa-file-pdf-o"></i>
             </a>
             <form id="searchForm" class="col-md-4 m-t-sm m-l-xl none">
@@ -81,16 +88,17 @@
                                         <tbody>
                                         @foreach($demands as $key=>$demand)
                                             <tr id="output{{$demand->id}}">
-                                                <td class="uppercase text-danger-dker">{{$demand->diagnostic->state->reference}}</td>
+                                                <td class="uppercase text-danger-dker">{{$demand->diagnostic->statee->reference}}</td>
                                                 <td class="uppercase text-danger-dker">{{$demand->reference}}</td>
                                                 <td class="text-success-dk text-center">{{number_format($demand->demand_piece->sum('quantity'))}}</td>
                                                 <td>{{number_format($demand->demand_piece->sum('delivered'))}}</td>
-                                                <td>{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}</td>
+                                                <td>{{$demand->diagnostic->statee->bus->model->brand->name." ".$demand->diagnostic->statee->bus->model->name}}</td>
                                                 <td>{{Jenssegers\Date\Date::parse($demand->created_at)->format('j M Y')}}</td>
                                                 <td><a href="#" id="{{$demand->id}}" onclick="validate(this)"
-                                                       data-car="{{$demand->diagnostic->state->bus->model->brand->name." ".$demand->diagnostic->state->bus->model->name}}"
+                                                       data-car="{{$demand->diagnostic->statee->bus->model->brand->name." ".$demand->diagnostic->statee->bus->model->name}}"
                                                        data-demand="{{$demand->reference}}"
-                                                       data-ot="{{$demand->diagnostic->state->reference}}" data-key="{{$key + 1}}">
+                                                       id_state="{{$demand->diagnostic->statee->id}}"
+                                                       data-ot="{{$demand->diagnostic->statee->reference}}" data-key="{{$key + 1}}">
                                                         <i class="fa fa-pencil"></i></a></td>
                                             </tr>
                                         @endforeach
@@ -136,6 +144,7 @@
                                 <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car"></a>
                             </div>
                         </div>
+                        <input type="hidden"  name="state_id" id="state_id">
                         <h3 class="text-center font-bold m-t-n-xl">SORTIE DES PIECES</h3>
                     </section>
                 </div>
@@ -147,11 +156,14 @@
                             <th colspan="2" class="text-center">Livraison</th>
                         </tr>
                         <tr>
-                            <th>Pièces demandées</th>
+                            <th width="10">Pièces demandées</th>
                             <th width="2">Quantité</th>
                             <th width="2">Livrée</th>
-                            <th width="150">Stock Referent</th>
+                            <th width="150">Reference</th>
                             <th width="2">Dispo.</th>
+                            <th width="2">Type.</th>
+                            <th width="2">Etage.</th>
+                            <th width="2">Casier.</th>
                             <th width="2">Quantité</th>
                         </tr>
                         </thead>
@@ -183,6 +195,7 @@
             $spinner = $('#spinner'),
             $search = $('#searchForm'),
             $result = $('#result'),
+                $pieceenattente=$('#pieceenattente')
             $table_piece = $('#pieceTable'),
             $piece_row = $('#pieceRow'),
             $modal_validate = $('#validateModal'),
@@ -193,6 +206,7 @@
             $submit_search = $('#submit_search'),
             $key = $('#key'),
             $view = $('#view'),
+                    $file=$('#file'),
             $submit = $('#submit');
 
         $(function () {
@@ -204,6 +218,18 @@
                     "url": "../assets/js/datatables/French.json"
                 }
             });
+
+            $file.on('click',function () {
+                $spinner.show();
+                var id = $(this).attr('data-value') ;
+                $.get('filesouputstock/' + id, function (data) {
+                    $modal_info_content.html(data);
+                    $modal_info.modal('show')
+                    $spinner.hide();
+                })
+            })
+
+
             $form.on('submit', function (e) {
                 e.preventDefault();
                 var formData = $(this).serialize();
@@ -219,6 +245,10 @@
                     data: formData,
                     success: function (data) {
                         $form.trigger('reset');
+                        score();
+                        $file.attr('data-value', data.id);
+                        $file.addClass('btn-danger');
+                        $file.removeClass('btn-default disabled');
                         toastr[status](msg, "<span class='uppercase'>"+ data.demand +"</span>");
                         toastr.options.preventDuplicates = true;
                         var row = '<tr id="output' + data.id + '" class="alert alert-info text-danger font-bold">' +
@@ -263,6 +293,17 @@
                     }
                 });
             });
+
+            function score()
+            {
+
+                $.get('score',function(data){
+                    $pieceenattente.html(data.pieceenattente);
+                    $('#count_attenterevision').html(data.revisionattente);
+                    $('#count_visitattente').html(data.visiteattente);
+                    $('#count_repairattente').html(data.reparationattente);
+                })
+            }
             $info.on('click', function () {
                 information(this)
             });
@@ -298,7 +339,8 @@
             var id = $(obj).attr('id');
             $.get('home/' + id, function (data) {
                 $car.html($(obj).attr('data-car'));
-                $ot.html($(obj).attr('data-ot'));
+                 $ot.html($(obj).attr('data-ot'));
+                 $('#state_id').val($(obj).attr('id_state'));
                 $demand.html($(obj).attr('data-demand'));
                 $demand_id.val(id);
                 $key.val($(obj).attr('data-key'));
@@ -309,7 +351,7 @@
                         '<input class="form-control input-sm" name="piece[]" value="' + modelObj.id + '" type="hidden"></td>' +
                         '<td>' + format(modelObj.quantity) + '</td><td>' + format(modelObj.delivered) + '' +
                         '<input name="delivered[]" value="' + modelObj.delivered + '" type="hidden"></td>' +
-                        '<td><select class="chosen-select input-sm form-control" id="' + i + '" name="reference[]" ' +
+                        '<td><select class=" input-sm form-control" id="' + i + '" name="reference[]" ' +
                         'onchange="infoReference(this)" required>' +
                         '<option selected disabled>Choissisez le stock</option>' +
                             @forelse($stocks as $key => $stock)
@@ -318,11 +360,24 @@
                                 '<option disabled>AUCUNE REFERENCE DISPONIBLE</option>' +
                             @endforelse
                                 ' </select></td><td><p class="text-danger-dker m-t-xs" id="qty' + i + '">...</p>' +
+                        '<td><p class="text-danger-dker m-t-xs" id="type' + i + '">...</p>' +
+                        '<input class=""form-control input-sm id="type'+i+'" type="hidden"></td>'+
                         '<input class="form-control input-sm" id="rest' + i + '" type="hidden"></td>' +
+                        '<td><p class="text-danger-dker m-t-xs" id="etage' + i + '">...</p>' +
+                         '<input class=""form-control input-sm id="etage'+i+'" type="hidden"></td>'+
+                        '<td><p class="text-danger-dker m-t-xs" id="casier' + i + '">...</p>' +
+                        '<input class=""form-control input-sm id="casier'+i+'" type="hidden"></td>'+
                         '<td><input class="form-control input-sm" name="quantity[]" data-id="' + i + '" id="quantity' + i + '" onchange="calcul($(this))"' +
                         'type="number"></td></tr>');
                     i++;
+
                 });
+                $(".custom-select").chosen({
+                    disable_search_threshold: 10,
+                    no_results_text: "Oops, rien n'a été trouvé!",
+                    width: "80%",
+                });
+
                 $modal_validate.modal('show');
                 $spinner.hide()
             })
@@ -333,11 +388,32 @@
                 quantity = $('#quantity' + id),
                 qty = $('#qty' + id),
                 rest = $('#rest' + id),
+                casier = $('#casier'+id),
+                etage = $('#etage'+id),
+                types = $('#type'+id)
                 type = "input";
             quantity.addClass('loading-input');
             $.get('references/' + ids + '/' + type, function (data) {
                 qty.html(data.qty);
                 rest.val(data.qty);
+                console.log(data.casier)
+                casier.html(data.casier);
+                etage.html(data.etage);
+                if(data.types==1)
+                {
+                    types.html("MOTEUR")
+                }
+
+                 else if(data.types==2)
+                {
+                    types.html("PNEU")
+
+                }
+                else{
+                    types.html("PIECE")
+                }
+
+
                 quantity.removeClass('loading-input');
             })
         }

@@ -22,6 +22,10 @@
                 <li><a href="#repair-pieces" data-toggle="tab"><i class="i i-stack"></i> Liste des piéces attribuées</a>
                 </li>
                 <li><a href="#repair-piece" data-toggle="tab"><i class="i i-stack2"></i> Demande des pieces</a></li>
+                @if(isset($item_stock))
+                <li><a href="#repair-moteur" data-toggle="tab"><i class="i i-stack2"></i> Gestion de moteur</a></li>
+                @endif
+                <li><a href="#repair-pneu" data-toggle="tab"><i class="i i-stack2"></i> Gestion de pneu</a></li>
             </ul>
         </li>
         @if($repair->state == 4)
@@ -77,6 +81,7 @@
                     <th width="90%">Piéces</th>
                     <th>Demandé</th>
                     <th>Attribué</th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -116,24 +121,221 @@
                 </tbody>
             </table>
         </div>
+        @if($item_stock)
+        <div class="tab-pane fade" id="repair-moteur">
+            <div class="panel-heading panel-danger alert-danger text-center">
+              GESTION DE MOTEUR
+            </div>
+            <div class="panel-body">
+                <div class="row form-group-sm">
+                    <div class="col-md-4">
+                        {{--{{$item_stock}}--}}
+                        <label class="text-info-dk"><b>REFERENCE</b> :  <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car">{{$item_stock->stock->reference}}</a></label>
+                    </div>
+                    {{--<div class="col-md-3 ">--}}
+                        {{--<input type="text" name="" class="form-control text-info" value="{{$item_stock->stock->reference}}" readonly>--}}
+                    {{--</div>--}}
+                    <div class="col-md-4">
+                        <label class="text-info-dk text-right"> <b>LIBELLE :</b>  <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car">{{$item_stock->stock->libelle}}</a> </label>
+                    </div>
+                    {{--<div class="col-md-3">--}}
+                        {{--<input type="text" name="" class="form-control text-danger" value="{{$item_stock->stock->libelle}}" readonly>--}}
+
+                    {{--</div>--}}
+                    <div class="col-md-4">
+                        <label class="text-info-dk text-right"> <b>km/s Initiale :</b>  <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car">{{$item_stock->stock->mileage}}</a>  </label>
+                    </div>
+
+                </div>
+                </br>
+
+                <div class="row form-group-sm">
+
+                    <div class="col-md-5">
+                        <label class="text-info-dker-dk text-right"> <b>km/s du moteur dans le véhicule :</b> <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car">{{$repair->diagnostic->statee->kilometer_engine}}</a>  </label>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-info-dker-dk text-right"> <b>km/s nouveau km moteur :</b> </label>
+
+                    </div>
+                    <div class="col-md-4">
+
+
+                        @if(isset($engine) and !empty($engine))
+
+                        <input type="text" name="new_kilometer"  @if($engine) value="{{$engine->kilometer ? $engine->kilometer : 0}}"  @endif placeholder="entrer le nouveau kilometrage" class="form-control text-danger">
+                            <input type="hidden" name="level_engine" value="{{$engine->level}}">
+                            @else
+                            <input type="text" name="new_kilometer"  value="0"   placeholder="entrer le nouveau kilometrage" class="form-control text-danger">
+
+                        @endif
+
+
+                    </div>
+
+
+                </div>
+                </br>
+                <div class="row form-group-sm">
+
+               <input type="hidden" name="item_stock_id" value="{{$item_stock->id}}" >
+                </div>
+
+
+            </div>
+        </div>
+        @endif
+        <div class="tab-pane fade" id="repair-pneu">
+
+
+            @foreach($item_tire_stock as $key=> $item_tire_stoc)
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{$key}}">
+                            <span class="text-info">Pneu n° {{$key+1}} </span>   ||    <u>Reference :  <strong class="text-danger"> {{$item_tire_stoc->stock->reference}}</strong> </u>  </a>
+                    </h4>
+                </div>
+                <div id="collapse{{$key}}" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        <div class="row form-group-sm">
+                            <div class="col-md-4">
+                                <label class="text-info-dk"><b>DOT</b> :  <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car">{{$item_tire_stoc->stock->dot}}</a></label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="text-info-dk text-right"> <b>LIBELLE :</b>  <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car">{{$item_tire_stoc->stock->libelle}}</a> </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="text-info-dk text-right"> <b>km/s Initiale :</b>  <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car">{{$item_tire_stoc->stock->mileage}}</a>  </label>
+                            </div>
+
+                        </div>
+                        </br>
+
+                        <div class="row form-group-sm">
+
+                            <div class="col-md-5">
+                                <label class="text-info-dk text-right"> <b> placement:</b> <a href="#" class="btn btn-xs btn-success m-t-xs capitalize" id="car">{{$item_tire_stoc->stock->sens_tire}}</a>  </label>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="text-info-dker-dk text-right"> <b>km/s du pneu :</b> </label>
+
+                            </div>
+                            <div class="col-md-4">
+                                @if(count($engine_tire)!=0)
+                                    @for($k=0;$k<count($engine_tire) ;$k++)
+
+
+
+                                    @if(count($engine_tire[$k]) !=0)
+
+                                        @if($engine_tire[$k][0]->item_stock_id==$item_tire_stoc->id)
+                                            <input type="text" name="new_kilometer_tire[]"
+                                       value="{{$engine_tire[$k][0]->kilometer}}" placeholder="entrer le nouveau kilometrage" class="form-control text-danger">
+
+                                            <input type="hidden" name="engine_tire_id[]" value="{{$engine_tire[$k][0]->id}}">
+                                            <input type="hidden" name="engine_tire_idd" value="1">
+
+                                        @else
+                                            <input type="text" name="new_kilometer_tire[]"
+                                                   value="0" placeholder="entrer le nouveau kilometrage" class="form-control text-danger">
+
+                                        @endif
+                                            @endif
+
+                                    @endfor
+                                    @else
+                                    <input type="text" name="new_kilometer_tire[]"
+                                           value="0" placeholder="entrer le nouveau kilometrage" class="form-control text-danger">
+
+
+                                @endif
+
+
+                            </div>
+
+
+                        </div>
+                        </br>
+                        <div class="row form-group-sm">
+
+                            <input type="hidden" name="item_stock_tire_id[]" value="{{$item_tire_stoc->id}}" >
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+                @endforeach
+
+
+        </div>
+
+
         <div class="tab-pane fade" id="repair-piece">
-            <a href="#"
-               class="btn btn-sm btn-info pull-right uppercase"
-               id="piece_add">
-                <i class="fa fa-plus-circle"></i>
-                Demande des pieces
-            </a>
-            <table class="table"
-                   id="pieceTable">
-                <thead>
-                <tr>
-                    <th>Pieces demandées</th>
-                    <th width="80">Qtés</th>
-                </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+
+            <div class="row">
+                <a href="#"
+                   class="btn btn-sm btn-info pull-right uppercase"
+                   id="piece_add">
+                    <i class="fa fa-plus-circle"></i>
+                    Demande des pieces
+                </a>
+                <table class="table"
+                       id="pieceTable">
+                    <thead>
+                    <tr>
+                        <th>Pieces demandées</th>
+                        <th width="80">Qtés</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            {{--<div class="row">--}}
+
+                {{--<table class="table table-striped m-b-none">--}}
+                    {{--<thead>--}}
+                        {{--<th width="10">Pièces demandées</th>--}}
+                        {{--<th width="10">Libellé</th>--}}
+                        {{--<th width="10">Qté</th>--}}
+                        {{--<th width="10">Km initiale</th>--}}
+                        {{--<th width="10">Km final</th>--}}
+                        {{--<th width="2">Dispo.</th>--}}
+                        {{--<th width="2">Quantité</th>--}}
+                    {{--</thead>--}}
+                    {{--<tr>--}}
+                        {{--<td>--}}
+                            {{--<select class="custom-select form-control input-sm uppercase col-md-6" name="diagnostic"--}}
+                                    {{--id="diagnostic" data-placeholder="la reference de la piece">--}}
+                                {{--<option></option>--}}
+                                {{--xxx--}}
+                                {{--@foreach($diagnostics as $diagnostic)--}}
+                                {{--<option value="{{$diagnostic->id}}" name="diagnostic"--}}
+                                {{--id="diagnostic{{$diagnostic->id}}"--}}
+                                {{--data-bus="{{$diagnostic->statee->bus->model->brand->name." ".$diagnostic->statee->bus->model->brand->name}}"--}}
+                                {{--data-matriculation="{{$diagnostic->statee->bus->matriculation}}">--}}
+                                {{--{{strtoupper($diagnostic->statee->reference)}}</option>--}}
+                                {{--@endforeach--}}
+                            {{--</select>--}}
+                        {{--</td>--}}
+
+                    {{--</tr>--}}
+
+                {{--</table>--}}
+                {{--<div class="col-md-4">--}}
+
+                {{--</div>--}}
+                {{--<div class="col-md-8">--}}
+                {{--</div>--}}
+
+
+            {{--</div>--}}
+
         </div>
         <div class="tab-pane fade" id="technicians">
             <div class="row">
@@ -236,4 +438,11 @@
         $('#reference_title' + count).val('');
         $('#reference_description' + count).val('');
     });
+
+    $(".custom-select").chosen({
+        disable_search_threshold: 10,
+        no_results_text: "Oops, rien n'a été trouvé!",
+        width: "80%",
+    });
+
 </script>

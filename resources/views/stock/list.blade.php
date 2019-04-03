@@ -42,12 +42,14 @@
                 <header class="header bg-white b-b clearfix">
                     <section class="panel col-md-4 panel-danger">
                         <div class="panel-body">
+                            <?php $site=\Illuminate\Support\Facades\Auth::user()->employee->site_id; ?>
                             <div class="b-b b-r">
                                 <a href="#" class="block padder-v hover">
                                     <span class="i-s i-s-2x pull-left m-r-sm">
                                     <i class="i i-hexagon2 i-s-base text-danger hover-rotate"></i>
                                     <i class="i i-plus2 text-white"></i></span><span class="clear">
-                                    <span class="h3 block m-t-xs text-danger">{{number_format(App\Stock::sum('total'))}} <sup>frs</sup></span>
+                                        <?php ?>
+                                    <span class="h3 block m-t-xs text-danger">{{number_format(App\Stock::where('site_id',$site)->sum('total'))}} <sup>frs</sup></span>
                                     <small class="text-black text-u-c">Total acquisition</small></span>
                                 </a>
                             </div>
@@ -58,7 +60,7 @@
                             <div class="b-b b-r"><a href="#" class="block padder-v hover">
                                     <span class="i-s i-s-2x pull-left m-r-sm"><i class="i i-hexagon2 i-s-base text-success-lt hover-rotate"></i>
                                         <i class="i i-users2 text-white"></i></span><span class="clear">
-                                            <span class="h3 block m-t-xs text-success">{{number_format(App\Supplier::count())}}</span>
+                                            <span class="h3 block m-t-xs text-success">{{number_format(App\Supplier::where('site_id',$site)->count())}}</span>
                                             <small class="text-black text-u-c">Fournisseurs</small></span>
                                 </a>
                             </div>
@@ -90,7 +92,7 @@
                                         <th>Categorie</th>
                                         <th>Sous categorie</th>
                                         <th>Qté</th>
-                                        <th>Fournisseur</th>
+                                        {{--<th>Fournisseur</th>--}}
                                         <th><i class="i i-calendar"></i> Creation</th>
                                     </tr>
                                     </thead>
@@ -104,7 +106,7 @@
                                             <td>{{$stock->sub_category->category->name}}</td>
                                             <td>{{$stock->sub_category->name}}</td>
                                             <td>{{$stock->quantity}}</td>
-                                            <td>{{$stock->supplier->name}}</td>
+
                                             <td>{{$stock->created_at->format('d/m/Y')}}</td>
                                         </tr>
                                     @endforeach
